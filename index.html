@@ -215,7 +215,7 @@
   <header class="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-3.5 py-3 bg-gradient-to-b from-slate-950/90 to-transparent max-w-[500px] mx-auto">
     <div class="flex items-center gap-2.5">
       <!-- Hamburger Menu Trigger -->
-      <button onclick="toggleSidebar(true)" aria-label="Open Menu" class="text-white hover:text-sky-400 p-1.5 rounded-lg active:scale-95 transition">
+      <button type="button" onclick="toggleSidebar(true)" aria-label="Open Menu" class="text-white hover:text-sky-400 p-1.5 rounded-lg active:scale-95 transition">
         <i class="fa-solid fa-bars text-2xl"></i>
       </button>
       <!-- Mplanet Brand Container -->
@@ -223,12 +223,12 @@
     </div>
 
     <div class="flex gap-3 text-base font-bold">
-      <button id="tab-following" onclick="switchFeed('following')" class="text-white/60 hover:text-white transition">Following</button>
+      <button id="tab-following" type="button" onclick="switchFeed('following')" class="text-white/60 hover:text-white transition">Following</button>
       <span class="text-white/30">|</span>
-      <button id="tab-foryou" onclick="switchFeed('foryou')" class="text-white border-b-2 border-orange-500 pb-0.5">For You</button>
+      <button id="tab-foryou" type="button" onclick="switchFeed('foryou')" class="text-white border-b-2 border-orange-500 pb-0.5">For You</button>
     </div>
 
-    <button onclick="openSearchModal()" class="text-white/90 hover:text-sky-400 p-1.5 transition">
+    <button type="button" onclick="openSearchModal()" aria-label="Search" class="text-white/90 hover:text-sky-400 p-1.5 transition">
       <i class="fa-solid fa-magnifying-glass text-xl"></i>
     </button>
   </header>
@@ -240,37 +240,34 @@
       <!-- Drawer Header with Coded Mplanet Logo -->
       <div class="flex items-center justify-between pb-4 border-b border-blue-500/20">
         <div class="mplanet-brand-lg logo-slot"></div>
-        <button onclick="toggleSidebar(false)" class="text-white/70 hover:text-orange-400 p-1.5 transition">
+        <button type="button" onclick="toggleSidebar(false)" aria-label="Close Menu" class="text-white/70 hover:text-orange-400 p-1.5 transition">
           <i class="fa-solid fa-xmark text-2xl"></i>
         </button>
       </div>
 
       <!-- Navigation Items -->
       <nav class="mt-6 flex flex-col gap-2 text-base">
-        <button onclick="toggleSidebar(false); switchFeed('foryou')" class="flex items-center gap-4 px-3.5 py-3 rounded-xl text-white hover:bg-blue-500/15 transition text-left font-semibold">
+        <button type="button" onclick="toggleSidebar(false); switchFeed('foryou')" class="w-full flex items-center gap-4 px-3.5 py-3 rounded-xl text-white hover:bg-blue-500/15 transition text-left font-semibold">
           <i class="fa-solid fa-house w-6 text-center text-xl text-sky-400"></i>
           <span>Home</span>
         </button>
 
-        <button onclick="toggleSidebar(false); openSearchModal()" class="flex items-center gap-4 px-3.5 py-3 rounded-xl text-white/90 hover:bg-blue-500/15 transition text-left font-semibold">
+        <button type="button" onclick="toggleSidebar(false); openSearchModal()" class="w-full flex items-center gap-4 px-3.5 py-3 rounded-xl text-white/90 hover:bg-blue-500/15 transition text-left font-semibold">
           <i class="fa-solid fa-compass w-6 text-center text-xl text-blue-400"></i>
           <span>Discover</span>
         </button>
 
-        <!-- Live Menu Button with Broadcast Icon -->
-        <button onclick="toggleSidebar(false); openLiveModal()" class="flex items-center justify-between px-3.5 py-3 rounded-xl text-white/95 hover:bg-orange-500/15 transition text-left font-semibold">
+        <!-- Classic Live Button Placed Cleanly in Menu -->
+        <button type="button" onclick="toggleSidebar(false); openLiveModal()" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-white hover:bg-orange-500/15 transition text-left font-semibold">
           <span class="flex items-center gap-4">
-            <i class="fa-solid fa-tower-broadcast w-6 text-center text-xl text-orange-500"></i>
+            <i class="fa-solid fa-video w-6 text-center text-xl text-orange-500"></i>
             <span>Live</span>
           </span>
-          <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-orange-500/20 text-orange-400 border border-orange-500/40">
-            <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-ping"></span>
-            LIVE
-          </span>
+          <span class="px-2 py-0.5 rounded bg-orange-500 text-white text-[11px] font-extrabold tracking-wide">LIVE</span>
         </button>
 
         <!-- Custom Planet Create / Upload Button -->
-        <button onclick="toggleSidebar(false); requireAuth(() => toggleModal('upload-modal', true))" class="planet-btn">
+        <button type="button" onclick="toggleSidebar(false); requireAuth(() => toggleModal('upload-modal', true))" class="planet-btn">
           <span class="planet-wrap">
             <span class="planet">🌍</span>
             <span class="ring"></span>
@@ -282,12 +279,12 @@
           </span>
         </button>
 
-        <button onclick="toggleSidebar(false); requireAuth(() => openInboxModal())" class="flex items-center gap-4 px-3.5 py-3 rounded-xl text-white/90 hover:bg-blue-500/15 transition text-left font-semibold">
+        <button type="button" onclick="toggleSidebar(false); requireAuth(() => openInboxModal())" class="w-full flex items-center gap-4 px-3.5 py-3 rounded-xl text-white/90 hover:bg-blue-500/15 transition text-left font-semibold">
           <i class="fa-regular fa-message w-6 text-center text-xl text-sky-300"></i>
           <span>Inbox</span>
         </button>
 
-        <button onclick="toggleSidebar(false); handleProfileNav()" class="flex items-center gap-4 px-3.5 py-3 rounded-xl text-white/90 hover:bg-blue-500/15 transition text-left font-semibold">
+        <button type="button" onclick="toggleSidebar(false); handleProfileNav()" class="w-full flex items-center gap-4 px-3.5 py-3 rounded-xl text-white/90 hover:bg-blue-500/15 transition text-left font-semibold">
           <i class="fa-regular fa-user w-6 text-center text-xl text-orange-400"></i>
           <span id="nav-profile-label">Profile</span>
         </button>
@@ -304,42 +301,43 @@
   <main id="video-feed" class="max-w-[500px] mx-auto relative"></main>
 
   <!-- Live Stream Modal -->
-  <div id="live-modal" class="hidden fixed inset-0 z-50 bg-slate-950/90 flex items-center justify-center p-4">
+  <div id="live-modal" onclick="if(event.target===this) closeLiveModal()" class="hidden fixed inset-0 z-50 bg-slate-950/90 flex items-center justify-center p-4">
     <div class="bg-slate-900 w-full max-w-md rounded-2xl p-5 border border-orange-500/35 shadow-2xl">
       <div class="flex justify-between items-center mb-4">
         <div class="flex items-center gap-2.5">
           <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-extrabold uppercase bg-orange-500 text-white">
-            <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+            <i class="fa-solid fa-video"></i>
             Mplanet Live
           </span>
         </div>
-        <button onclick="closeLiveModal()" class="text-white/60 hover:text-orange-400"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <button type="button" onclick="closeLiveModal()" aria-label="Back" class="text-white/60 hover:text-orange-400 p-1"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
       <div class="aspect-[9/12] w-full rounded-xl bg-slate-950 border border-blue-500/25 overflow-hidden relative flex flex-col items-center justify-center mb-4">
         <video id="live-preview-video" autoplay muted playsinline class="hidden w-full h-full object-cover"></video>
         <div id="live-placeholder" class="text-center p-6">
-          <i class="fa-solid fa-tower-broadcast text-4xl text-orange-500 mb-3"></i>
+          <i class="fa-solid fa-video text-4xl text-orange-500 mb-3"></i>
           <p class="font-bold text-lg text-white">Broadcast to Mplanet</p>
           <p class="text-sm text-slate-400 mt-1">Start your camera preview or watch active creator rooms.</p>
         </div>
       </div>
       <div class="flex gap-2.5">
-        <button onclick="startLivePreview()" class="flex-1 bg-gradient-to-r from-blue-600 to-orange-500 py-3 rounded-xl font-bold text-base shadow-lg">
+        <button type="button" onclick="startLivePreview()" class="flex-1 bg-gradient-to-r from-blue-600 to-orange-500 py-3 rounded-xl font-bold text-base shadow-lg">
           <i class="fa-solid fa-video mr-1.5"></i> Go Live Now
         </button>
-        <button onclick="closeLiveModal()" class="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 font-semibold text-base">
-          Close
+        <button type="button" onclick="closeLiveModal()" class="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 font-semibold text-base">
+          Back
         </button>
       </div>
     </div>
   </div>
 
   <!-- Comments Drawer Modal -->
-  <div id="comments-modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 flex items-end justify-center">
+  <div id="comments-modal" onclick="if(event.target===this) toggleModal('comments-modal', false)" class="hidden fixed inset-0 z-50 bg-slate-950/70 flex items-end justify-center">
     <div class="bg-slate-900 border-t border-blue-500/25 w-full max-w-[500px] h-[65dvh] rounded-t-2xl flex flex-col p-4">
       <div class="flex justify-between items-center border-b border-blue-500/20 pb-2.5">
+        <button type="button" onclick="toggleModal('comments-modal', false)" aria-label="Back" class="text-white/70 hover:text-sky-400 p-1"><i class="fa-solid fa-arrow-left text-lg"></i></button>
         <span id="comments-count-header" class="font-bold text-base text-sky-300">Comments</span>
-        <button onclick="toggleModal('comments-modal', false)" class="text-white/70 hover:text-orange-400"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <button type="button" onclick="toggleModal('comments-modal', false)" aria-label="Close Comments" class="text-white/70 hover:text-orange-400 p-1"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
       <div id="comments-list" class="flex-1 overflow-y-auto py-3 space-y-3 text-base"></div>
       <form onsubmit="submitComment(event)" class="flex gap-2 pt-2.5 border-t border-blue-500/20">
@@ -350,11 +348,14 @@
   </div>
 
   <!-- Upload Video Modal -->
-  <div id="upload-modal" class="hidden fixed inset-0 z-50 bg-slate-950/85 flex items-center justify-center p-4">
+  <div id="upload-modal" onclick="if(event.target===this) toggleModal('upload-modal', false)" class="hidden fixed inset-0 z-50 bg-slate-950/85 flex items-center justify-center p-4">
     <div class="bg-slate-900 w-full max-w-md rounded-2xl p-5 border border-blue-500/30">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="font-bold text-xl bg-gradient-to-r from-sky-400 to-orange-400 bg-clip-text text-transparent">Post to Mplanet</h2>
-        <button onclick="toggleModal('upload-modal', false)" class="text-white/60 hover:text-orange-400"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <div class="flex items-center gap-2.5">
+          <button type="button" onclick="toggleModal('upload-modal', false)" aria-label="Back" class="text-white/70 hover:text-sky-400 p-1"><i class="fa-solid fa-arrow-left text-lg"></i></button>
+          <h2 class="font-bold text-xl bg-gradient-to-r from-sky-400 to-orange-400 bg-clip-text text-transparent">Post to Mplanet</h2>
+        </div>
+        <button type="button" onclick="toggleModal('upload-modal', false)" aria-label="Close Upload" class="text-white/60 hover:text-orange-400 p-1"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
       <form onsubmit="handleVideoUpload(event)" class="space-y-4">
         <div>
@@ -375,11 +376,14 @@
   </div>
 
   <!-- Auth Modal (Login / Sign Up) -->
-  <div id="auth-modal" class="hidden fixed inset-0 z-50 bg-slate-950/90 flex items-center justify-center p-4">
+  <div id="auth-modal" onclick="if(event.target===this) toggleModal('auth-modal', false)" class="hidden fixed inset-0 z-50 bg-slate-950/90 flex items-center justify-center p-4">
     <div class="bg-slate-900 w-full max-w-sm rounded-2xl p-6 border border-blue-500/30">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="font-bold text-2xl bg-gradient-to-r from-sky-400 to-orange-400 bg-clip-text text-transparent">Join Mplanet</h2>
-        <button onclick="toggleModal('auth-modal', false)" class="text-white/60 hover:text-orange-400"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <div class="flex items-center gap-2.5">
+          <button type="button" onclick="toggleModal('auth-modal', false)" aria-label="Back" class="text-white/70 hover:text-sky-400 p-1"><i class="fa-solid fa-arrow-left text-lg"></i></button>
+          <h2 class="font-bold text-2xl bg-gradient-to-r from-sky-400 to-orange-400 bg-clip-text text-transparent">Join Mplanet</h2>
+        </div>
+        <button type="button" onclick="toggleModal('auth-modal', false)" aria-label="Close Auth" class="text-white/60 hover:text-orange-400 p-1"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
       <form onsubmit="handleAuth(event)" class="space-y-3.5">
         <input id="auth-username" type="text" placeholder="Username (for new accounts)" class="w-full bg-slate-800 rounded-xl p-3.5 text-base outline-none focus:ring-1 focus:ring-blue-500" />
@@ -396,9 +400,9 @@
   <!-- Profile Modal -->
   <div id="profile-modal" class="hidden fixed inset-0 z-50 bg-slate-950 flex flex-col max-w-[500px] mx-auto">
     <div class="flex justify-between items-center p-4 border-b border-blue-500/20">
-      <button onclick="toggleModal('profile-modal', false)" class="hover:text-sky-400"><i class="fa-solid fa-arrow-left text-xl"></i></button>
+      <button type="button" onclick="toggleModal('profile-modal', false)" aria-label="Back" class="hover:text-sky-400 p-1"><i class="fa-solid fa-arrow-left text-xl"></i></button>
       <span id="profile-header-username" class="font-bold text-base">@user</span>
-      <button onclick="logoutUser()" class="text-sm text-orange-400 hover:text-orange-300 font-semibold">Log out</button>
+      <button type="button" onclick="logoutUser()" class="text-sm text-orange-400 hover:text-orange-300 font-semibold">Log out</button>
     </div>
     <div class="p-6 flex flex-col items-center text-center border-b border-blue-500/20">
       <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-blue-600 via-sky-400 to-orange-500 flex items-center justify-center text-3xl font-bold mb-3 shadow-lg shadow-blue-950" id="profile-avatar">M</div>
@@ -416,7 +420,7 @@
   <!-- Search / Discover Modal -->
   <div id="search-modal" class="hidden fixed inset-0 z-50 bg-slate-950 flex flex-col max-w-[500px] mx-auto p-4">
     <div class="flex items-center gap-3 mb-4">
-      <button onclick="toggleModal('search-modal', false)" class="hover:text-sky-400"><i class="fa-solid fa-arrow-left text-xl"></i></button>
+      <button type="button" onclick="toggleModal('search-modal', false)" aria-label="Back" class="hover:text-sky-400 p-1"><i class="fa-solid fa-arrow-left text-xl"></i></button>
       <input id="search-input" oninput="filterVideos(this.value)" type="text" placeholder="Search captions, #hashtags, creators..." class="flex-1 bg-slate-800 rounded-full px-4 py-2.5 text-base outline-none focus:ring-1 focus:ring-orange-500" />
     </div>
     <div id="search-results" class="grid grid-cols-2 gap-2.5 overflow-y-auto"></div>
@@ -449,6 +453,9 @@
     let authMode = 'login';
     let isMuted = false;
     let liveMediaStream = null;
+    let ignoreNextPopstate = false;
+
+    const MODAL_IDS = ['live-modal', 'comments-modal', 'upload-modal', 'auth-modal', 'profile-modal', 'search-modal'];
 
     const DEMO_VIDEOS = [
       {
@@ -474,17 +481,40 @@
     ];
 
     // ==========================================
-    // 2. SIDEBAR DRAWER, LIVE & INITIALIZATION
+    // 2. SIDEBAR DRAWER, LIVE, BACK NAV & INIT
     // ==========================================
+    function isDrawerOpen() {
+      return !document.getElementById('menu-drawer').classList.contains('-translate-x-full');
+    }
+
+    function getOpenModalId() {
+      return MODAL_IDS.find(id => !document.getElementById(id).classList.contains('hidden')) || null;
+    }
+
+    function pushOverlayState() {
+      if (window.history && (!window.history.state || !window.history.state.mplanetOverlay)) {
+        window.history.pushState({ mplanetOverlay: true }, '');
+      }
+    }
+
+    function popOverlayStateIfNeeded() {
+      if (window.history && window.history.state && window.history.state.mplanetOverlay) {
+        ignoreNextPopstate = true;
+        window.history.back();
+      }
+    }
+
     function toggleSidebar(open) {
       const drawer = document.getElementById('menu-drawer');
       const backdrop = document.getElementById('menu-drawer-backdrop');
       if (open) {
         backdrop.classList.remove('hidden');
         drawer.classList.remove('-translate-x-full');
+        pushOverlayState();
       } else {
         backdrop.classList.add('hidden');
         drawer.classList.add('-translate-x-full');
+        if (!getOpenModalId()) popOverlayStateIfNeeded();
       }
     }
 
@@ -504,7 +534,7 @@
       }
     }
 
-    function closeLiveModal() {
+    function closeLiveModal(fromPopstate = false) {
       if (liveMediaStream) {
         liveMediaStream.getTracks().forEach(t => t.stop());
         liveMediaStream = null;
@@ -513,8 +543,54 @@
       preview.srcObject = null;
       preview.classList.add('hidden');
       document.getElementById('live-placeholder').classList.remove('hidden');
-      toggleModal('live-modal', false);
+      document.getElementById('live-modal').classList.add('hidden');
+      if (!fromPopstate && !isDrawerOpen()) popOverlayStateIfNeeded();
     }
+
+    function toggleModal(id, show, fromPopstate = false) {
+      if (id === 'live-modal' && !show) {
+        closeLiveModal(fromPopstate);
+        return;
+      }
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.toggle('hidden', !show);
+      if (show) {
+        pushOverlayState();
+      } else if (!fromPopstate && !isDrawerOpen() && !getOpenModalId()) {
+        popOverlayStateIfNeeded();
+      }
+    }
+
+    window.addEventListener('popstate', () => {
+      if (ignoreNextPopstate) {
+        ignoreNextPopstate = false;
+        return;
+      }
+      const openModal = getOpenModalId();
+      if (openModal) {
+        if (openModal === 'live-modal') {
+          closeLiveModal(true);
+        } else {
+          document.getElementById(openModal).classList.add('hidden');
+        }
+        return;
+      }
+      if (isDrawerOpen()) {
+        document.getElementById('menu-drawer-backdrop').classList.add('hidden');
+        document.getElementById('menu-drawer').classList.add('-translate-x-full');
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      const openModal = getOpenModalId();
+      if (openModal) {
+        toggleModal(openModal, false);
+      } else if (isDrawerOpen()) {
+        toggleSidebar(false);
+      }
+    });
 
     async function initApp() {
       const { data: { session } } = await sb.auth.getSession();
@@ -651,37 +727,37 @@
                   </div>
                 </div>
                 ${showFollowBtn ? `
-                <button onclick="toggleFollow('${creator.id}', this)" class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-orange-500 text-white text-xs flex items-center justify-center shadow">
+                <button type="button" onclick="toggleFollow('${creator.id}', this)" class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-orange-500 text-white text-xs flex items-center justify-center shadow">
                   <i class="fa-solid fa-plus"></i>
                 </button>` : ''}
               </div>
 
               <!-- Like Button -->
-              <button onclick="toggleLike('${v.id}')" class="flex items-center gap-1.5 active:scale-110 transition">
+              <button type="button" onclick="toggleLike('${v.id}')" class="flex items-center gap-1.5 active:scale-110 transition">
                 <i id="like-icon-${v.id}" class="fa-solid fa-heart text-2xl ${isLiked ? 'text-orange-500' : 'text-white'}"></i>
                 <span id="like-count-${v.id}" class="text-sm font-bold">${v.likes_count || 0}</span>
               </button>
 
               <!-- Comments Button -->
-              <button onclick="openComments('${v.id}')" class="flex items-center gap-1.5 active:scale-110 transition">
+              <button type="button" onclick="openComments('${v.id}')" class="flex items-center gap-1.5 active:scale-110 transition">
                 <i class="fa-solid fa-comment-dots text-2xl text-sky-300"></i>
                 <span id="comment-count-${v.id}" class="text-sm font-bold">${v.comments_count || 0}</span>
               </button>
 
               <!-- Bookmark / Save Button -->
-              <button onclick="toggleSave('${v.id}')" class="flex items-center gap-1.5 active:scale-110 transition">
+              <button type="button" onclick="toggleSave('${v.id}')" class="flex items-center gap-1.5 active:scale-110 transition">
                 <i id="save-icon-${v.id}" class="fa-solid fa-bookmark text-2xl ${isSaved ? 'text-blue-400' : 'text-white'}"></i>
                 <span id="save-count-${v.id}" class="text-sm font-bold">${v.saves_count || 0}</span>
               </button>
 
               <!-- Share Button -->
-              <button onclick="shareVideo('${v.id}', '${creator.username}')" class="flex items-center gap-1.5 active:scale-110 transition">
+              <button type="button" onclick="shareVideo('${v.id}', '${creator.username}')" class="flex items-center gap-1.5 active:scale-110 transition">
                 <i class="fa-solid fa-share text-2xl text-white"></i>
                 <span class="text-sm font-bold">Share</span>
               </button>
 
               <!-- Spinning Sound Disc / Mute Toggle -->
-              <button onclick="toggleMuteAll()" title="Toggle Mute" class="relative w-10 h-10 rounded-full bg-slate-900 border-2 border-blue-500/60 flex items-center justify-center spinning-disc">
+              <button type="button" onclick="toggleMuteAll()" title="Toggle Mute" class="relative w-10 h-10 rounded-full bg-slate-900 border-2 border-blue-500/60 flex items-center justify-center spinning-disc">
                 <i class="mute-icon fa-solid ${isMuted ? 'fa-volume-xmark text-orange-400' : 'fa-music text-sky-400'} text-sm"></i>
               </button>
 
@@ -933,10 +1009,6 @@
 
     function openInboxModal() {
       alert('Notifications: You are all caught up on likes, comments, and new followers!');
-    }
-
-    function toggleModal(id, show) {
-      document.getElementById(id).classList.toggle('hidden', !show);
     }
 
     function escapeHtml(str) {
