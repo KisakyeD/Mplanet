@@ -13,7 +13,7 @@
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body, html {
-      margin: 0; padding: 0; background-color: #000; color: #fff;
+      margin: 0; padding: 0; background-color: #030712; color: #fff;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       overflow: hidden; height: 100%; width: 100%;
     }
@@ -26,7 +26,7 @@
     .video-card {
       position: relative; height: 100dvh; width: 100%;
       scroll-snap-align: start; scroll-snap-stop: always;
-      background: #0a0a0a; display: flex; align-items: center; justify-content: center;
+      background: #050b18; display: flex; align-items: center; justify-content: center;
     }
     video {
       width: 100%; height: 100%; object-fit: cover; max-width: 500px;
@@ -42,7 +42,7 @@
       100% { transform: scale(1.6); opacity: 0; }
     }
     .heart-burst {
-      position: absolute; pointer-events: none; color: #ff2a5f;
+      position: absolute; pointer-events: none; color: #f97316;
       font-size: 5rem; animation: heartPop 0.7s ease-out forwards;
     }
   </style>
@@ -50,71 +50,71 @@
 <body>
 
   <!-- Top Header Navigation with Top-Left Hamburger Button -->
-  <header class="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/75 to-transparent max-w-[500px] mx-auto">
+  <header class="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-slate-950/85 to-transparent max-w-[500px] mx-auto">
     <div class="flex items-center gap-3">
       <!-- Hamburger Menu Trigger -->
-      <button onclick="toggleSidebar(true)" aria-label="Open Menu" class="text-white hover:text-cyan-400 p-1.5 rounded-lg active:scale-95 transition">
+      <button onclick="toggleSidebar(true)" aria-label="Open Menu" class="text-white hover:text-sky-400 p-1.5 rounded-lg active:scale-95 transition">
         <i class="fa-solid fa-bars text-xl"></i>
       </button>
-      <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent">Mplanet</span>
+      <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-sky-400 via-blue-500 to-orange-500 bg-clip-text text-transparent">Mplanet</span>
     </div>
 
     <div class="flex gap-3 text-sm font-semibold">
       <button id="tab-following" onclick="switchFeed('following')" class="text-white/60 hover:text-white transition">Following</button>
       <span class="text-white/30">|</span>
-      <button id="tab-foryou" onclick="switchFeed('foryou')" class="text-white border-b-2 border-white pb-0.5">For You</button>
+      <button id="tab-foryou" onclick="switchFeed('foryou')" class="text-white border-b-2 border-orange-500 pb-0.5">For You</button>
     </div>
 
-    <button onclick="openSearchModal()" class="text-white/90 hover:text-white p-1.5">
+    <button onclick="openSearchModal()" class="text-white/90 hover:text-sky-400 p-1.5 transition">
       <i class="fa-solid fa-magnifying-glass text-lg"></i>
     </button>
   </header>
 
   <!-- Slide-Out Hamburger Menu Drawer -->
-  <div id="menu-drawer-backdrop" onclick="toggleSidebar(false)" class="hidden fixed inset-0 z-40 bg-black/70 backdrop-blur-xs transition-opacity"></div>
-  <aside id="menu-drawer" class="fixed top-0 left-0 bottom-0 z-50 w-72 bg-zinc-950 border-r border-white/10 p-5 flex flex-col justify-between transform -translate-x-full transition-transform duration-200 ease-out">
+  <div id="menu-drawer-backdrop" onclick="toggleSidebar(false)" class="hidden fixed inset-0 z-40 bg-slate-950/75 backdrop-blur-xs transition-opacity"></div>
+  <aside id="menu-drawer" class="fixed top-0 left-0 bottom-0 z-50 w-72 bg-slate-950 border-r border-blue-500/20 p-5 flex flex-col justify-between transform -translate-x-full transition-transform duration-200 ease-out">
     <div>
       <!-- Drawer Header -->
-      <div class="flex items-center justify-between pb-5 border-b border-white/10">
-        <span class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent">Mplanet</span>
-        <button onclick="toggleSidebar(false)" class="text-white/70 hover:text-white p-1.5">
+      <div class="flex items-center justify-between pb-5 border-b border-blue-500/20">
+        <span class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-sky-400 via-blue-500 to-orange-500 bg-clip-text text-transparent">Mplanet</span>
+        <button onclick="toggleSidebar(false)" class="text-white/70 hover:text-orange-400 p-1.5 transition">
           <i class="fa-solid fa-xmark text-xl"></i>
         </button>
       </div>
 
       <!-- Navigation Items -->
       <nav class="mt-6 flex flex-col gap-2">
-        <button onclick="toggleSidebar(false); switchFeed('foryou')" class="flex items-center gap-4 px-3 py-3 rounded-xl text-white hover:bg-white/10 transition text-left font-medium">
-          <i class="fa-solid fa-house w-5 text-center text-lg text-cyan-400"></i>
+        <button onclick="toggleSidebar(false); switchFeed('foryou')" class="flex items-center gap-4 px-3 py-3 rounded-xl text-white hover:bg-blue-500/15 transition text-left font-medium">
+          <i class="fa-solid fa-house w-5 text-center text-lg text-sky-400"></i>
           <span>Home</span>
         </button>
 
-        <button onclick="toggleSidebar(false); openSearchModal()" class="flex items-center gap-4 px-3 py-3 rounded-xl text-white/90 hover:bg-white/10 transition text-left font-medium">
-          <i class="fa-solid fa-compass w-5 text-center text-lg text-zinc-300"></i>
+        <button onclick="toggleSidebar(false); openSearchModal()" class="flex items-center gap-4 px-3 py-3 rounded-xl text-white/90 hover:bg-blue-500/15 transition text-left font-medium">
+          <i class="fa-solid fa-compass w-5 text-center text-lg text-blue-400"></i>
           <span>Discover</span>
         </button>
 
-        <button onclick="toggleSidebar(false); requireAuth(() => toggleModal('upload-modal', true))" class="flex items-center gap-4 px-3 py-3 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 transition text-left font-semibold my-1">
-          <span class="w-6 h-5 rounded-md bg-white text-black flex items-center justify-center text-xs shadow-[-2px_0_0_#25F4EE,2px_0_0_#FE2C55]">
+        <button onclick="toggleSidebar(false); requireAuth(() => toggleModal('upload-modal', true))" class="flex items-center gap-4 px-3 py-3 rounded-xl bg-gradient-to-r from-blue-600/20 to-orange-500/20 hover:from-blue-600/30 hover:to-orange-500/30 border border-blue-500/30 transition text-left font-semibold my-1">
+          <span class="w-6 h-5 rounded-md bg-white text-slate-950 flex items-center justify-center text-xs shadow-[-2px_0_0_#38BDF8,2px_0_0_#F97316]">
             <i class="fa-solid fa-plus"></i>
           </span>
           <span>Create / Upload</span>
         </button>
 
-        <button onclick="toggleSidebar(false); requireAuth(() => openInboxModal())" class="flex items-center gap-4 px-3 py-3 rounded-xl text-white/90 hover:bg-white/10 transition text-left font-medium">
-          <i class="fa-regular fa-message w-5 text-center text-lg text-zinc-300"></i>
+        <button onclick="toggleSidebar(false); requireAuth(() => openInboxModal())" class="flex items-center gap-4 px-3 py-3 rounded-xl text-white/90 hover:bg-blue-500/15 transition text-left font-medium">
+          <i class="fa-regular fa-message w-5 text-center text-lg text-sky-300"></i>
           <span>Inbox</span>
         </button>
 
-        <button onclick="toggleSidebar(false); handleProfileNav()" class="flex items-center gap-4 px-3 py-3 rounded-xl text-white/90 hover:bg-white/10 transition text-left font-medium">
-          <i class="fa-regular fa-user w-5 text-center text-lg text-pink-400"></i>
+        <button onclick="toggleSidebar(false); handleProfileNav()" class="flex items-center gap-4 px-3 py-3 rounded-xl text-white/90 hover:bg-blue-500/15 transition text-left font-medium">
+          <i class="fa-regular fa-user w-5 text-center text-lg text-orange-400"></i>
           <span id="nav-profile-label">Profile</span>
         </button>
       </nav>
     </div>
 
     <!-- Bottom Drawer Footer -->
-    <div class="pt-4 border-t border-white/10 text-xs text-white/40">
+    <div class="pt-4 border-t border-blue-500/20 text-xs text-slate-400">
       Mplanet Creator Platform
     </div>
   </aside>
@@ -123,89 +123,89 @@
   <main id="video-feed" class="max-w-[500px] mx-auto relative"></main>
 
   <!-- Comments Drawer Modal -->
-  <div id="comments-modal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-end justify-center">
-    <div class="bg-zinc-900 w-full max-w-[500px] h-[65dvh] rounded-t-2xl flex flex-col p-4">
-      <div class="flex justify-between items-center border-b border-white/10 pb-2">
-        <span id="comments-count-header" class="font-bold text-sm">Comments</span>
-        <button onclick="toggleModal('comments-modal', false)" class="text-white/70 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+  <div id="comments-modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 flex items-end justify-center">
+    <div class="bg-slate-900 border-t border-blue-500/25 w-full max-w-[500px] h-[65dvh] rounded-t-2xl flex flex-col p-4">
+      <div class="flex justify-between items-center border-b border-blue-500/20 pb-2">
+        <span id="comments-count-header" class="font-bold text-sm text-sky-300">Comments</span>
+        <button onclick="toggleModal('comments-modal', false)" class="text-white/70 hover:text-orange-400"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <div id="comments-list" class="flex-1 overflow-y-auto py-3 space-y-3 text-sm"></div>
-      <form onsubmit="submitComment(event)" class="flex gap-2 pt-2 border-t border-white/10">
-        <input id="comment-input" type="text" placeholder="Add a comment..." required class="flex-1 bg-zinc-800 rounded-full px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-pink-500" />
-        <button type="submit" class="bg-pink-600 hover:bg-pink-500 px-4 py-2 rounded-full text-sm font-semibold">Post</button>
+      <form onsubmit="submitComment(event)" class="flex gap-2 pt-2 border-t border-blue-500/20">
+        <input id="comment-input" type="text" placeholder="Add a comment..." required class="flex-1 bg-slate-800 rounded-full px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-orange-500" />
+        <button type="submit" class="bg-gradient-to-r from-blue-600 to-orange-500 hover:opacity-95 px-4 py-2 rounded-full text-sm font-semibold">Post</button>
       </form>
     </div>
   </div>
 
   <!-- Upload Video Modal -->
-  <div id="upload-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-    <div class="bg-zinc-900 w-full max-w-md rounded-2xl p-5 border border-white/10">
+  <div id="upload-modal" class="hidden fixed inset-0 z-50 bg-slate-950/85 flex items-center justify-center p-4">
+    <div class="bg-slate-900 w-full max-w-md rounded-2xl p-5 border border-blue-500/30">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="font-bold text-lg">Post to Mplanet</h2>
-        <button onclick="toggleModal('upload-modal', false)" class="text-white/60 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <h2 class="font-bold text-lg bg-gradient-to-r from-sky-400 to-orange-400 bg-clip-text text-transparent">Post to Mplanet</h2>
+        <button onclick="toggleModal('upload-modal', false)" class="text-white/60 hover:text-orange-400"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <form onsubmit="handleVideoUpload(event)" class="space-y-4">
         <div>
-          <label class="block text-xs text-white/70 mb-1">Select MP4 / WebM Video</label>
-          <input id="video-file" type="file" accept="video/mp4,video/webm" required class="w-full text-sm text-zinc-300 file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-pink-600 file:text-white hover:file:bg-pink-500" />
+          <label class="block text-xs text-sky-300/80 mb-1">Select MP4 / WebM Video</label>
+          <input id="video-file" type="file" accept="video/mp4,video/webm" required class="w-full text-sm text-slate-300 file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-orange-500 file:text-white hover:file:bg-orange-400" />
         </div>
         <div>
-          <label class="block text-xs text-white/70 mb-1">Caption & Hashtags</label>
-          <textarea id="video-caption" rows="2" placeholder="Describe your video... #mplanet #viral" required class="w-full bg-zinc-800 rounded-xl p-3 text-sm outline-none"></textarea>
+          <label class="block text-xs text-sky-300/80 mb-1">Caption & Hashtags</label>
+          <textarea id="video-caption" rows="2" placeholder="Describe your video... #mplanet #viral" required class="w-full bg-slate-800 rounded-xl p-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"></textarea>
         </div>
         <div>
-          <label class="block text-xs text-white/70 mb-1">Sound / Track Name</label>
-          <input id="video-music" type="text" placeholder="Original Sound" class="w-full bg-zinc-800 rounded-xl p-2.5 text-sm outline-none" />
+          <label class="block text-xs text-sky-300/80 mb-1">Sound / Track Name</label>
+          <input id="video-music" type="text" placeholder="Original Sound" class="w-full bg-slate-800 rounded-xl p-2.5 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
         </div>
-        <button id="upload-btn" type="submit" class="w-full bg-gradient-to-r from-cyan-500 to-pink-600 py-2.5 rounded-xl font-bold text-sm">Publish Video</button>
+        <button id="upload-btn" type="submit" class="w-full bg-gradient-to-r from-blue-600 to-orange-500 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-950/50">Publish Video</button>
       </form>
     </div>
   </div>
 
   <!-- Auth Modal (Login / Sign Up) -->
-  <div id="auth-modal" class="hidden fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
-    <div class="bg-zinc-900 w-full max-w-sm rounded-2xl p-6 border border-white/10">
+  <div id="auth-modal" class="hidden fixed inset-0 z-50 bg-slate-950/90 flex items-center justify-center p-4">
+    <div class="bg-slate-900 w-full max-w-sm rounded-2xl p-6 border border-blue-500/30">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="font-bold text-xl">Join Mplanet</h2>
-        <button onclick="toggleModal('auth-modal', false)" class="text-white/60 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        <h2 class="font-bold text-xl bg-gradient-to-r from-sky-400 to-orange-400 bg-clip-text text-transparent">Join Mplanet</h2>
+        <button onclick="toggleModal('auth-modal', false)" class="text-white/60 hover:text-orange-400"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <form onsubmit="handleAuth(event)" class="space-y-3">
-        <input id="auth-username" type="text" placeholder="Username (for new accounts)" class="w-full bg-zinc-800 rounded-xl p-3 text-sm outline-none" />
-        <input id="auth-email" type="email" placeholder="Email address" required class="w-full bg-zinc-800 rounded-xl p-3 text-sm outline-none" />
-        <input id="auth-password" type="password" placeholder="Password (min 6 chars)" required class="w-full bg-zinc-800 rounded-xl p-3 text-sm outline-none" />
+        <input id="auth-username" type="text" placeholder="Username (for new accounts)" class="w-full bg-slate-800 rounded-xl p-3 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+        <input id="auth-email" type="email" placeholder="Email address" required class="w-full bg-slate-800 rounded-xl p-3 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+        <input id="auth-password" type="password" placeholder="Password (min 6 chars)" required class="w-full bg-slate-800 rounded-xl p-3 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
         <div class="flex gap-2 pt-2">
-          <button type="submit" onclick="authMode='login'" class="flex-1 bg-zinc-700 hover:bg-zinc-600 py-2.5 rounded-xl font-semibold text-sm">Log In</button>
-          <button type="submit" onclick="authMode='signup'" class="flex-1 bg-pink-600 hover:bg-pink-500 py-2.5 rounded-xl font-semibold text-sm">Sign Up</button>
+          <button type="submit" onclick="authMode='login'" class="flex-1 bg-blue-600 hover:bg-blue-500 py-2.5 rounded-xl font-semibold text-sm transition">Log In</button>
+          <button type="submit" onclick="authMode='signup'" class="flex-1 bg-orange-500 hover:bg-orange-400 py-2.5 rounded-xl font-semibold text-sm transition">Sign Up</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- Profile Modal -->
-  <div id="profile-modal" class="hidden fixed inset-0 z-50 bg-black flex flex-col max-w-[500px] mx-auto">
-    <div class="flex justify-between items-center p-4 border-b border-white/10">
-      <button onclick="toggleModal('profile-modal', false)"><i class="fa-solid fa-arrow-left text-lg"></i></button>
+  <div id="profile-modal" class="hidden fixed inset-0 z-50 bg-slate-950 flex flex-col max-w-[500px] mx-auto">
+    <div class="flex justify-between items-center p-4 border-b border-blue-500/20">
+      <button onclick="toggleModal('profile-modal', false)" class="hover:text-sky-400"><i class="fa-solid fa-arrow-left text-lg"></i></button>
       <span id="profile-header-username" class="font-bold">@user</span>
-      <button onclick="logoutUser()" class="text-xs text-red-400 font-semibold">Log out</button>
+      <button onclick="logoutUser()" class="text-xs text-orange-400 hover:text-orange-300 font-semibold">Log out</button>
     </div>
-    <div class="p-6 flex flex-col items-center text-center border-b border-white/10">
-      <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-cyan-400 to-pink-500 flex items-center justify-center text-2xl font-bold mb-3" id="profile-avatar">M</div>
+    <div class="p-6 flex flex-col items-center text-center border-b border-blue-500/20">
+      <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-blue-600 via-sky-400 to-orange-500 flex items-center justify-center text-2xl font-bold mb-3 shadow-lg shadow-blue-950" id="profile-avatar">M</div>
       <h3 id="profile-display-name" class="font-bold text-lg">@username</h3>
-      <p id="profile-bio" class="text-xs text-white/60 mt-1">Creator on Mplanet</p>
+      <p id="profile-bio" class="text-xs text-slate-400 mt-1">Creator on Mplanet</p>
       <div class="flex gap-6 mt-4 text-sm">
-        <div><span id="stat-following" class="font-bold block">0</span><span class="text-white/50 text-xs">Following</span></div>
-        <div><span id="stat-followers" class="font-bold block">0</span><span class="text-white/50 text-xs">Followers</span></div>
-        <div><span id="stat-videos" class="font-bold block">0</span><span class="text-white/50 text-xs">Videos</span></div>
+        <div><span id="stat-following" class="font-bold block text-sky-400">0</span><span class="text-slate-400 text-xs">Following</span></div>
+        <div><span id="stat-followers" class="font-bold block text-orange-400">0</span><span class="text-slate-400 text-xs">Followers</span></div>
+        <div><span id="stat-videos" class="font-bold block text-white">0</span><span class="text-slate-400 text-xs">Videos</span></div>
       </div>
     </div>
     <div id="profile-videos-grid" class="grid grid-cols-3 gap-0.5 p-0.5 overflow-y-auto flex-1"></div>
   </div>
 
   <!-- Search / Discover Modal -->
-  <div id="search-modal" class="hidden fixed inset-0 z-50 bg-black flex flex-col max-w-[500px] mx-auto p-4">
+  <div id="search-modal" class="hidden fixed inset-0 z-50 bg-slate-950 flex flex-col max-w-[500px] mx-auto p-4">
     <div class="flex items-center gap-3 mb-4">
-      <button onclick="toggleModal('search-modal', false)"><i class="fa-solid fa-arrow-left text-lg"></i></button>
-      <input id="search-input" oninput="filterVideos(this.value)" type="text" placeholder="Search captions, #hashtags, creators..." class="flex-1 bg-zinc-800 rounded-full px-4 py-2 text-sm outline-none" />
+      <button onclick="toggleModal('search-modal', false)" class="hover:text-sky-400"><i class="fa-solid fa-arrow-left text-lg"></i></button>
+      <input id="search-input" oninput="filterVideos(this.value)" type="text" placeholder="Search captions, #hashtags, creators..." class="flex-1 bg-slate-800 rounded-full px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-orange-500" />
     </div>
     <div id="search-results" class="grid grid-cols-2 gap-2 overflow-y-auto"></div>
   </div>
@@ -232,8 +232,8 @@
       {
         id: 'demo-1',
         video_url: 'https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-1282-large.mp4',
-        caption: 'Welcome to Mplanet! Neon vibes tonight #mplanet #dance #viral',
-        music_name: 'Midnight Pulse - Mplanet Audio',
+        caption: 'Welcome to Mplanet! Cosmic vibes tonight #mplanet #dance #viral',
+        music_name: 'Orbit Pulse - Mplanet Audio',
         likes_count: 1420,
         comments_count: 34,
         saves_count: 56,
@@ -334,8 +334,8 @@
     // 3. FEED LOADING & INTERSECTION OBSERVER
     // ==========================================
     async function loadFeed(mode = 'foryou') {
-      document.getElementById('tab-foryou').className = mode === 'foryou' ? 'text-white border-b-2 border-white pb-0.5' : 'text-white/60 hover:text-white transition';
-      document.getElementById('tab-following').className = mode === 'following' ? 'text-white border-b-2 border-white pb-0.5' : 'text-white/60 hover:text-white transition';
+      document.getElementById('tab-foryou').className = mode === 'foryou' ? 'text-white border-b-2 border-orange-500 pb-0.5' : 'text-white/60 hover:text-white transition';
+      document.getElementById('tab-following').className = mode === 'following' ? 'text-white border-b-2 border-orange-500 pb-0.5' : 'text-white/60 hover:text-white transition';
 
       let query = sb.from('videos').select('*, profiles(id, username, avatar_url)').order('created_at', { ascending: false });
       if (mode === 'following' && currentUser) {
@@ -378,49 +378,49 @@
           <video src="${v.video_url}" loop playsinline onclick="togglePlayPause(this)"></video>
 
           <!-- Bottom Gradient Overlay & Action Bar -->
-          <div class="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/95 via-black/70 to-transparent pt-12 pb-4 px-4">
+          <div class="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-slate-950/95 via-slate-950/75 to-transparent pt-12 pb-4 px-4">
             
             <!-- Creator Info, Caption & Audio -->
             <div class="mb-3 pointer-events-none">
-              <h3 class="font-bold text-base mb-1">@${creator.username}</h3>
-              <p class="text-sm text-white/90 line-clamp-2 mb-1.5">${escapeHtml(v.caption || '')}</p>
-              <div class="flex items-center gap-2 text-xs text-white/75">
+              <h3 class="font-bold text-base mb-1 text-sky-300">@${creator.username}</h3>
+              <p class="text-sm text-white/95 line-clamp-2 mb-1.5">${escapeHtml(v.caption || '')}</p>
+              <div class="flex items-center gap-2 text-xs text-orange-300/90">
                 <i class="fa-solid fa-music"></i>
                 <span class="truncate max-w-[260px]">${escapeHtml(v.music_name || 'Original Sound')}</span>
               </div>
             </div>
 
             <!-- Transferred Bottom Action Buttons Row -->
-            <div class="flex items-center justify-between pt-2.5 border-t border-white/15">
+            <div class="flex items-center justify-between pt-2.5 border-t border-blue-500/20">
               
               <!-- Creator Avatar + Follow -->
               <div class="relative flex items-center">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-cyan-400 to-pink-500 p-0.5">
-                  <div class="w-full h-full rounded-full bg-zinc-900 flex items-center justify-center font-bold text-sm uppercase">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 via-sky-400 to-orange-500 p-0.5">
+                  <div class="w-full h-full rounded-full bg-slate-950 flex items-center justify-center font-bold text-sm uppercase">
                     ${creator.username[0]}
                   </div>
                 </div>
                 ${showFollowBtn ? `
-                <button onclick="toggleFollow('${creator.id}', this)" class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-pink-600 text-white text-[10px] flex items-center justify-center shadow">
+                <button onclick="toggleFollow('${creator.id}', this)" class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-orange-500 text-white text-[10px] flex items-center justify-center shadow">
                   <i class="fa-solid fa-plus"></i>
                 </button>` : ''}
               </div>
 
               <!-- Like Button -->
               <button onclick="toggleLike('${v.id}')" class="flex items-center gap-1.5 active:scale-110 transition">
-                <i id="like-icon-${v.id}" class="fa-solid fa-heart text-xl ${isLiked ? 'text-pink-500' : 'text-white'}"></i>
+                <i id="like-icon-${v.id}" class="fa-solid fa-heart text-xl ${isLiked ? 'text-orange-500' : 'text-white'}"></i>
                 <span id="like-count-${v.id}" class="text-xs font-semibold">${v.likes_count || 0}</span>
               </button>
 
               <!-- Comments Button -->
               <button onclick="openComments('${v.id}')" class="flex items-center gap-1.5 active:scale-110 transition">
-                <i class="fa-solid fa-comment-dots text-xl text-white"></i>
+                <i class="fa-solid fa-comment-dots text-xl text-sky-300"></i>
                 <span id="comment-count-${v.id}" class="text-xs font-semibold">${v.comments_count || 0}</span>
               </button>
 
               <!-- Bookmark / Save Button -->
               <button onclick="toggleSave('${v.id}')" class="flex items-center gap-1.5 active:scale-110 transition">
-                <i id="save-icon-${v.id}" class="fa-solid fa-bookmark text-xl ${isSaved ? 'text-amber-400' : 'text-white'}"></i>
+                <i id="save-icon-${v.id}" class="fa-solid fa-bookmark text-xl ${isSaved ? 'text-blue-400' : 'text-white'}"></i>
                 <span id="save-count-${v.id}" class="text-xs font-semibold">${v.saves_count || 0}</span>
               </button>
 
@@ -431,8 +431,8 @@
               </button>
 
               <!-- Spinning Sound Disc / Mute Toggle -->
-              <button onclick="toggleMuteAll()" title="Toggle Mute" class="relative w-9 h-9 rounded-full bg-zinc-800 border-2 border-zinc-600 flex items-center justify-center spinning-disc">
-                <i class="mute-icon fa-solid ${isMuted ? 'fa-volume-xmark text-red-400' : 'fa-music text-pink-400'} text-xs"></i>
+              <button onclick="toggleMuteAll()" title="Toggle Mute" class="relative w-9 h-9 rounded-full bg-slate-900 border-2 border-blue-500/60 flex items-center justify-center spinning-disc">
+                <i class="mute-icon fa-solid ${isMuted ? 'fa-volume-xmark text-orange-400' : 'fa-music text-sky-400'} text-xs"></i>
               </button>
 
             </div>
@@ -472,7 +472,7 @@
       isMuted = !isMuted;
       document.querySelectorAll('video').forEach(v => v.muted = isMuted);
       document.querySelectorAll('.mute-icon').forEach(i => {
-        i.className = `mute-icon fa-solid ${isMuted ? 'fa-volume-xmark text-red-400' : 'fa-music text-pink-400'} text-xs`;
+        i.className = `mute-icon fa-solid ${isMuted ? 'fa-volume-xmark text-orange-400' : 'fa-music text-sky-400'} text-xs`;
       });
     }
 
@@ -496,7 +496,7 @@
       const iconEl = document.getElementById(`save-icon-${videoId}`);
       const isSaved = savedVideoIds.has(videoId);
       isSaved ? savedVideoIds.delete(videoId) : savedVideoIds.add(videoId);
-      iconEl.classList.toggle('text-amber-400', !isSaved);
+      iconEl.classList.toggle('text-blue-400', !isSaved);
       iconEl.classList.toggle('text-white', isSaved);
       countEl.textContent = Math.max(0, parseInt(countEl.textContent) + (isSaved ? -1 : 1));
     }
@@ -507,7 +507,7 @@
         const iconEl = document.getElementById(`like-icon-${videoId}`);
         const liked = likedVideoIds.has(videoId);
         liked ? likedVideoIds.delete(videoId) : likedVideoIds.add(videoId);
-        iconEl.classList.toggle('text-pink-500', !liked);
+        iconEl.classList.toggle('text-orange-500', !liked);
         iconEl.classList.toggle('text-white', liked);
         countEl.textContent = parseInt(countEl.textContent) + (liked ? -1 : 1);
         return;
@@ -527,7 +527,7 @@
           await sb.from('likes').insert({ user_id: currentUser.id, video_id: videoId });
         }
         await sb.from('videos').update({ likes_count: newCount }).eq('id', videoId);
-        iconEl.classList.toggle('text-pink-500', !isLiked);
+        iconEl.classList.toggle('text-orange-500', !isLiked);
         iconEl.classList.toggle('text-white', isLiked);
         countEl.textContent = newCount;
       });
@@ -546,20 +546,20 @@
       activeVideoIdForComments = videoId;
       toggleModal('comments-modal', true);
       const list = document.getElementById('comments-list');
-      list.innerHTML = `<p class="text-white/50 text-center">Loading comments...</p>`;
+      list.innerHTML = `<p class="text-slate-400 text-center">Loading comments...</p>`;
 
       if (videoId.startsWith('demo-')) {
-        list.innerHTML = `<div class="bg-zinc-800/60 p-3 rounded-xl"><span class="font-bold text-cyan-400">@alex_ug</span>: Love Mplanet! 🔥</div>`;
+        list.innerHTML = `<div class="bg-slate-800/80 p-3 rounded-xl border border-blue-500/15"><span class="font-bold text-sky-400">@alex_ug</span>: Love Mplanet! 🚀🔥</div>`;
         return;
       }
 
       const { data } = await sb.from('comments').select('*, profiles(username)').eq('video_id', videoId).order('created_at', { ascending: true });
       list.innerHTML = (data || []).map(c => `
-        <div class="bg-zinc-800/60 p-2.5 rounded-xl">
-          <span class="font-bold text-cyan-400 text-xs">@${c.profiles?.username || 'user'}</span>
-          <p class="text-white/90 mt-0.5">${escapeHtml(c.content)}</p>
+        <div class="bg-slate-800/80 p-2.5 rounded-xl border border-blue-500/15">
+          <span class="font-bold text-sky-400 text-xs">@${c.profiles?.username || 'user'}</span>
+          <p class="text-white/95 mt-0.5">${escapeHtml(c.content)}</p>
         </div>
-      `).join('') || `<p class="text-white/50 text-center">No comments yet. Be the first!</p>`;
+      `).join('') || `<p class="text-slate-400 text-center">No comments yet. Be the first!</p>`;
     }
 
     async function submitComment(e) {
@@ -569,7 +569,7 @@
       if (!content || !activeVideoIdForComments) return;
 
       if (activeVideoIdForComments.startsWith('demo-')) {
-        document.getElementById('comments-list').innerHTML += `<div class="bg-zinc-800/60 p-2.5 rounded-xl"><span class="font-bold text-pink-400">@you</span>: ${escapeHtml(content)}</div>`;
+        document.getElementById('comments-list').innerHTML += `<div class="bg-slate-800/80 p-2.5 rounded-xl border border-orange-500/20"><span class="font-bold text-orange-400">@you</span>: ${escapeHtml(content)}</div>`;
         input.value = '';
         return;
       }
@@ -641,9 +641,9 @@
         const { data: myVideos } = await sb.from('videos').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
         document.getElementById('stat-videos').textContent = (myVideos || []).length;
         document.getElementById('profile-videos-grid').innerHTML = (myVideos || []).map(v => `
-          <div class="aspect-[9/16] bg-zinc-900 relative">
+          <div class="aspect-[9/16] bg-slate-900 relative">
             <video src="${v.video_url}" class="w-full h-full object-cover" muted></video>
-            <span class="absolute bottom-1 left-1 text-[10px] bg-black/60 px-1.5 rounded"><i class="fa-solid fa-heart text-pink-500"></i> ${v.likes_count}</span>
+            <span class="absolute bottom-1 left-1 text-[10px] bg-slate-950/75 px-1.5 rounded"><i class="fa-solid fa-heart text-orange-500"></i> ${v.likes_count}</span>
           </div>
         `).join('');
       });
@@ -661,11 +661,11 @@
         (v.profiles?.username || '').toLowerCase().includes(q)
       );
       document.getElementById('search-results').innerHTML = matches.map(v => `
-        <div onclick="toggleModal('search-modal', false)" class="aspect-[9/16] bg-zinc-900 rounded-xl overflow-hidden relative cursor-pointer">
+        <div onclick="toggleModal('search-modal', false)" class="aspect-[9/16] bg-slate-900 border border-blue-500/20 rounded-xl overflow-hidden relative cursor-pointer">
           <video src="${v.video_url}" class="w-full h-full object-cover" muted></video>
-          <div class="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-black to-transparent text-xs">
-            <p class="truncate font-semibold">@${v.profiles?.username || 'user'}</p>
-            <p class="truncate text-white/70">${escapeHtml(v.caption || '')}</p>
+          <div class="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-slate-950 to-transparent text-xs">
+            <p class="truncate font-semibold text-sky-300">@${v.profiles?.username || 'user'}</p>
+            <p class="truncate text-white/75">${escapeHtml(v.caption || '')}</p>
           </div>
         </div>
       `).join('');
