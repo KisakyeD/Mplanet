@@ -49,47 +49,78 @@
 </head>
 <body>
 
-  <!-- Top Header Navigation -->
-  <header class="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/70 to-transparent max-w-[500px] mx-auto">
-    <div class="flex items-center gap-1.5 font-extrabold text-lg tracking-tight">
-      <span class="bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent">Mplanet</span>
+  <!-- Top Header Navigation with Top-Left Hamburger Button -->
+  <header class="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/75 to-transparent max-w-[500px] mx-auto">
+    <div class="flex items-center gap-3">
+      <!-- Hamburger Menu Trigger -->
+      <button onclick="toggleSidebar(true)" aria-label="Open Menu" class="text-white hover:text-cyan-400 p-1.5 rounded-lg active:scale-95 transition">
+        <i class="fa-solid fa-bars text-xl"></i>
+      </button>
+      <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent">Mplanet</span>
     </div>
-    <div class="flex gap-4 text-sm font-semibold">
+
+    <div class="flex gap-3 text-sm font-semibold">
       <button id="tab-following" onclick="switchFeed('following')" class="text-white/60 hover:text-white transition">Following</button>
       <span class="text-white/30">|</span>
       <button id="tab-foryou" onclick="switchFeed('foryou')" class="text-white border-b-2 border-white pb-0.5">For You</button>
     </div>
-    <button onclick="openSearchModal()" class="text-white/90 hover:text-white p-1">
+
+    <button onclick="openSearchModal()" class="text-white/90 hover:text-white p-1.5">
       <i class="fa-solid fa-magnifying-glass text-lg"></i>
     </button>
   </header>
 
+  <!-- Slide-Out Hamburger Menu Drawer -->
+  <div id="menu-drawer-backdrop" onclick="toggleSidebar(false)" class="hidden fixed inset-0 z-40 bg-black/70 backdrop-blur-xs transition-opacity"></div>
+  <aside id="menu-drawer" class="fixed top-0 left-0 bottom-0 z-50 w-72 bg-zinc-950 border-r border-white/10 p-5 flex flex-col justify-between transform -translate-x-full transition-transform duration-200 ease-out">
+    <div>
+      <!-- Drawer Header -->
+      <div class="flex items-center justify-between pb-5 border-b border-white/10">
+        <span class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent">Mplanet</span>
+        <button onclick="toggleSidebar(false)" class="text-white/70 hover:text-white p-1.5">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Navigation Items -->
+      <nav class="mt-6 flex flex-col gap-2">
+        <button onclick="toggleSidebar(false); switchFeed('foryou')" class="flex items-center gap-4 px-3 py-3 rounded-xl text-white hover:bg-white/10 transition text-left font-medium">
+          <i class="fa-solid fa-house w-5 text-center text-lg text-cyan-400"></i>
+          <span>Home</span>
+        </button>
+
+        <button onclick="toggleSidebar(false); openSearchModal()" class="flex items-center gap-4 px-3 py-3 rounded-xl text-white/90 hover:bg-white/10 transition text-left font-medium">
+          <i class="fa-solid fa-compass w-5 text-center text-lg text-zinc-300"></i>
+          <span>Discover</span>
+        </button>
+
+        <button onclick="toggleSidebar(false); requireAuth(() => toggleModal('upload-modal', true))" class="flex items-center gap-4 px-3 py-3 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 transition text-left font-semibold my-1">
+          <span class="w-6 h-5 rounded-md bg-white text-black flex items-center justify-center text-xs shadow-[-2px_0_0_#25F4EE,2px_0_0_#FE2C55]">
+            <i class="fa-solid fa-plus"></i>
+          </span>
+          <span>Create / Upload</span>
+        </button>
+
+        <button onclick="toggleSidebar(false); requireAuth(() => openInboxModal())" class="flex items-center gap-4 px-3 py-3 rounded-xl text-white/90 hover:bg-white/10 transition text-left font-medium">
+          <i class="fa-regular fa-message w-5 text-center text-lg text-zinc-300"></i>
+          <span>Inbox</span>
+        </button>
+
+        <button onclick="toggleSidebar(false); handleProfileNav()" class="flex items-center gap-4 px-3 py-3 rounded-xl text-white/90 hover:bg-white/10 transition text-left font-medium">
+          <i class="fa-regular fa-user w-5 text-center text-lg text-pink-400"></i>
+          <span id="nav-profile-label">Profile</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Bottom Drawer Footer -->
+    <div class="pt-4 border-t border-white/10 text-xs text-white/40">
+      Mplanet Creator Platform
+    </div>
+  </aside>
+
   <!-- Main Vertical Video Feed -->
   <main id="video-feed" class="max-w-[500px] mx-auto relative"></main>
-
-  <!-- Bottom Navigation Bar -->
-  <nav class="fixed bottom-0 left-0 right-0 z-30 bg-black/95 border-t border-white/10 h-14 flex items-center justify-around max-w-[500px] mx-auto">
-    <button onclick="switchFeed('foryou')" class="flex flex-col items-center text-white text-xs gap-1">
-      <i class="fa-solid fa-house text-lg"></i>
-      <span>Home</span>
-    </button>
-    <button onclick="openSearchModal()" class="flex flex-col items-center text-white/60 hover:text-white text-xs gap-1">
-      <i class="fa-solid fa-compass text-lg"></i>
-      <span>Discover</span>
-    </button>
-    <!-- Upload Button -->
-    <button onclick="requireAuth(() => toggleModal('upload-modal', true))" class="relative flex items-center justify-center w-11 h-7 rounded-lg bg-white text-black font-bold shadow-[ -3px_0_0_#25F4EE,3px_0_0_#FE2C55 ] active:scale-95 transition">
-      <i class="fa-solid fa-plus text-sm"></i>
-    </button>
-    <button onclick="requireAuth(() => openInboxModal())" class="flex flex-col items-center text-white/60 hover:text-white text-xs gap-1">
-      <i class="fa-regular fa-message text-lg"></i>
-      <span>Inbox</span>
-    </button>
-    <button onclick="handleProfileNav()" class="flex flex-col items-center text-white/60 hover:text-white text-xs gap-1">
-      <i class="fa-regular fa-user text-lg"></i>
-      <span id="nav-profile-label">Profile</span>
-    </button>
-  </nav>
 
   <!-- Comments Drawer Modal -->
   <div id="comments-modal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-end justify-center">
@@ -191,12 +222,12 @@
     let currentProfile = null;
     let allVideos = [];
     let likedVideoIds = new Set();
+    let savedVideoIds = new Set();
     let followingIds = new Set();
     let activeVideoIdForComments = null;
     let authMode = 'login';
     let isMuted = false;
 
-    // Fallback demo videos if database is empty on first launch
     const DEMO_VIDEOS = [
       {
         id: 'demo-1',
@@ -205,6 +236,7 @@
         music_name: 'Midnight Pulse - Mplanet Audio',
         likes_count: 1420,
         comments_count: 34,
+        saves_count: 56,
         profiles: { id: 'demo-u1', username: 'maya_vibes' }
       },
       {
@@ -214,13 +246,26 @@
         music_name: 'Acoustic Breeze - Original',
         likes_count: 890,
         comments_count: 19,
+        saves_count: 24,
         profiles: { id: 'demo-u2', username: 'kampala_explorer' }
       }
     ];
 
     // ==========================================
-    // 2. INITIALIZATION & AUTH
+    // 2. SIDEBAR DRAWER & INITIALIZATION
     // ==========================================
+    function toggleSidebar(open) {
+      const drawer = document.getElementById('menu-drawer');
+      const backdrop = document.getElementById('menu-drawer-backdrop');
+      if (open) {
+        backdrop.classList.remove('hidden');
+        drawer.classList.remove('-translate-x-full');
+      } else {
+        backdrop.classList.add('hidden');
+        drawer.classList.add('-translate-x-full');
+      }
+    }
+
     async function initApp() {
       const { data: { session } } = await sb.auth.getSession();
       if (session?.user) {
@@ -231,9 +276,9 @@
 
     async function setAuthenticatedUser(user) {
       currentUser = user;
-      document.getElementById('nav-profile-label').textContent = 'Me';
       const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
       currentProfile = profile;
+      document.getElementById('nav-profile-label').textContent = profile?.username ? `Profile (@${profile.username})` : 'Profile (Me)';
 
       const { data: likes } = await sb.from('likes').select('video_id').eq('user_id', user.id);
       likedVideoIds = new Set((likes || []).map(l => l.video_id));
@@ -323,6 +368,7 @@
 
       container.innerHTML = videos.map(v => {
         const isLiked = likedVideoIds.has(v.id);
+        const isSaved = savedVideoIds.has(v.id);
         const creator = v.profiles || { id: v.user_id, username: 'mplanet_user' };
         const isFollowing = followingIds.has(creator.id);
         const showFollowBtn = (!currentUser || currentUser.id !== creator.id) && !isFollowing;
@@ -331,57 +377,64 @@
         <div class="video-card" data-id="${v.id}" ondblclick="doubleTapLike(event, '${v.id}')">
           <video src="${v.video_url}" loop playsinline onclick="togglePlayPause(this)"></video>
 
-          <!-- Right Action Sidebar -->
-          <div class="absolute right-3 bottom-20 z-20 flex flex-col items-center gap-5">
-            <!-- Creator Avatar + Follow -->
-            <div class="relative mb-1">
-              <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-cyan-400 to-pink-500 p-0.5">
-                <div class="w-full h-full rounded-full bg-zinc-900 flex items-center justify-center font-bold text-sm uppercase">
-                  ${creator.username[0]}
-                </div>
+          <!-- Bottom Gradient Overlay & Action Bar -->
+          <div class="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/95 via-black/70 to-transparent pt-12 pb-4 px-4">
+            
+            <!-- Creator Info, Caption & Audio -->
+            <div class="mb-3 pointer-events-none">
+              <h3 class="font-bold text-base mb-1">@${creator.username}</h3>
+              <p class="text-sm text-white/90 line-clamp-2 mb-1.5">${escapeHtml(v.caption || '')}</p>
+              <div class="flex items-center gap-2 text-xs text-white/75">
+                <i class="fa-solid fa-music"></i>
+                <span class="truncate max-w-[260px]">${escapeHtml(v.music_name || 'Original Sound')}</span>
               </div>
-              ${showFollowBtn ? `
-              <button onclick="toggleFollow('${creator.id}', this)" class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-pink-600 text-white text-xs flex items-center justify-center shadow">
-                <i class="fa-solid fa-plus"></i>
-              </button>` : ''}
             </div>
 
-            <!-- Like Button -->
-            <button onclick="toggleLike('${v.id}')" class="flex flex-col items-center gap-1">
-              <i id="like-icon-${v.id}" class="fa-solid fa-heart text-2xl ${isLiked ? 'text-pink-500' : 'text-white'} transition-transform active:scale-125"></i>
-              <span id="like-count-${v.id}" class="text-xs font-semibold">${v.likes_count || 0}</span>
-            </button>
+            <!-- Transferred Bottom Action Buttons Row -->
+            <div class="flex items-center justify-between pt-2.5 border-t border-white/15">
+              
+              <!-- Creator Avatar + Follow -->
+              <div class="relative flex items-center">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-cyan-400 to-pink-500 p-0.5">
+                  <div class="w-full h-full rounded-full bg-zinc-900 flex items-center justify-center font-bold text-sm uppercase">
+                    ${creator.username[0]}
+                  </div>
+                </div>
+                ${showFollowBtn ? `
+                <button onclick="toggleFollow('${creator.id}', this)" class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-pink-600 text-white text-[10px] flex items-center justify-center shadow">
+                  <i class="fa-solid fa-plus"></i>
+                </button>` : ''}
+              </div>
 
-            <!-- Comments Button -->
-            <button onclick="openComments('${v.id}')" class="flex flex-col items-center gap-1">
-              <i class="fa-solid fa-comment-dots text-2xl text-white"></i>
-              <span id="comment-count-${v.id}" class="text-xs font-semibold">${v.comments_count || 0}</span>
-            </button>
+              <!-- Like Button -->
+              <button onclick="toggleLike('${v.id}')" class="flex items-center gap-1.5 active:scale-110 transition">
+                <i id="like-icon-${v.id}" class="fa-solid fa-heart text-xl ${isLiked ? 'text-pink-500' : 'text-white'}"></i>
+                <span id="like-count-${v.id}" class="text-xs font-semibold">${v.likes_count || 0}</span>
+              </button>
 
-            <!-- Share Button -->
-            <button onclick="shareVideo('${v.id}', '${creator.username}')" class="flex flex-col items-center gap-1">
-              <i class="fa-solid fa-share text-2xl text-white"></i>
-              <span class="text-xs font-semibold">Share</span>
-            </button>
+              <!-- Comments Button -->
+              <button onclick="openComments('${v.id}')" class="flex items-center gap-1.5 active:scale-110 transition">
+                <i class="fa-solid fa-comment-dots text-xl text-white"></i>
+                <span id="comment-count-${v.id}" class="text-xs font-semibold">${v.comments_count || 0}</span>
+              </button>
 
-            <!-- Mute Toggle -->
-            <button onclick="toggleMuteAll()" class="w-9 h-9 rounded-full bg-black/50 flex items-center justify-center text-white/90">
-              <i class="mute-icon fa-solid ${isMuted ? 'fa-volume-xmark' : 'fa-volume-high'} text-sm"></i>
-            </button>
+              <!-- Bookmark / Save Button -->
+              <button onclick="toggleSave('${v.id}')" class="flex items-center gap-1.5 active:scale-110 transition">
+                <i id="save-icon-${v.id}" class="fa-solid fa-bookmark text-xl ${isSaved ? 'text-amber-400' : 'text-white'}"></i>
+                <span id="save-count-${v.id}" class="text-xs font-semibold">${v.saves_count || 0}</span>
+              </button>
 
-            <!-- Spinning Sound Disc -->
-            <div class="w-10 h-10 rounded-full bg-zinc-800 border-4 border-zinc-700 flex items-center justify-center spinning-disc mt-1">
-              <i class="fa-solid fa-music text-xs text-pink-400"></i>
-            </div>
-          </div>
+              <!-- Share Button -->
+              <button onclick="shareVideo('${v.id}', '${creator.username}')" class="flex items-center gap-1.5 active:scale-110 transition">
+                <i class="fa-solid fa-share text-xl text-white"></i>
+                <span class="text-xs font-semibold">Share</span>
+              </button>
 
-          <!-- Bottom Metadata Overlay -->
-          <div class="absolute left-3 right-16 bottom-16 z-20 pointer-events-none">
-            <h3 class="font-bold text-base mb-1">@${creator.username}</h3>
-            <p class="text-sm text-white/90 line-clamp-2 mb-2">${escapeHtml(v.caption || '')}</p>
-            <div class="flex items-center gap-2 text-xs text-white/80">
-              <i class="fa-solid fa-music"></i>
-              <span class="truncate max-w-[220px]">${escapeHtml(v.music_name || 'Original Sound')}</span>
+              <!-- Spinning Sound Disc / Mute Toggle -->
+              <button onclick="toggleMuteAll()" title="Toggle Mute" class="relative w-9 h-9 rounded-full bg-zinc-800 border-2 border-zinc-600 flex items-center justify-center spinning-disc">
+                <i class="mute-icon fa-solid ${isMuted ? 'fa-volume-xmark text-red-400' : 'fa-music text-pink-400'} text-xs"></i>
+              </button>
+
             </div>
           </div>
         </div>`;
@@ -419,12 +472,12 @@
       isMuted = !isMuted;
       document.querySelectorAll('video').forEach(v => v.muted = isMuted);
       document.querySelectorAll('.mute-icon').forEach(i => {
-        i.className = `mute-icon fa-solid ${isMuted ? 'fa-volume-xmark' : 'fa-volume-high'} text-sm`;
+        i.className = `mute-icon fa-solid ${isMuted ? 'fa-volume-xmark text-red-400' : 'fa-music text-pink-400'} text-xs`;
       });
     }
 
     // ==========================================
-    // 4. LIKES, COMMENTS, FOLLOWS & UPLOAD
+    // 4. LIKES, SAVES, COMMENTS, FOLLOWS & UPLOAD
     // ==========================================
     function doubleTapLike(e, videoId) {
       const card = e.currentTarget;
@@ -436,6 +489,16 @@
       setTimeout(() => heart.remove(), 750);
 
       if (!likedVideoIds.has(videoId)) toggleLike(videoId);
+    }
+
+    function toggleSave(videoId) {
+      const countEl = document.getElementById(`save-count-${videoId}`);
+      const iconEl = document.getElementById(`save-icon-${videoId}`);
+      const isSaved = savedVideoIds.has(videoId);
+      isSaved ? savedVideoIds.delete(videoId) : savedVideoIds.add(videoId);
+      iconEl.classList.toggle('text-amber-400', !isSaved);
+      iconEl.classList.toggle('text-white', isSaved);
+      countEl.textContent = Math.max(0, parseInt(countEl.textContent) + (isSaved ? -1 : 1));
     }
 
     async function toggleLike(videoId) {
