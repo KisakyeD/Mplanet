@@ -54,45 +54,61 @@
     }
     .planet-wrap {
       position: relative;
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      overflow: visible;
     }
     .planet-wrap .planet {
-      font-size: 26px;
+      position: relative;
+      font-size: 24px;
       line-height: 1;
       z-index: 2;
-      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.5));
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.55));
     }
+    /* Full tilted ring cradling the planet */
     .planet-wrap .ring {
       position: absolute;
-      width: 44px;
-      height: 13px;
-      border: 2px solid #fb923c;
+      width: 46px;
+      height: 14px;
+      border: 2.2px solid #fb923c;
+      border-top-color: rgba(251, 146, 60, 0.45);
+      border-bottom-color: #fdba74;
       border-radius: 50%;
-      transform: rotate(-22deg);
-      box-shadow: 0 0 8px rgba(249, 115, 22, 0.65);
+      transform: rotate(-20deg);
+      box-shadow: 0 0 9px rgba(249, 115, 22, 0.7), inset 0 0 4px rgba(253, 186, 116, 0.5);
       z-index: 3;
       pointer-events: none;
     }
+    /* Front arc crossing in front of the planet */
+    .planet-wrap .ring::after {
+      content: "";
+      position: absolute;
+      inset: -2.2px;
+      border: 2.4px solid transparent;
+      border-bottom-color: #ffedd5;
+      border-left-color: #fb923c;
+      border-right-color: #f97316;
+      border-radius: 50%;
+    }
     .planet-wrap .plus-star {
       position: absolute;
-      top: -2px;
-      right: -3px;
-      width: 18px;
-      height: 18px;
+      top: -1px;
+      right: -2px;
+      width: 17px;
+      height: 17px;
       border-radius: 50%;
       background: linear-gradient(135deg, #38bdf8, #f97316);
       color: #fff;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 900;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 8px rgba(249, 115, 22, 0.8);
+      box-shadow: 0 0 8px rgba(249, 115, 22, 0.85);
       z-index: 4;
     }
     .btn-text {
