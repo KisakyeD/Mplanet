@@ -134,6 +134,24 @@
     </svg>
   </template>
 
+  <template id="mtn-logo-svg">
+    <svg viewBox="0 0 120 48" class="h-7 w-auto shrink-0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MTN">
+      <rect x="2" y="2" width="116" height="44" rx="10" fill="#FFCC00" />
+      <ellipse cx="60" cy="24" rx="44" ry="16" fill="none" stroke="#111827" stroke-width="3.2" />
+      <text x="60" y="30" text-anchor="middle" font-family="'Arial Black', Impact, sans-serif" font-weight="900" font-size="18" letter-spacing="1.5" fill="#111827">MTN</text>
+    </svg>
+  </template>
+
+  <template id="airtel-logo-svg">
+    <svg viewBox="0 0 120 48" class="h-7 w-auto shrink-0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Airtel">
+      <rect x="2" y="2" width="116" height="44" rx="10" fill="#E60000" />
+      <path d="M24 27 C20 27 18 24 19 20 C20 15 26 12 31 14 C35 16 36 22 33 27 C31 30 27 32 23 31"
+            fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" />
+      <circle cx="28" cy="21" r="2.2" fill="#FFFFFF" />
+      <text x="72" y="30" text-anchor="middle" font-family="'Trebuchet MS', 'Segoe UI', sans-serif" font-weight="800" font-size="19" letter-spacing="-0.4" fill="#FFFFFF">airtel</text>
+    </svg>
+  </template>
+
   <!-- Top Header Navigation -->
   <header class="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-3.5 py-3 bg-gradient-to-b from-slate-950/90 to-transparent max-w-[500px] mx-auto">
     <div class="flex items-center gap-2.5">
@@ -424,11 +442,18 @@
   <script>
     (function mountLogos() {
       const tpl = document.getElementById('mplanet-logo-svg');
-      if (!tpl) return;
-      document.querySelectorAll('.logo-slot').forEach(slot => {
-        slot.appendChild(tpl.content.cloneNode(true));
-      });
+      if (tpl) {
+        document.querySelectorAll('.logo-slot').forEach(slot => {
+          slot.appendChild(tpl.content.cloneNode(true));
+        });
+      }
     })();
+
+    function getProviderLogoHtml(provider) {
+      const id = provider === 'Airtel' ? 'airtel-logo-svg' : 'mtn-logo-svg';
+      const tpl = document.getElementById(id);
+      return tpl ? tpl.innerHTML : provider;
+    }
 
     // Deposit & Withdrawal Pricing Config + Live USD Rate
     const DEPOSIT_UGX_PER_COIN = 30;
@@ -442,7 +467,9 @@
     const USERNAME_COOLDOWN_DAYS = 30;
 
     let ugxPerUsd = 4222.218; // Live 1 USD -> UGX rate (auto-refreshed via FX API)
-    let withdrawalHistory = []; // Timestamps (ms) of withdrawals
+    let withdrawalHistory = []; // Hidden timestamps (ms) for daily & weekly limits
+    let selectedDepositProvider = 'MTN';
+    let selectedWithdrawProvider = 'MTN';
 
     async function fetchLiveUsdRate() {
       try {
@@ -918,6 +945,21 @@
       reader.readAsDataURL(file);
     }
 
+    function selectProvider(scope, provider) {
+      if (scope === 'deposit') {
+        selectedDepositProvider = provider;
+      } else {
+        selectedWithdrawProvider = provider;
+      }
+      document.querySelectorAll(`[data-provider-scope="${scope}"]`).forEach(btn => {
+        const active = btn.getAttribute('data-provider-value') === provider;
+        btn.classList.toggle('border-sky-400', active);
+        btn.classList.toggle('bg-slate-800', active);
+        btn.classList.toggle('border-slate-700', !active);
+        btn.classList.toggle('bg-slate-900', !active);
+      });
+    }
+
     function updateCustomCoinPreview() {
       const input = document.getElementById('custom-coins-input');
       const priceEl = document.getElementById('custom-coins-usd');
@@ -1025,6 +1067,14 @@
         title.textContent = 'Buy Coins (Deposit)';
         body.innerHTML = `
           <div class="space-y-3.5">
+            <div class="grid grid-cols-2 gap-2.5">
+              <button type="button" data-provider-scope="deposit" data-provider-value="MTN" onclick="selectProvider('deposit', 'MTN')" class="p-2.5 rounded-xl border ${selectedDepositProvider === 'MTN' ? 'border-sky-400 bg-slate-800' : 'border-slate-700 bg-slate-900'} flex items-center justify-center gap-2 transition">
+                ${getProviderLogoHtml('MTN')}
+              </button>
+              <button type="button" data-provider-scope="deposit" data-provider-value="Airtel" onclick="selectProvider('deposit', 'Airtel')" class="p-2.5 rounded-xl border ${selectedDepositProvider === 'Airtel' ? 'border-sky-400 bg-slate-800' : 'border-slate-700 bg-slate-900'} flex items-center justify-center gap-2 transition">
+                ${getProviderLogoHtml('Airtel')}
+              </button>
+            </div>
             <p class="text-xs text-slate-400">Live USD Rate Active • Max Custom Amount: ${MAX_CUSTOM_COINS.toLocaleString()} Coins</p>
             <div class="grid grid-cols-3 gap-2.5">
               <button type="button" onclick="topUpCoins(100)" class="p-3 rounded-xl bg-slate-800 hover:bg-blue-600/30 border border-blue-500/30 text-center">
@@ -1050,23 +1100,20 @@
             </form>
           </div>`;
       } else if (mode === 'withdraw') {
-        const { dailyCount, weeklyCount } = getWithdrawalCounts();
-        title.textContent = 'Withdraw to MoMo';
+        title.textContent = 'Withdraw';
         body.innerHTML = `
           <form onsubmit="handleWithdrawCoins(event)" class="space-y-3.5">
+            <div class="grid grid-cols-2 gap-2.5">
+              <button type="button" data-provider-scope="withdraw" data-provider-value="MTN" onclick="selectProvider('withdraw', 'MTN')" class="p-2.5 rounded-xl border ${selectedWithdrawProvider === 'MTN' ? 'border-orange-400 bg-slate-800' : 'border-slate-700 bg-slate-900'} flex items-center justify-center gap-2 transition">
+                ${getProviderLogoHtml('MTN')}
+              </button>
+              <button type="button" data-provider-scope="withdraw" data-provider-value="Airtel" onclick="selectProvider('withdraw', 'Airtel')" class="p-2.5 rounded-xl border ${selectedWithdrawProvider === 'Airtel' ? 'border-orange-400 bg-slate-800' : 'border-slate-700 bg-slate-900'} flex items-center justify-center gap-2 transition">
+                ${getProviderLogoHtml('Airtel')}
+              </button>
+            </div>
             <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
               <span>Available Balance: <strong class="text-white">${Number(p.coins || 0).toLocaleString()} Coins</strong></span>
               <span class="px-2 py-0.5 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-300 font-semibold">Min $${MIN_WITHDRAWAL_USD} • ${WITHDRAWAL_FEE_PERCENT}% Fee at $${FEE_THRESHOLD_USD}+</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <div class="p-2.5 rounded-xl bg-slate-800/70 border border-blue-500/20">
-                <span class="text-slate-400 block">Daily Limit</span>
-                <span class="font-bold text-white">${dailyCount} / ${DAILY_MAX_WITHDRAWALS} used</span>
-              </div>
-              <div class="p-2.5 rounded-xl bg-slate-800/70 border border-blue-500/20">
-                <span class="text-slate-400 block">Weekly Limit</span>
-                <span class="font-bold text-white">${weeklyCount} / ${WEEKLY_MAX_WITHDRAWALS} used</span>
-              </div>
             </div>
             <div>
               <label class="block text-xs text-sky-300 mb-1">Coins to Withdraw</label>
@@ -1083,10 +1130,10 @@
               </div>
             </div>
             <div>
-              <label class="block text-xs text-sky-300 mb-1">MoMo Number</label>
+              <label class="block text-xs text-sky-300 mb-1">Mobile Money Number</label>
               <input id="withdraw-momo-input" type="tel" value="${escapeHtml(p.momo_number || '')}" placeholder="0770000000" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-orange-500" />
             </div>
-            <button type="submit" class="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-400 font-bold text-base">Withdraw to MoMo</button>
+            <button type="submit" class="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-400 font-bold text-base">Withdraw</button>
           </form>`;
       }
       subpanel.classList.remove('hidden');
@@ -1144,6 +1191,7 @@
       const nextCoins = Number(currentProfile.coins || 0) + Number(amount);
       currentProfile = { ...currentProfile, coins: nextCoins };
       viewingProfileData = currentProfile;
+      alert(`${selectedDepositProvider} deposit of ${Number(amount).toLocaleString()} Coins completed.`);
       closeProfileSubModal();
       await renderProfileView(currentProfile);
     }
@@ -1152,10 +1200,10 @@
       e.preventDefault();
       const { dailyCount, weeklyCount } = getWithdrawalCounts();
       if (dailyCount >= DAILY_MAX_WITHDRAWALS) {
-        return alert(`Daily withdrawal limit reached (${DAILY_MAX_WITHDRAWALS} withdrawal per day).`);
+        return alert('You have reached your daily withdrawal limit. Please try again tomorrow.');
       }
       if (weeklyCount >= WEEKLY_MAX_WITHDRAWALS) {
-        return alert(`Weekly withdrawal limit reached (${WEEKLY_MAX_WITHDRAWALS} withdrawals per week).`);
+        return alert('You have reached your weekly withdrawal limit. Please try again next week.');
       }
 
       const amount = parseInt(document.getElementById('withdraw-coins-input').value, 10);
@@ -1174,7 +1222,7 @@
       const nextCoins = currentCoins - amount;
       currentProfile = { ...currentProfile, coins: nextCoins, momo_number: momoNumber };
       viewingProfileData = currentProfile;
-      alert(`Withdrawal of ${amount} Coins submitted to ${momoNumber}.\nWithdrawal Charge (${feePercent}%): ${formatUsd(feeUsd)}\nNet Payout: ${formatUsd(netUsd)}`);
+      alert(`${selectedWithdrawProvider} withdrawal of ${amount} Coins submitted to ${momoNumber}.\nWithdrawal Charge (${feePercent}%): ${formatUsd(feeUsd)}\nNet Payout: ${formatUsd(netUsd)}`);
       closeProfileSubModal();
       await renderProfileView(currentProfile);
     }
