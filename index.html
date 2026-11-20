@@ -535,6 +535,8 @@
       coins: 850,
       momo_number: '',
       virtual_card: '',
+      virtual_card_expiry: '',
+      virtual_card_cvv: '',
       phone: ''
     };
     let viewingProfileData = currentProfile;
@@ -971,27 +973,78 @@
       { value: 'Virtual Card', label: 'Virtual Card', sub: 'Visa / Mastercard virtual card' }
     ];
 
+    function formatCardNumber(value) {
+      const digits = String(value || '').replace(/\D/g, '').slice(0, 19);
+      return digits.replace(/(\d{4})(?=\d)/g, '$1 ');
+    }
+
+    function formatCardExpiry(value) {
+      const digits = String(value || '').replace(/\D/g, '').slice(0, 4);
+      if (digits.length <= 2) return digits;
+      return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    }
+
+    function formatCardCvv(value) {
+      return String(value || '').replace(/\D/g, '').slice(0, 4);
+    }
+
+    function handleCardInputAutoFormat(scope, field, inputEl) {
+      if (!inputEl) return;
+      if (field === 'number') {
+        inputEl.value = formatCardNumber(inputEl.value);
+      } else if (field === 'expiry') {
+        inputEl.value = formatCardExpiry(inputEl.value);
+      } else if (field === 'cvv') {
+        inputEl.value = formatCardCvv(inputEl.value);
+      }
+    }
+
+    function renderCardExtraFields(scope, p) {
+      return `
+        <div id="${scope}-card-extra" class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label for="${scope}-card-expiry" class="block text-xs text-sky-300 mb-1">Expiry Date (MM/YY)</label>
+            <input id="${scope}-card-expiry" oninput="handleCardInputAutoFormat('${scope}', 'expiry', this)" type="text" inputmode="numeric" maxlength="5" value="${escapeHtml(p.virtual_card_expiry || '')}" placeholder="MM/YY" class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-sky-400" />
+          </div>
+          <div>
+            <label for="${scope}-card-cvv" class="block text-xs text-sky-300 mb-1">CVV</label>
+            <input id="${scope}-card-cvv" oninput="handleCardInputAutoFormat('${scope}', 'cvv', this)" type="text" inputmode="numeric" maxlength="4" value="${escapeHtml(p.virtual_card_cvv || '')}" placeholder="123" class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-sky-400" />
+          </div>
+        </div>`;
+    }
+
     function syncProviderField(scope, provider) {
       const isCard = provider === 'Virtual Card';
-      if (scope === 'deposit') {
-        const label = document.getElementById('deposit-account-label');
-        const input = document.getElementById('deposit-account-input');
-        if (label && input) {
-          label.textContent = isCard ? 'Virtual Card Number' : `${provider} Mobile Money Number`;
-          input.placeholder = isCard ? '4242 •••• •••• 1234' : '0770000000';
-          input.type = isCard ? 'text' : 'tel';
-          if (!isCard && !input.value) input.value = currentProfile.momo_number || '';
-          if (isCard && input.value === (currentProfile.momo_number || '')) input.value = currentProfile.virtual_card || '';
+      const label = document.getElementById(`${scope}-account-label`);
+      const input = document.getElementById(`${scope}-account-input`);
+      const extra = document.getElementById(`${scope}-card-extra`);
+      const expiryInput = document.getElementById(`${scope}-card-expiry`);
+      const cvvInput = document.getElementById(`${scope}-card-cvv`);
+
+      if (label && input) {
+        label.textContent = isCard ? 'Virtual Card Number' : `${provider} Mobile Money Number`;
+        input.placeholder = isCard ? '4242 4242 4242 4242' : '0770000000';
+        input.type = isCard ? 'text' : 'tel';
+        input.inputMode = isCard ? 'numeric' : 'tel';
+        input.maxLength = isCard ? 23 : 20;
+        input.setAttribute('oninput', isCard ? `handleCardInputAutoFormat('${scope}', 'number', this)` : '');
+        if (isCard) {
+          input.value = formatCardNumber(currentProfile.virtual_card || '');
+        } else {
+          input.value = currentProfile.momo_number || '';
         }
-      } else {
-        const label = document.getElementById('withdraw-account-label');
-        const input = document.getElementById('withdraw-account-input');
-        if (label && input) {
-          label.textContent = isCard ? 'Virtual Card Number' : `${provider} Mobile Money Number`;
-          input.placeholder = isCard ? '4242 •••• •••• 1234' : '0770000000';
-          input.type = isCard ? 'text' : 'tel';
-          input.value = isCard ? (currentProfile.virtual_card || '') : (currentProfile.momo_number || '');
-        }
+      }
+
+      if (extra) {
+        extra.classList.toggle('hidden', !isCard);
+      }
+      if (expiryInput) {
+        expiryInput.required = isCard;
+        if (isCard && !expiryInput.value) expiryInput.value = formatCardExpiry(currentProfile.virtual_card_expiry || '');
+      }
+      if (cvvInput) {
+        cvvInput.required = isCard;
+        if (isCard && !cvvInput.value) cvvInput.value = formatCardCvv(currentProfile.virtual_card_cvv || '');
       }
     }
 
@@ -1187,8 +1240,9 @@
             ${renderMethodChooser('deposit', selectedDepositProvider)}
             <div>
               <label id="deposit-account-label" class="block text-xs text-sky-300 mb-1">${isCard ? 'Virtual Card Number' : `${selectedDepositProvider} Mobile Money Number`}</label>
-              <input id="deposit-account-input" type="${isCard ? 'text' : 'tel'}" value="${escapeHtml(isCard ? (p.virtual_card || '') : (p.momo_number || ''))}" placeholder="${isCard ? '4242 •••• •••• 1234' : '0770000000'}" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-sky-400" />
+              <input id="deposit-account-input" oninput="${isCard ? `handleCardInputAutoFormat('deposit', 'number', this)` : ''}" type="${isCard ? 'text' : 'tel'}" inputmode="${isCard ? 'numeric' : 'tel'}" maxlength="${isCard ? 23 : 20}" value="${escapeHtml(isCard ? formatCardNumber(p.virtual_card || '') : (p.momo_number || ''))}" placeholder="${isCard ? '4242 4242 4242 4242' : '0770000000'}" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-sky-400" />
             </div>
+            ${renderCardExtraFields('deposit', p)}
             <p class="text-xs text-slate-400">Live USD Rate Active • Max Custom Amount: ${MAX_CUSTOM_COINS.toLocaleString()} Coins</p>
             <div class="grid grid-cols-3 gap-2.5">
               <button type="button" onclick="topUpCoins(100)" class="p-3 rounded-xl bg-slate-800 hover:bg-blue-600/30 border border-blue-500/30 text-center">
@@ -1213,6 +1267,7 @@
               <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 hover:opacity-95 font-bold text-sm text-white">Buy Custom Coins</button>
             </form>
           </div>`;
+        syncProviderField('deposit', selectedDepositProvider);
       } else if (mode === 'withdraw') {
         const isCard = selectedWithdrawProvider === 'Virtual Card';
         title.textContent = 'Withdraw';
@@ -1239,10 +1294,12 @@
             </div>
             <div>
               <label id="withdraw-account-label" class="block text-xs text-sky-300 mb-1">${isCard ? 'Virtual Card Number' : `${selectedWithdrawProvider} Mobile Money Number`}</label>
-              <input id="withdraw-account-input" type="${isCard ? 'text' : 'tel'}" value="${escapeHtml(isCard ? (p.virtual_card || '') : (p.momo_number || ''))}" placeholder="${isCard ? '4242 •••• •••• 1234' : '0770000000'}" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-orange-500" />
+              <input id="withdraw-account-input" oninput="${isCard ? `handleCardInputAutoFormat('withdraw', 'number', this)` : ''}" type="${isCard ? 'text' : 'tel'}" inputmode="${isCard ? 'numeric' : 'tel'}" maxlength="${isCard ? 23 : 20}" value="${escapeHtml(isCard ? formatCardNumber(p.virtual_card || '') : (p.momo_number || ''))}" placeholder="${isCard ? '4242 4242 4242 4242' : '0770000000'}" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-orange-500" />
             </div>
+            ${renderCardExtraFields('withdraw', p)}
             <button type="submit" class="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-400 font-bold text-base">Withdraw</button>
           </form>`;
+        syncProviderField('withdraw', selectedWithdrawProvider);
       }
       subpanel.classList.remove('hidden');
     }
@@ -1295,15 +1352,45 @@
       await renderProfileView(currentProfile);
     }
 
+    function validateAndExtractCardDetails(scope, rawAccountVal) {
+      const cardNumber = formatCardNumber(rawAccountVal);
+      const cardExpiry = formatCardExpiry(document.getElementById(`${scope}-card-expiry`)?.value || '');
+      const cardCvv = formatCardCvv(document.getElementById(`${scope}-card-cvv`)?.value || '');
+      const digitsOnly = cardNumber.replace(/\D/g, '');
+      if (digitsOnly.length < 12) {
+        alert('Enter a valid Virtual Card number.');
+        return null;
+      }
+      if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExpiry)) {
+        alert('Enter a valid card expiry date in MM/YY format.');
+        return null;
+      }
+      if (cardCvv.length < 3) {
+        alert('Enter a valid 3 or 4 digit CVV.');
+        return null;
+      }
+      return { cardNumber, cardExpiry, cardCvv };
+    }
+
     async function topUpCoins(amount, accountOverride = null) {
       const accountVal = (accountOverride ?? document.getElementById('deposit-account-input')?.value ?? '').trim();
       if (!accountVal) {
         return alert(selectedDepositProvider === 'Virtual Card' ? 'Enter your Virtual Card number.' : `Enter your ${selectedDepositProvider} number.`);
       }
       const nextCoins = Number(currentProfile.coins || 0) + Number(amount);
-      const profilePatch = selectedDepositProvider === 'Virtual Card'
-        ? { coins: nextCoins, virtual_card: accountVal }
-        : { coins: nextCoins, momo_number: accountVal };
+      let profilePatch = { coins: nextCoins, momo_number: accountVal };
+
+      if (selectedDepositProvider === 'Virtual Card') {
+        const cardData = validateAndExtractCardDetails('deposit', accountVal);
+        if (!cardData) return;
+        profilePatch = {
+          coins: nextCoins,
+          virtual_card: cardData.cardNumber,
+          virtual_card_expiry: cardData.cardExpiry,
+          virtual_card_cvv: cardData.cardCvv
+        };
+      }
+
       currentProfile = { ...currentProfile, ...profilePatch };
       viewingProfileData = currentProfile;
       alert(`${selectedDepositProvider} deposit of ${Number(amount).toLocaleString()} Coins completed.`);
@@ -1333,14 +1420,25 @@
         return alert(`Minimum withdrawal is ${formatUsd(MIN_WITHDRAWAL_USD)} USD.`);
       }
 
+      let profilePatch = { coins: currentCoins - amount, momo_number: accountVal };
+      let destinationDisplay = accountVal;
+
+      if (selectedWithdrawProvider === 'Virtual Card') {
+        const cardData = validateAndExtractCardDetails('withdraw', accountVal);
+        if (!cardData) return;
+        profilePatch = {
+          coins: currentCoins - amount,
+          virtual_card: cardData.cardNumber,
+          virtual_card_expiry: cardData.cardExpiry,
+          virtual_card_cvv: cardData.cardCvv
+        };
+        destinationDisplay = cardData.cardNumber;
+      }
+
       withdrawalHistory.push(Date.now());
-      const nextCoins = currentCoins - amount;
-      const profilePatch = selectedWithdrawProvider === 'Virtual Card'
-        ? { coins: nextCoins, virtual_card: accountVal }
-        : { coins: nextCoins, momo_number: accountVal };
       currentProfile = { ...currentProfile, ...profilePatch };
       viewingProfileData = currentProfile;
-      alert(`${selectedWithdrawProvider} withdrawal of ${amount} Coins submitted to ${accountVal}.\nWithdrawal Charge (${feePercent}%): ${formatUsd(feeUsd)}\nNet Payout: ${formatUsd(netUsd)}`);
+      alert(`${selectedWithdrawProvider} withdrawal of ${amount} Coins submitted to ${destinationDisplay}.\nWithdrawal Charge (${feePercent}%): ${formatUsd(feeUsd)}\nNet Payout: ${formatUsd(netUsd)}`);
       closeProfileSubModal();
       await renderProfileView(currentProfile);
     }
