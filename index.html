@@ -152,6 +152,21 @@
     </svg>
   </template>
 
+  <template id="virtual-card-logo-svg">
+    <svg viewBox="0 0 120 48" class="h-7 w-auto shrink-0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Virtual Card">
+      <defs>
+        <linearGradient id="vcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#2563EB" />
+          <stop offset="100%" stop-color="#F97316" />
+        </linearGradient>
+      </defs>
+      <rect x="2" y="2" width="116" height="44" rx="10" fill="url(#vcGrad)" />
+      <rect x="14" y="14" width="22" height="16" rx="3" fill="none" stroke="#FFFFFF" stroke-width="2.2" />
+      <line x1="14" y1="19" x2="36" y2="19" stroke="#FFFFFF" stroke-width="2" />
+      <text x="75" y="28" text-anchor="middle" font-family="'Trebuchet MS', 'Segoe UI', sans-serif" font-weight="800" font-size="13" letter-spacing="0.3" fill="#FFFFFF">V-CARD</text>
+    </svg>
+  </template>
+
   <!-- Top Header Navigation -->
   <header class="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-3.5 py-3 bg-gradient-to-b from-slate-950/90 to-transparent max-w-[500px] mx-auto">
     <div class="flex items-center gap-2.5">
@@ -450,8 +465,12 @@
     })();
 
     function getProviderLogoHtml(provider) {
-      const id = provider === 'Airtel' ? 'airtel-logo-svg' : 'mtn-logo-svg';
-      const tpl = document.getElementById(id);
+      const map = {
+        'Airtel': 'airtel-logo-svg',
+        'Virtual Card': 'virtual-card-logo-svg',
+        'MTN': 'mtn-logo-svg'
+      };
+      const tpl = document.getElementById(map[provider] || 'mtn-logo-svg');
       return tpl ? tpl.innerHTML : provider;
     }
 
@@ -515,6 +534,7 @@
       bio: 'Funny videos from Kampala',
       coins: 850,
       momo_number: '',
+      virtual_card: '',
       phone: ''
     };
     let viewingProfileData = currentProfile;
@@ -945,19 +965,83 @@
       reader.readAsDataURL(file);
     }
 
+    function syncProviderField(scope, provider) {
+      const isCard = provider === 'Virtual Card';
+      if (scope === 'deposit') {
+        const label = document.getElementById('deposit-account-label');
+        const input = document.getElementById('deposit-account-input');
+        if (label && input) {
+          label.textContent = isCard ? 'Virtual Card Number' : `${provider} Mobile Money Number`;
+          input.placeholder = isCard ? '4242 •••• •••• 1234' : '0770000000';
+          input.type = isCard ? 'text' : 'tel';
+          if (!isCard && !input.value) input.value = currentProfile.momo_number || '';
+          if (isCard && input.value === (currentProfile.momo_number || '')) input.value = currentProfile.virtual_card || '';
+        }
+        const chosenText = document.getElementById('deposit-chosen-method');
+        if (chosenText) chosenText.textContent = provider;
+      } else {
+        const label = document.getElementById('withdraw-account-label');
+        const input = document.getElementById('withdraw-account-input');
+        if (label && input) {
+          label.textContent = isCard ? 'Virtual Card Number' : `${provider} Mobile Money Number`;
+          input.placeholder = isCard ? '4242 •••• •••• 1234' : '0770000000';
+          input.type = isCard ? 'text' : 'tel';
+          input.value = isCard ? (currentProfile.virtual_card || '') : (currentProfile.momo_number || '');
+        }
+        const chosenText = document.getElementById('withdraw-chosen-method');
+        if (chosenText) chosenText.textContent = provider;
+      }
+    }
+
     function selectProvider(scope, provider) {
       if (scope === 'deposit') {
         selectedDepositProvider = provider;
       } else {
         selectedWithdrawProvider = provider;
       }
+      const activeBorderClass = scope === 'deposit' ? 'border-sky-400' : 'border-orange-400';
       document.querySelectorAll(`[data-provider-scope="${scope}"]`).forEach(btn => {
         const active = btn.getAttribute('data-provider-value') === provider;
-        btn.classList.toggle('border-sky-400', active);
+        btn.classList.toggle(activeBorderClass, active);
         btn.classList.toggle('bg-slate-800', active);
+        btn.classList.toggle('ring-1', active);
+        btn.classList.toggle(scope === 'deposit' ? 'ring-sky-400' : 'ring-orange-400', active);
         btn.classList.toggle('border-slate-700', !active);
         btn.classList.toggle('bg-slate-900', !active);
+        const badge = btn.querySelector('.method-check');
+        if (badge) badge.classList.toggle('hidden', !active);
       });
+      syncProviderField(scope, provider);
+    }
+
+    function renderMethodChooser(scope, selected) {
+      const methods = [
+        { value: 'MTN', label: 'MTN MoMo' },
+        { value: 'Airtel', label: 'Airtel Money' },
+        { value: 'Virtual Card', label: 'Virtual Card' }
+      ];
+      const activeBorder = scope === 'deposit' ? 'border-sky-400 ring-1 ring-sky-400' : 'border-orange-400 ring-1 ring-orange-400';
+      const checkColor = scope === 'deposit' ? 'text-sky-400' : 'text-orange-400';
+
+      return `
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-sky-300 font-bold">Click to Choose Method</span>
+            <span class="text-slate-300">Selected: <strong id="${scope}-chosen-method" class="text-white">${escapeHtml(selected)}</strong></span>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            ${methods.map(m => {
+              const active = m.value === selected;
+              return `
+                <button type="button" data-provider-scope="${scope}" data-provider-value="${m.value}" onclick="selectProvider('${scope}', '${m.value}')"
+                  class="relative p-2.5 rounded-xl border ${active ? `${activeBorder} bg-slate-800` : 'border-slate-700 bg-slate-900'} flex flex-col items-center justify-center gap-1.5 transition active:scale-95">
+                  <i class="method-check fa-solid fa-circle-check ${checkColor} text-xs absolute top-1.5 right-1.5 ${active ? '' : 'hidden'}"></i>
+                  ${getProviderLogoHtml(m.value)}
+                  <span class="text-[11px] font-bold text-white/90 leading-tight">${m.label}</span>
+                </button>`;
+            }).join('')}
+          </div>
+        </div>`;
     }
 
     function updateCustomCoinPreview() {
@@ -984,7 +1068,8 @@
       if (amount > MAX_CUSTOM_COINS) {
         return alert(`Maximum coin purchase is ${MAX_CUSTOM_COINS.toLocaleString()} Coins.`);
       }
-      await topUpCoins(amount);
+      const accountVal = (document.getElementById('deposit-account-input')?.value || '').trim();
+      await topUpCoins(amount, accountVal);
     }
 
     function calculateWithdrawalSummary(coins) {
@@ -1064,16 +1149,14 @@
             <button type="button" onclick="logoutUser()" class="w-full py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 font-bold text-sm">Log Out</button>
           </div>`;
       } else if (mode === 'buy-coins') {
+        const isCard = selectedDepositProvider === 'Virtual Card';
         title.textContent = 'Buy Coins (Deposit)';
         body.innerHTML = `
           <div class="space-y-3.5">
-            <div class="grid grid-cols-2 gap-2.5">
-              <button type="button" data-provider-scope="deposit" data-provider-value="MTN" onclick="selectProvider('deposit', 'MTN')" class="p-2.5 rounded-xl border ${selectedDepositProvider === 'MTN' ? 'border-sky-400 bg-slate-800' : 'border-slate-700 bg-slate-900'} flex items-center justify-center gap-2 transition">
-                ${getProviderLogoHtml('MTN')}
-              </button>
-              <button type="button" data-provider-scope="deposit" data-provider-value="Airtel" onclick="selectProvider('deposit', 'Airtel')" class="p-2.5 rounded-xl border ${selectedDepositProvider === 'Airtel' ? 'border-sky-400 bg-slate-800' : 'border-slate-700 bg-slate-900'} flex items-center justify-center gap-2 transition">
-                ${getProviderLogoHtml('Airtel')}
-              </button>
+            ${renderMethodChooser('deposit', selectedDepositProvider)}
+            <div>
+              <label id="deposit-account-label" class="block text-xs text-sky-300 mb-1">${isCard ? 'Virtual Card Number' : `${selectedDepositProvider} Mobile Money Number`}</label>
+              <input id="deposit-account-input" type="${isCard ? 'text' : 'tel'}" value="${escapeHtml(isCard ? (p.virtual_card || '') : (p.momo_number || ''))}" placeholder="${isCard ? '4242 •••• •••• 1234' : '0770000000'}" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-sky-400" />
             </div>
             <p class="text-xs text-slate-400">Live USD Rate Active • Max Custom Amount: ${MAX_CUSTOM_COINS.toLocaleString()} Coins</p>
             <div class="grid grid-cols-3 gap-2.5">
@@ -1100,17 +1183,11 @@
             </form>
           </div>`;
       } else if (mode === 'withdraw') {
+        const isCard = selectedWithdrawProvider === 'Virtual Card';
         title.textContent = 'Withdraw';
         body.innerHTML = `
           <form onsubmit="handleWithdrawCoins(event)" class="space-y-3.5">
-            <div class="grid grid-cols-2 gap-2.5">
-              <button type="button" data-provider-scope="withdraw" data-provider-value="MTN" onclick="selectProvider('withdraw', 'MTN')" class="p-2.5 rounded-xl border ${selectedWithdrawProvider === 'MTN' ? 'border-orange-400 bg-slate-800' : 'border-slate-700 bg-slate-900'} flex items-center justify-center gap-2 transition">
-                ${getProviderLogoHtml('MTN')}
-              </button>
-              <button type="button" data-provider-scope="withdraw" data-provider-value="Airtel" onclick="selectProvider('withdraw', 'Airtel')" class="p-2.5 rounded-xl border ${selectedWithdrawProvider === 'Airtel' ? 'border-orange-400 bg-slate-800' : 'border-slate-700 bg-slate-900'} flex items-center justify-center gap-2 transition">
-                ${getProviderLogoHtml('Airtel')}
-              </button>
-            </div>
+            ${renderMethodChooser('withdraw', selectedWithdrawProvider)}
             <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
               <span>Available Balance: <strong class="text-white">${Number(p.coins || 0).toLocaleString()} Coins</strong></span>
               <span class="px-2 py-0.5 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-300 font-semibold">Min $${MIN_WITHDRAWAL_USD} • ${WITHDRAWAL_FEE_PERCENT}% Fee at $${FEE_THRESHOLD_USD}+</span>
@@ -1130,8 +1207,8 @@
               </div>
             </div>
             <div>
-              <label class="block text-xs text-sky-300 mb-1">Mobile Money Number</label>
-              <input id="withdraw-momo-input" type="tel" value="${escapeHtml(p.momo_number || '')}" placeholder="0770000000" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-orange-500" />
+              <label id="withdraw-account-label" class="block text-xs text-sky-300 mb-1">${isCard ? 'Virtual Card Number' : `${selectedWithdrawProvider} Mobile Money Number`}</label>
+              <input id="withdraw-account-input" type="${isCard ? 'text' : 'tel'}" value="${escapeHtml(isCard ? (p.virtual_card || '') : (p.momo_number || ''))}" placeholder="${isCard ? '4242 •••• •••• 1234' : '0770000000'}" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-orange-500" />
             </div>
             <button type="submit" class="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-400 font-bold text-base">Withdraw</button>
           </form>`;
@@ -1187,9 +1264,16 @@
       await renderProfileView(currentProfile);
     }
 
-    async function topUpCoins(amount) {
+    async function topUpCoins(amount, accountOverride = null) {
+      const accountVal = (accountOverride ?? document.getElementById('deposit-account-input')?.value ?? '').trim();
+      if (!accountVal) {
+        return alert(selectedDepositProvider === 'Virtual Card' ? 'Enter your Virtual Card number.' : `Enter your ${selectedDepositProvider} number.`);
+      }
       const nextCoins = Number(currentProfile.coins || 0) + Number(amount);
-      currentProfile = { ...currentProfile, coins: nextCoins };
+      const profilePatch = selectedDepositProvider === 'Virtual Card'
+        ? { coins: nextCoins, virtual_card: accountVal }
+        : { coins: nextCoins, momo_number: accountVal };
+      currentProfile = { ...currentProfile, ...profilePatch };
       viewingProfileData = currentProfile;
       alert(`${selectedDepositProvider} deposit of ${Number(amount).toLocaleString()} Coins completed.`);
       closeProfileSubModal();
@@ -1207,7 +1291,7 @@
       }
 
       const amount = parseInt(document.getElementById('withdraw-coins-input').value, 10);
-      const momoNumber = document.getElementById('withdraw-momo-input').value.trim();
+      const accountVal = document.getElementById('withdraw-account-input').value.trim();
       const currentCoins = Number(currentProfile.coins || 0);
       if (!amount || amount <= 0 || amount > currentCoins) {
         return alert('Enter a valid coin amount within your balance.');
@@ -1220,9 +1304,12 @@
 
       withdrawalHistory.push(Date.now());
       const nextCoins = currentCoins - amount;
-      currentProfile = { ...currentProfile, coins: nextCoins, momo_number: momoNumber };
+      const profilePatch = selectedWithdrawProvider === 'Virtual Card'
+        ? { coins: nextCoins, virtual_card: accountVal }
+        : { coins: nextCoins, momo_number: accountVal };
+      currentProfile = { ...currentProfile, ...profilePatch };
       viewingProfileData = currentProfile;
-      alert(`${selectedWithdrawProvider} withdrawal of ${amount} Coins submitted to ${momoNumber}.\nWithdrawal Charge (${feePercent}%): ${formatUsd(feeUsd)}\nNet Payout: ${formatUsd(netUsd)}`);
+      alert(`${selectedWithdrawProvider} withdrawal of ${amount} Coins submitted to ${accountVal}.\nWithdrawal Charge (${feePercent}%): ${formatUsd(feeUsd)}\nNet Payout: ${formatUsd(netUsd)}`);
       closeProfileSubModal();
       await renderProfileView(currentProfile);
     }
