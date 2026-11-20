@@ -397,24 +397,139 @@
     </div>
   </div>
 
-  <!-- Profile Modal -->
-  <div id="profile-modal" class="hidden fixed inset-0 z-50 bg-slate-950 flex flex-col max-w-[500px] mx-auto">
-    <div class="flex justify-between items-center p-4 border-b border-blue-500/20">
+  <!-- Profile Modal (Full Profile Spec from Screenshots) -->
+  <div id="profile-modal" class="hidden fixed inset-0 z-50 bg-slate-950 flex flex-col max-w-[500px] mx-auto overflow-y-auto">
+    <!-- Top Header -->
+    <div class="sticky top-0 z-20 flex justify-between items-center px-4 py-3.5 bg-slate-950/95 border-b border-blue-500/20">
       <button type="button" onclick="toggleModal('profile-modal', false)" aria-label="Back" class="hover:text-sky-400 p-1"><i class="fa-solid fa-arrow-left text-xl"></i></button>
-      <span id="profile-header-username" class="font-bold text-base">@user</span>
-      <button type="button" onclick="logoutUser()" class="text-sm text-orange-400 hover:text-orange-300 font-semibold">Log out</button>
-    </div>
-    <div class="p-6 flex flex-col items-center text-center border-b border-blue-500/20">
-      <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-blue-600 via-sky-400 to-orange-500 flex items-center justify-center text-3xl font-bold mb-3 shadow-lg shadow-blue-950" id="profile-avatar">M</div>
-      <h3 id="profile-display-name" class="font-bold text-xl">@username</h3>
-      <p id="profile-bio" class="text-sm text-slate-400 mt-1">Creator on Mplanet</p>
-      <div class="flex gap-7 mt-4 text-base">
-        <div><span id="stat-following" class="font-bold text-lg block text-sky-400">0</span><span class="text-slate-400 text-sm">Following</span></div>
-        <div><span id="stat-followers" class="font-bold text-lg block text-orange-400">0</span><span class="text-slate-400 text-sm">Followers</span></div>
-        <div><span id="stat-videos" class="font-bold text-lg block text-white">0</span><span class="text-slate-400 text-sm">Videos</span></div>
+      <span id="profile-header-username" class="font-bold text-base text-sky-300">@username</span>
+      <div class="flex items-center gap-2">
+        <button type="button" onclick="openProfileSubModal('settings')" aria-label="Settings" class="p-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-sky-400 transition">
+          <i class="fa-solid fa-gear text-lg"></i>
+        </button>
+        <button type="button" onclick="logoutUser()" class="text-sm text-orange-400 hover:text-orange-300 font-semibold">Log Out</button>
       </div>
     </div>
-    <div id="profile-videos-grid" class="grid grid-cols-3 gap-0.5 p-0.5 overflow-y-auto flex-1"></div>
+
+    <!-- 1. Profile Photo, 2. Username, 3. Display Name, 4. Bio & 12. Follow/Unfollow -->
+    <div class="px-5 pt-5 pb-4 flex flex-col items-center text-center border-b border-blue-500/20">
+      <!-- 1. Profile Photo (Circle photo, tap to change) -->
+      <label class="relative cursor-pointer group mb-3" title="Tap to change profile photo">
+        <input id="profile-photo-input" type="file" accept="image/*" onchange="handleProfilePhotoChange(event)" class="hidden" />
+        <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-blue-600 via-sky-400 to-orange-500 p-0.5 shadow-lg shadow-blue-950 overflow-hidden">
+          <div id="profile-avatar" class="w-full h-full rounded-full bg-slate-900 flex items-center justify-center text-3xl font-bold overflow-hidden">
+            M
+          </div>
+        </div>
+        <span class="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-orange-500 border-2 border-slate-950 text-white text-xs flex items-center justify-center shadow">
+          <i class="fa-solid fa-camera"></i>
+        </span>
+      </label>
+
+      <!-- 3. Display Name (Real name e.g. Brian K) -->
+      <h3 id="profile-display-name" class="font-extrabold text-xl text-white">Brian K</h3>
+      <!-- 2. Username (@name - unique, can't change every day) -->
+      <p id="profile-username-handle" class="text-sm font-semibold text-sky-400 mt-0.5">@briank</p>
+      <p id="profile-username-note" class="text-[11px] text-slate-400 mt-0.5">Unique @name • Can't change every day</p>
+
+      <!-- 4. Bio (1 line: what you post, e.g. Funny videos from Kampala) -->
+      <p id="profile-bio" class="text-sm text-white/90 mt-2 max-w-[340px] line-clamp-1">Funny videos from Kampala</p>
+
+      <!-- 12. Follow / Unfollow Button (shown when viewing someone else's profile) -->
+      <button id="profile-follow-btn" type="button" onclick="toggleViewedProfileFollow()" class="hidden mt-3 px-6 py-2 rounded-full font-bold text-sm bg-orange-500 hover:bg-orange-400 text-white transition">
+        Follow
+      </button>
+
+      <!-- 5. Stats (Posts, Followers, Following, Total Likes) -->
+      <div class="grid grid-cols-4 gap-2 w-full mt-4 pt-3 border-t border-blue-500/15">
+        <div class="text-center">
+          <span id="stat-videos" class="font-extrabold text-base block text-white">0</span>
+          <span class="text-slate-400 text-xs">Posts</span>
+        </div>
+        <div class="text-center">
+          <span id="stat-followers" class="font-extrabold text-base block text-orange-400">0</span>
+          <span class="text-slate-400 text-xs">Followers</span>
+        </div>
+        <div class="text-center">
+          <span id="stat-following" class="font-extrabold text-base block text-sky-400">0</span>
+          <span class="text-slate-400 text-xs">Following</span>
+        </div>
+        <div class="text-center">
+          <span id="stat-total-likes" class="font-extrabold text-base block text-amber-400">0</span>
+          <span class="text-slate-400 text-xs">Total Likes</span>
+        </div>
+      </div>
+
+      <!-- 8. Edit Profile Button & 9. Settings Button -->
+      <div class="flex gap-2.5 w-full mt-4">
+        <button type="button" onclick="openProfileSubModal('edit')" class="flex-1 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-blue-500/25 font-semibold text-sm flex items-center justify-center gap-2 transition">
+          <i class="fa-solid fa-pen-to-square text-sky-400"></i>
+          <span>Edit Profile</span>
+        </button>
+        <button type="button" onclick="openProfileSubModal('settings')" class="flex-1 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-blue-500/25 font-semibold text-sm flex items-center justify-center gap-2 transition">
+          <i class="fa-solid fa-sliders text-orange-400"></i>
+          <span>Settings</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 6. Coins Wallet -->
+    <div class="mx-4 mt-4 p-4 rounded-2xl bg-gradient-to-r from-blue-950/70 via-slate-900 to-orange-950/50 border border-blue-500/30">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-extrabold uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+          <i class="fa-solid fa-coins text-amber-400"></i> Coins Wallet
+        </span>
+        <span id="wallet-momo-badge" class="text-xs text-slate-400">MoMo: Not set</span>
+      </div>
+      <div class="flex items-baseline justify-between mb-3">
+        <div>
+          <span id="wallet-coins-balance" class="text-2xl font-black text-white">0</span>
+          <span class="text-xs font-bold text-amber-400 ml-1">Coins</span>
+        </div>
+        <div class="text-right">
+          <span id="wallet-ugx-balance" class="text-lg font-extrabold text-sky-300">UGX 0</span>
+        </div>
+      </div>
+      <div class="flex gap-2.5">
+        <button type="button" onclick="openProfileSubModal('buy-coins')" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 hover:opacity-95 font-bold text-sm text-white transition">
+          <i class="fa-solid fa-plus-circle mr-1"></i> Buy Coins
+        </button>
+        <button type="button" onclick="openProfileSubModal('withdraw')" class="flex-1 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-400 font-bold text-sm text-white transition">
+          <i class="fa-solid fa-money-bill-transfer mr-1"></i> Withdraw
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabs: 7. My Posts, 10. Liked Posts Tab, 11. Saved Posts Tab -->
+    <div class="grid grid-cols-3 border-b border-blue-500/20 mt-4 sticky top-[52px] bg-slate-950 z-10 text-sm font-bold">
+      <button id="profile-tab-posts" type="button" onclick="switchProfileTab('posts')" class="py-3 text-white border-b-2 border-orange-500 flex items-center justify-center gap-1.5">
+        <i class="fa-solid fa-table-cells text-xs"></i>
+        <span>My Posts</span>
+      </button>
+      <button id="profile-tab-liked" type="button" onclick="switchProfileTab('liked')" class="py-3 text-slate-400 hover:text-white flex items-center justify-center gap-1.5">
+        <i class="fa-solid fa-heart text-xs"></i>
+        <span>Liked</span>
+      </button>
+      <button id="profile-tab-saved" type="button" onclick="switchProfileTab('saved')" class="py-3 text-slate-400 hover:text-white flex items-center justify-center gap-1.5">
+        <i class="fa-solid fa-bookmark text-xs"></i>
+        <span>Saved</span>
+      </button>
+    </div>
+
+    <!-- Posts Grid Container (My Posts / Liked / Saved) -->
+    <div id="profile-videos-grid" class="grid grid-cols-3 gap-0.5 p-0.5 flex-1 min-h-[220px]"></div>
+
+    <!-- Sub-Panel Drawer inside Profile (Edit Profile / Settings / Buy Coins / Withdraw) -->
+    <div id="profile-subpanel" class="hidden fixed inset-0 z-50 bg-slate-950/90 flex items-end justify-center max-w-[500px] mx-auto" onclick="if(event.target===this) closeProfileSubModal()">
+      <div class="bg-slate-900 border-t border-blue-500/30 w-full rounded-t-2xl p-5 max-h-[82dvh] overflow-y-auto">
+        <div class="flex justify-between items-center pb-3 mb-4 border-b border-blue-500/20">
+          <button type="button" onclick="closeProfileSubModal()" aria-label="Back" class="text-white/70 hover:text-sky-400 p-1"><i class="fa-solid fa-arrow-left text-lg"></i></button>
+          <h4 id="subpanel-title" class="font-bold text-lg text-sky-300">Profile Option</h4>
+          <button type="button" onclick="closeProfileSubModal()" aria-label="Close" class="text-white/60 hover:text-orange-400 p-1"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+        <div id="subpanel-body"></div>
+      </div>
+    </div>
   </div>
 
   <!-- Search / Discover Modal -->
@@ -443,8 +558,13 @@
     const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    const UGX_PER_COIN = 50; // 1 Coin = 50 UGX conversion rate
+    const USERNAME_COOLDOWN_DAYS = 30;
+
     let currentUser = null;
     let currentProfile = null;
+    let viewingProfileData = null;
+    let activeProfileTab = 'posts';
     let allVideos = [];
     let likedVideoIds = new Set();
     let savedVideoIds = new Set();
@@ -466,7 +586,7 @@
         likes_count: 1420,
         comments_count: 34,
         saves_count: 56,
-        profiles: { id: 'demo-u1', username: 'maya_vibes' }
+        profiles: { id: 'demo-u1', username: 'maya_vibes', display_name: 'Maya Vibes', bio: 'Funny videos from Kampala' }
       },
       {
         id: 'demo-2',
@@ -476,7 +596,7 @@
         likes_count: 890,
         comments_count: 19,
         saves_count: 24,
-        profiles: { id: 'demo-u2', username: 'kampala_explorer' }
+        profiles: { id: 'demo-u2', username: 'kampala_explorer', display_name: 'Brian K', bio: 'Funny videos from Kampala' }
       }
     ];
 
@@ -552,6 +672,9 @@
         closeLiveModal(fromPopstate);
         return;
       }
+      if (id === 'profile-modal' && !show) {
+        closeProfileSubModal();
+      }
       const el = document.getElementById(id);
       if (!el) return;
       el.classList.toggle('hidden', !show);
@@ -565,6 +688,11 @@
     window.addEventListener('popstate', () => {
       if (ignoreNextPopstate) {
         ignoreNextPopstate = false;
+        return;
+      }
+      const subpanel = document.getElementById('profile-subpanel');
+      if (subpanel && !subpanel.classList.contains('hidden')) {
+        subpanel.classList.add('hidden');
         return;
       }
       const openModal = getOpenModalId();
@@ -584,6 +712,11 @@
 
     window.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
+      const subpanel = document.getElementById('profile-subpanel');
+      if (subpanel && !subpanel.classList.contains('hidden')) {
+        closeProfileSubModal();
+        return;
+      }
       const openModal = getOpenModalId();
       if (openModal) {
         toggleModal(openModal, false);
@@ -603,8 +736,16 @@
     async function setAuthenticatedUser(user) {
       currentUser = user;
       const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
-      currentProfile = profile;
-      document.getElementById('nav-profile-label').textContent = profile?.username ? `Profile (@${profile.username})` : 'Profile (Me)';
+      currentProfile = profile || {
+        id: user.id,
+        username: (user.email || 'user').split('@')[0].toLowerCase(),
+        display_name: 'Brian K',
+        bio: 'Funny videos from Kampala',
+        coins: 0,
+        momo_number: '',
+        phone: ''
+      };
+      document.getElementById('nav-profile-label').textContent = currentProfile?.username ? `Profile (@${currentProfile.username})` : 'Profile';
 
       const { data: likes } = await sb.from('likes').select('video_id').eq('user_id', user.id);
       likedVideoIds = new Set((likes || []).map(l => l.video_id));
@@ -623,7 +764,13 @@
         const { data, error } = await sb.auth.signUp({ email, password });
         if (error) return alert(error.message);
         if (data.user) {
-          await sb.from('profiles').insert({ id: data.user.id, username: username.toLowerCase() });
+          await sb.from('profiles').insert({
+            id: data.user.id,
+            username: username.toLowerCase(),
+            display_name: 'Brian K',
+            bio: 'Funny videos from Kampala',
+            coins: 0
+          });
           await setAuthenticatedUser(data.user);
           toggleModal('auth-modal', false);
           loadFeed('foryou');
@@ -641,6 +788,7 @@
       await sb.auth.signOut();
       currentUser = null;
       currentProfile = null;
+      viewingProfileData = null;
       likedVideoIds.clear();
       followingIds.clear();
       document.getElementById('nav-profile-label').textContent = 'Profile';
@@ -663,7 +811,7 @@
       document.getElementById('tab-foryou').className = mode === 'foryou' ? 'text-white border-b-2 border-orange-500 pb-0.5' : 'text-white/60 hover:text-white transition';
       document.getElementById('tab-following').className = mode === 'following' ? 'text-white border-b-2 border-orange-500 pb-0.5' : 'text-white/60 hover:text-white transition';
 
-      let query = sb.from('videos').select('*, profiles(id, username, avatar_url)').order('created_at', { ascending: false });
+      let query = sb.from('videos').select('*, profiles(id, username, display_name, bio, avatar_url)').order('created_at', { ascending: false });
       if (mode === 'following' && currentUser) {
         const ids = Array.from(followingIds);
         query = ids.length ? query.in('user_id', ids) : null;
@@ -864,8 +1012,28 @@
       requireAuth(async () => {
         followingIds.add(targetUserId);
         await sb.from('follows').insert({ follower_id: currentUser.id, following_id: targetUserId });
-        btnEl.remove();
+        if (btnEl) btnEl.remove();
       });
+    }
+
+    async function toggleViewedProfileFollow() {
+      if (!viewingProfileData || !currentUser || viewingProfileData.id === currentUser.id) return;
+      const targetId = viewingProfileData.id;
+      const btn = document.getElementById('profile-follow-btn');
+      const isFollowing = followingIds.has(targetId);
+
+      if (isFollowing) {
+        followingIds.delete(targetId);
+        await sb.from('follows').delete().match({ follower_id: currentUser.id, following_id: targetId });
+        btn.textContent = 'Follow';
+        btn.className = 'mt-3 px-6 py-2 rounded-full font-bold text-sm bg-orange-500 hover:bg-orange-400 text-white transition';
+      } else {
+        followingIds.add(targetId);
+        await sb.from('follows').insert({ follower_id: currentUser.id, following_id: targetId });
+        btn.textContent = 'Following';
+        btn.className = 'mt-3 px-6 py-2 rounded-full font-bold text-sm bg-slate-800 hover:bg-slate-700 border border-sky-400/40 text-sky-300 transition';
+      }
+      await renderProfileView(viewingProfileData);
     }
 
     async function openComments(videoId) {
@@ -950,29 +1118,337 @@
     }
 
     // ==========================================
-    // 5. PROFILE, SEARCH & UTILITIES
+    // 5. FULL PROFILE SYSTEM (1 - 12), SEARCH & UTILS
     // ==========================================
     async function handleProfileNav() {
       requireAuth(async () => {
         toggleModal('profile-modal', true);
-        const uname = currentProfile?.username || 'creator';
-        document.getElementById('profile-header-username').textContent = `@${uname}`;
-        document.getElementById('profile-display-name').textContent = `@${uname}`;
-        document.getElementById('profile-avatar').textContent = uname[0].toUpperCase();
-        document.getElementById('stat-following').textContent = followingIds.size;
-
-        const { count: followersCount } = await sb.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', currentUser.id);
-        document.getElementById('stat-followers').textContent = followersCount || 0;
-
-        const { data: myVideos } = await sb.from('videos').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
-        document.getElementById('stat-videos').textContent = (myVideos || []).length;
-        document.getElementById('profile-videos-grid').innerHTML = (myVideos || []).map(v => `
-          <div class="aspect-[9/16] bg-slate-900 relative">
-            <video src="${v.video_url}" class="w-full h-full object-cover" muted></video>
-            <span class="absolute bottom-1 left-1 text-xs bg-slate-950/75 px-1.5 rounded"><i class="fa-solid fa-heart text-orange-500"></i> ${v.likes_count}</span>
-          </div>
-        `).join('');
+        viewingProfileData = currentProfile;
+        activeProfileTab = 'posts';
+        await renderProfileView(currentProfile);
       });
+    }
+
+    async function openCreatorProfile(targetUserId) {
+      if (!targetUserId || targetUserId.startsWith('demo-')) return;
+      requireAuth(async () => {
+        const { data: profile } = await sb.from('profiles').select('*').eq('id', targetUserId).single();
+        if (!profile) return;
+        toggleModal('profile-modal', true);
+        viewingProfileData = profile;
+        activeProfileTab = 'posts';
+        await renderProfileView(profile);
+      });
+    }
+
+    async function renderProfileView(profileData) {
+      const isOwnProfile = !currentUser || profileData.id === currentUser.id;
+      const uname = profileData.username || 'creator';
+      const displayName = profileData.display_name || 'Brian K';
+      const bio = profileData.bio || 'Funny videos from Kampala';
+      const coins = Number(profileData.coins || 0);
+      const ugx = coins * UGX_PER_COIN;
+
+      // 1. Profile Photo
+      const avatarEl = document.getElementById('profile-avatar');
+      if (profileData.avatar_url) {
+        avatarEl.innerHTML = `<img src="${profileData.avatar_url}" alt="${escapeHtml(displayName)}" class="w-full h-full object-cover" />`;
+      } else {
+        avatarEl.innerHTML = `<span>${uname[0].toUpperCase()}</span>`;
+      }
+
+      // 2. Username & 3. Display Name & 4. Bio
+      document.getElementById('profile-header-username').textContent = `@${uname}`;
+      document.getElementById('profile-display-name').textContent = displayName;
+      document.getElementById('profile-username-handle').textContent = `@${uname}`;
+      document.getElementById('profile-bio').textContent = bio;
+
+      // 12. Follow / Unfollow Button
+      const followBtn = document.getElementById('profile-follow-btn');
+      if (!isOwnProfile) {
+        followBtn.classList.remove('hidden');
+        const alreadyFollowing = followingIds.has(profileData.id);
+        followBtn.textContent = alreadyFollowing ? 'Following' : 'Follow';
+        followBtn.className = alreadyFollowing
+          ? 'mt-3 px-6 py-2 rounded-full font-bold text-sm bg-slate-800 hover:bg-slate-700 border border-sky-400/40 text-sky-300 transition'
+          : 'mt-3 px-6 py-2 rounded-full font-bold text-sm bg-orange-500 hover:bg-orange-400 text-white transition';
+      } else {
+        followBtn.classList.add('hidden');
+      }
+
+      // 5. Stats (Posts, Followers, Following, Total Likes)
+      const { data: userVideos } = await sb.from('videos').select('*').eq('user_id', profileData.id).order('created_at', { ascending: false });
+      const postsList = userVideos || [];
+      const totalLikes = postsList.reduce((sum, item) => sum + (Number(item.likes_count) || 0), 0);
+
+      const { count: followersCount } = await sb.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', profileData.id);
+      const { count: followingCount } = await sb.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', profileData.id);
+
+      document.getElementById('stat-videos').textContent = postsList.length;
+      document.getElementById('stat-followers').textContent = followersCount || 0;
+      document.getElementById('stat-following').textContent = followingCount || 0;
+      document.getElementById('stat-total-likes').textContent = totalLikes;
+
+      // 6. Coins Wallet
+      document.getElementById('wallet-coins-balance').textContent = coins.toLocaleString();
+      document.getElementById('wallet-ugx-balance').textContent = `UGX ${ugx.toLocaleString()}`;
+      document.getElementById('wallet-momo-badge').textContent = profileData.momo_number
+        ? `MoMo: ${profileData.momo_number}`
+        : 'MoMo: Not set';
+
+      await loadProfileTabGrid(activeProfileTab, profileData.id, postsList);
+    }
+
+    async function switchProfileTab(tab) {
+      activeProfileTab = tab;
+      ['posts', 'liked', 'saved'].forEach(t => {
+        const btn = document.getElementById(`profile-tab-${t}`);
+        if (!btn) return;
+        btn.className = t === tab
+          ? 'py-3 text-white border-b-2 border-orange-500 flex items-center justify-center gap-1.5'
+          : 'py-3 text-slate-400 hover:text-white flex items-center justify-center gap-1.5';
+      });
+      const targetProfile = viewingProfileData || currentProfile;
+      if (targetProfile) {
+        await loadProfileTabGrid(tab, targetProfile.id);
+      }
+    }
+
+    async function loadProfileTabGrid(tab, userId, preloadedPosts = null) {
+      const grid = document.getElementById('profile-videos-grid');
+      let items = [];
+
+      if (tab === 'posts') {
+        if (preloadedPosts) {
+          items = preloadedPosts;
+        } else {
+          const { data } = await sb.from('videos').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+          items = data || [];
+        }
+      } else if (tab === 'liked') {
+        const ids = Array.from(likedVideoIds);
+        if (ids.length) {
+          const { data } = await sb.from('videos').select('*').in('id', ids);
+          items = data || [];
+        }
+      } else if (tab === 'saved') {
+        const ids = Array.from(savedVideoIds);
+        items = allVideos.filter(v => ids.includes(v.id));
+      }
+
+      if (!items.length) {
+        grid.innerHTML = `<div class="col-span-3 py-10 text-center text-sm text-slate-400">No ${tab} posts yet.</div>`;
+        return;
+      }
+
+      // 7. My Posts / 10. Liked / 11. Saved Grid
+      grid.innerHTML = items.map(v => `
+        <div class="aspect-[9/16] bg-slate-900 relative overflow-hidden">
+          <video src="${v.video_url}" class="w-full h-full object-cover" muted></video>
+          <span class="absolute bottom-1 left-1 text-xs bg-slate-950/75 px-1.5 py-0.5 rounded flex items-center gap-1">
+            <i class="fa-solid fa-heart text-orange-500"></i> ${v.likes_count || 0}
+          </span>
+        </div>
+      `).join('');
+    }
+
+    async function handleProfilePhotoChange(e) {
+      const file = e.target.files[0];
+      if (!file || !currentUser) return;
+
+      const filePath = `avatars/${currentUser.id}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+      const { error } = await sb.storage.from('videos').upload(filePath, file, { upsert: true });
+      if (error) return alert('Photo upload failed: ' + error.message);
+
+      const { data: { publicUrl } } = sb.storage.from('videos').getPublicUrl(filePath);
+      await sb.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
+      currentProfile = { ...currentProfile, avatar_url: publicUrl };
+      viewingProfileData = currentProfile;
+      await renderProfileView(currentProfile);
+    }
+
+    function openProfileSubModal(mode) {
+      const subpanel = document.getElementById('profile-subpanel');
+      const title = document.getElementById('subpanel-title');
+      const body = document.getElementById('subpanel-body');
+      const p = currentProfile || {};
+
+      if (mode === 'edit') {
+        title.textContent = 'Edit Profile';
+        body.innerHTML = `
+          <form onsubmit="saveProfileEdits(event)" class="space-y-3.5">
+            <div>
+              <label class="block text-xs text-sky-300 mb-1">Display Name</label>
+              <input id="edit-display-name" type="text" value="${escapeHtml(p.display_name || 'Brian K')}" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label class="block text-xs text-sky-300 mb-1">Username (@name — can't change every day)</label>
+              <input id="edit-username" type="text" value="${escapeHtml(p.username || '')}" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label class="block text-xs text-sky-300 mb-1">Bio (1 line)</label>
+              <input id="edit-bio" type="text" maxlength="100" value="${escapeHtml(p.bio || 'Funny videos from Kampala')}" class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label class="block text-xs text-sky-300 mb-1">Phone Number</label>
+              <input id="edit-phone" type="tel" value="${escapeHtml(p.phone || '')}" placeholder="+256 7XX XXX XXX" class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-blue-500" />
+            </div>
+            <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-orange-500 font-bold text-base">Save Changes</button>
+          </form>
+        `;
+      } else if (mode === 'settings') {
+        title.textContent = 'Settings';
+        body.innerHTML = `
+          <div class="space-y-4">
+            <form onsubmit="handleChangePassword(event)" class="p-3.5 rounded-xl bg-slate-800/80 border border-blue-500/20 space-y-2.5">
+              <p class="font-bold text-sm text-sky-300">Change Password</p>
+              <input id="new-password-input" type="password" minlength="6" placeholder="New password (min 6 chars)" required class="w-full bg-slate-900 rounded-xl p-2.5 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+              <button type="submit" class="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-500 font-semibold text-sm">Update Password</button>
+            </form>
+
+            <form onsubmit="handleChangeMomo(event)" class="p-3.5 rounded-xl bg-slate-800/80 border border-blue-500/20 space-y-2.5">
+              <p class="font-bold text-sm text-orange-400">Change MoMo Number</p>
+              <input id="momo-number-input" type="tel" value="${escapeHtml(p.momo_number || '')}" placeholder="e.g. 0770000000" required class="w-full bg-slate-900 rounded-xl p-2.5 text-sm outline-none focus:ring-1 focus:ring-orange-500" />
+              <button type="submit" class="w-full py-2 rounded-xl bg-orange-500 hover:bg-orange-400 font-semibold text-sm">Save MoMo Number</button>
+            </form>
+
+            <button type="button" onclick="logoutUser()" class="w-full py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 font-bold text-sm">
+              Log Out
+            </button>
+          </div>
+        `;
+      } else if (mode === 'buy-coins') {
+        title.textContent = 'Buy Coins';
+        body.innerHTML = `
+          <div class="space-y-3">
+            <p class="text-xs text-slate-400">Rate: 1 Coin = UGX ${UGX_PER_COIN}</p>
+            <div class="grid grid-cols-3 gap-2.5">
+              <button type="button" onclick="topUpCoins(100)" class="p-3 rounded-xl bg-slate-800 hover:bg-blue-600/30 border border-blue-500/30 text-center">
+                <span class="block font-black text-base text-amber-400">100 Coins</span>
+                <span class="block text-xs text-slate-300 mt-0.5">UGX ${(100 * UGX_PER_COIN).toLocaleString()}</span>
+              </button>
+              <button type="button" onclick="topUpCoins(500)" class="p-3 rounded-xl bg-slate-800 hover:bg-blue-600/30 border border-blue-500/30 text-center">
+                <span class="block font-black text-base text-amber-400">500 Coins</span>
+                <span class="block text-xs text-slate-300 mt-0.5">UGX ${(500 * UGX_PER_COIN).toLocaleString()}</span>
+              </button>
+              <button type="button" onclick="topUpCoins(1000)" class="p-3 rounded-xl bg-slate-800 hover:bg-blue-600/30 border border-blue-500/30 text-center">
+                <span class="block font-black text-base text-amber-400">1,000 Coins</span>
+                <span class="block text-xs text-slate-300 mt-0.5">UGX ${(1000 * UGX_PER_COIN).toLocaleString()}</span>
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (mode === 'withdraw') {
+        title.textContent = 'Withdraw Coins to UGX';
+        body.innerHTML = `
+          <form onsubmit="handleWithdrawCoins(event)" class="space-y-3.5">
+            <p class="text-xs text-slate-400">Available: <strong class="text-white">${Number(p.coins || 0).toLocaleString()} Coins</strong> (UGX ${(Number(p.coins || 0) * UGX_PER_COIN).toLocaleString()})</p>
+            <div>
+              <label class="block text-xs text-sky-300 mb-1">Coins to Withdraw</label>
+              <input id="withdraw-coins-input" type="number" min="1" max="${Number(p.coins || 0)}" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-orange-500" />
+            </div>
+            <div>
+              <label class="block text-xs text-sky-300 mb-1">MoMo Number</label>
+              <input id="withdraw-momo-input" type="tel" value="${escapeHtml(p.momo_number || '')}" placeholder="0770000000" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-orange-500" />
+            </div>
+            <button type="submit" class="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-400 font-bold text-base">Withdraw to MoMo</button>
+          </form>
+        `;
+      }
+
+      subpanel.classList.remove('hidden');
+      pushOverlayState();
+    }
+
+    function closeProfileSubModal() {
+      const subpanel = document.getElementById('profile-subpanel');
+      if (subpanel) subpanel.classList.add('hidden');
+    }
+
+    async function saveProfileEdits(e) {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const displayName = document.getElementById('edit-display-name').value.trim();
+      const nextUsername = document.getElementById('edit-username').value.trim().toLowerCase().replace(/^@+/, '');
+      const bio = document.getElementById('edit-bio').value.trim();
+      const phone = document.getElementById('edit-phone').value.trim();
+
+      const prevUsername = (currentProfile?.username || '').toLowerCase();
+      const updates = { display_name: displayName, bio, phone };
+
+      if (nextUsername && nextUsername !== prevUsername) {
+        const lastChanged = currentProfile?.username_changed_at ? new Date(currentProfile.username_changed_at) : null;
+        if (lastChanged) {
+          const daysSince = (Date.now() - lastChanged.getTime()) / (1000 * 60 * 60 * 24);
+          if (daysSince < USERNAME_COOLDOWN_DAYS) {
+            const daysLeft = Math.ceil(USERNAME_COOLDOWN_DAYS - daysSince);
+            return alert(`You can't change your @username every day. Try again in ${daysLeft} day(s).`);
+          }
+        }
+        updates.username = nextUsername;
+        updates.username_changed_at = new Date().toISOString();
+      }
+
+      const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
+      if (error) return alert('Could not update profile: ' + error.message);
+
+      currentProfile = { ...currentProfile, ...updates };
+      viewingProfileData = currentProfile;
+      document.getElementById('nav-profile-label').textContent = `Profile (@${currentProfile.username})`;
+      closeProfileSubModal();
+      await renderProfileView(currentProfile);
+    }
+
+    async function handleChangePassword(e) {
+      e.preventDefault();
+      const password = document.getElementById('new-password-input').value;
+      const { error } = await sb.auth.updateUser({ password });
+      if (error) return alert(error.message);
+      alert('Password updated!');
+      closeProfileSubModal();
+    }
+
+    async function handleChangeMomo(e) {
+      e.preventDefault();
+      if (!currentUser) return;
+      const momoNumber = document.getElementById('momo-number-input').value.trim();
+      const { error } = await sb.from('profiles').update({ momo_number: momoNumber }).eq('id', currentUser.id);
+      if (error) return alert(error.message);
+      currentProfile = { ...currentProfile, momo_number: momoNumber };
+      viewingProfileData = currentProfile;
+      closeProfileSubModal();
+      await renderProfileView(currentProfile);
+    }
+
+    async function topUpCoins(amount) {
+      if (!currentUser) return;
+      const nextCoins = Number(currentProfile?.coins || 0) + Number(amount);
+      await sb.from('profiles').update({ coins: nextCoins }).eq('id', currentUser.id);
+      currentProfile = { ...currentProfile, coins: nextCoins };
+      viewingProfileData = currentProfile;
+      closeProfileSubModal();
+      await renderProfileView(currentProfile);
+    }
+
+    async function handleWithdrawCoins(e) {
+      e.preventDefault();
+      if (!currentUser) return;
+      const amount = parseInt(document.getElementById('withdraw-coins-input').value, 10);
+      const momoNumber = document.getElementById('withdraw-momo-input').value.trim();
+      const currentCoins = Number(currentProfile?.coins || 0);
+
+      if (!amount || amount <= 0 || amount > currentCoins) {
+        return alert('Enter a valid coin amount within your balance.');
+      }
+
+      const nextCoins = currentCoins - amount;
+      await sb.from('profiles').update({ coins: nextCoins, momo_number: momoNumber }).eq('id', currentUser.id);
+      currentProfile = { ...currentProfile, coins: nextCoins, momo_number: momoNumber };
+      viewingProfileData = currentProfile;
+      alert(`Withdrawal request for ${amount} Coins (UGX ${(amount * UGX_PER_COIN).toLocaleString()}) to ${momoNumber} recorded.`);
+      closeProfileSubModal();
+      await renderProfileView(currentProfile);
     }
 
     function openSearchModal() {
@@ -1012,7 +1488,7 @@
     }
 
     function escapeHtml(str) {
-      return str.replace(/[&<>"']/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m]));
+      return String(str).replace(/[&<>"']/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m]));
     }
 
     initApp();
