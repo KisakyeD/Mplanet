@@ -368,8 +368,8 @@
           <span id="wallet-coins-balance" class="text-2xl font-black text-white">850</span>
           <span class="text-xs font-bold text-amber-400 ml-1">Coins</span>
         </div>
-        <div class="text-right shrink-0">
-          <span id="wallet-usd-balance" class="text-lg font-extrabold text-sky-300 whitespace-nowrap">$6.16</span>
+        <div class="hidden text-right shrink-0">
+          <span id="wallet-usd-balance" class="hidden text-lg font-extrabold text-sky-300 whitespace-nowrap">$6.16</span>
         </div>
       </div>
       <div class="flex gap-2.5">
@@ -838,7 +838,11 @@
       document.getElementById('stat-total-likes').textContent = totalLikes;
 
       document.getElementById('wallet-coins-balance').textContent = coins.toLocaleString();
-      document.getElementById('wallet-usd-balance').textContent = coins === 850 ? '$6.16' : formatUsd(walletUsd);
+      const usdBalanceEl = document.getElementById('wallet-usd-balance');
+      if (usdBalanceEl) {
+        usdBalanceEl.textContent = formatUsd(walletUsd);
+        usdBalanceEl.classList.add('hidden');
+      }
       document.getElementById('wallet-momo-badge').textContent = profileData.momo_number ? `MoMo: ${profileData.momo_number}` : 'MoMo: Not set';
 
       await loadProfileTabGrid(activeProfileTab, profileData.id, postsList);
