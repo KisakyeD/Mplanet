@@ -286,7 +286,7 @@
     </div>
   </div>
 
-  <!-- Profile Modal (Full Profile Spec from Screenshots) -->
+  <!-- Profile Modal -->
   <div id="profile-modal" class="hidden fixed inset-0 z-50 bg-slate-950 flex flex-col max-w-[500px] mx-auto overflow-y-auto">
     <div class="sticky top-0 z-20 flex justify-between items-center px-4 py-3.5 bg-slate-950/95 border-b border-blue-500/20">
       <button type="button" onclick="toggleModal('profile-modal', false)" aria-label="Back" class="hover:text-sky-400 p-1"><i class="fa-solid fa-arrow-left text-xl"></i></button>
@@ -369,7 +369,7 @@
           <span class="text-xs font-bold text-amber-400 ml-1">Coins</span>
         </div>
         <div class="text-right">
-          <span id="wallet-ugx-balance" class="text-lg font-extrabold text-sky-300">UGX 12,500</span>
+          <span id="wallet-usd-balance" class="text-lg font-extrabold text-sky-300">$1.78</span>
         </div>
       </div>
       <div class="flex gap-2.5">
@@ -430,13 +430,39 @@
       });
     })();
 
-    // Supabase will be connected later
-    const SUPABASE_URL = "";
-    const SUPABASE_ANON_KEY = "";
-    const sb = null;
-
-    const UGX_PER_COIN = 50;
+    // Deposit & Withdrawal Pricing Config + Live Google USD Rate
+    const DEPOSIT_UGX_PER_COIN = 30;
+    const WITHDRAWAL_FEE_PERCENT = 10;
+    const _basePayoutFactor = 7.5; // Internal payout conversion (not displayed)
     const USERNAME_COOLDOWN_DAYS = 30;
+
+    let ugxPerUsd = 4222.218; // Live 1 USD -> UGX rate (auto-refreshed via Google/FX API)
+
+    async function fetchLiveUsdRate() {
+      try {
+        const res = await fetch('https://open.er-api.com/v6/latest/USD');
+        if (!res.ok) return;
+        const data = await res.json();
+        const rate = Number(data?.rates?.UGX);
+        if (rate && rate > 0) {
+          ugxPerUsd = rate;
+          if (document.getElementById('profile-modal') && !document.getElementById('profile-modal').classList.contains('hidden')) {
+            await renderProfileView(viewingProfileData || currentProfile);
+          }
+          updateWithdrawPreview();
+        }
+      } catch (_) {
+        // Keep current/fallback live rate if network request is blocked
+      }
+    }
+
+    function ugxToUsd(ugxAmount) {
+      return Number(ugxAmount || 0) / ugxPerUsd;
+    }
+
+    function formatUsd(usdAmount) {
+      return `$${Number(usdAmount || 0).toFixed(2)}`;
+    }
 
     let currentProfile = {
       id: 'local-user',
@@ -564,6 +590,7 @@
 
     async function initApp() {
       document.getElementById('nav-profile-label').textContent = `Profile (@${currentProfile.username})`;
+      await fetchLiveUsdRate();
       await loadFeed('foryou');
     }
 
@@ -771,6 +798,7 @@
       viewingProfileData = currentProfile;
       activeProfileTab = 'posts';
       toggleModal('profile-modal', true);
+      await fetchLiveUsdRate();
       await renderProfileView(currentProfile);
     }
 
@@ -780,7 +808,7 @@
       const displayName = profileData.display_name || 'Brian K';
       const bio = profileData.bio || 'Funny videos from Kampala';
       const coins = Number(profileData.coins || 0);
-      const ugx = coins * UGX_PER_COIN;
+      const walletUsd = ugxToUsd(coins * DEPOSIT_UGX_PER_COIN);
 
       const avatarEl = document.getElementById('profile-avatar');
       if (profileData.avatar_url) {
@@ -810,7 +838,7 @@
       document.getElementById('stat-total-likes').textContent = totalLikes;
 
       document.getElementById('wallet-coins-balance').textContent = coins.toLocaleString();
-      document.getElementById('wallet-ugx-balance').textContent = `UGX ${ugx.toLocaleString()}`;
+      document.getElementById('wallet-usd-balance').textContent = formatUsd(walletUsd);
       document.getElementById('wallet-momo-badge').textContent = profileData.momo_number ? `MoMo: ${profileData.momo_number}` : 'MoMo: Not set';
 
       await loadProfileTabGrid(activeProfileTab, profileData.id, postsList);
@@ -869,6 +897,28 @@
       reader.readAsDataURL(file);
     }
 
+    function calculateWithdrawalSummary(coins) {
+      const qty = Math.max(0, Number(coins) || 0);
+      const grossUgx = qty * _basePayoutFactor;
+      const feeUgx = grossUgx * (WITHDRAWAL_FEE_PERCENT / 100);
+      const netUgx = grossUgx - feeUgx;
+      return {
+        feeUsd: ugxToUsd(feeUgx),
+        netUsd: ugxToUsd(netUgx)
+      };
+    }
+
+    function updateWithdrawPreview() {
+      const input = document.getElementById('withdraw-coins-input');
+      const feeEl = document.getElementById('withdraw-fee-amount');
+      const netEl = document.getElementById('withdraw-net-amount');
+      if (!input || !feeEl || !netEl) return;
+
+      const { feeUsd, netUsd } = calculateWithdrawalSummary(input.value);
+      feeEl.textContent = formatUsd(feeUsd);
+      netEl.textContent = formatUsd(netUsd);
+    }
+
     function openProfileSubModal(mode) {
       const subpanel = document.getElementById('profile-subpanel');
       const title = document.getElementById('subpanel-title');
@@ -914,33 +964,46 @@
             <button type="button" onclick="logoutUser()" class="w-full py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 font-bold text-sm">Log Out</button>
           </div>`;
       } else if (mode === 'buy-coins') {
-        title.textContent = 'Buy Coins';
+        title.textContent = 'Buy Coins (Deposit)';
         body.innerHTML = `
           <div class="space-y-3">
-            <p class="text-xs text-slate-400">Rate: 1 Coin = UGX ${UGX_PER_COIN}</p>
+            <p class="text-xs text-slate-400">Live USD Rate Active • Instant Coin Top-Up</p>
             <div class="grid grid-cols-3 gap-2.5">
               <button type="button" onclick="topUpCoins(100)" class="p-3 rounded-xl bg-slate-800 hover:bg-blue-600/30 border border-blue-500/30 text-center">
                 <span class="block font-black text-base text-amber-400">100 Coins</span>
-                <span class="block text-xs text-slate-300 mt-0.5">UGX ${(100 * UGX_PER_COIN).toLocaleString()}</span>
+                <span class="block text-xs text-slate-300 mt-0.5">${formatUsd(ugxToUsd(100 * DEPOSIT_UGX_PER_COIN))}</span>
               </button>
               <button type="button" onclick="topUpCoins(500)" class="p-3 rounded-xl bg-slate-800 hover:bg-blue-600/30 border border-blue-500/30 text-center">
                 <span class="block font-black text-base text-amber-400">500 Coins</span>
-                <span class="block text-xs text-slate-300 mt-0.5">UGX ${(500 * UGX_PER_COIN).toLocaleString()}</span>
+                <span class="block text-xs text-slate-300 mt-0.5">${formatUsd(ugxToUsd(500 * DEPOSIT_UGX_PER_COIN))}</span>
               </button>
               <button type="button" onclick="topUpCoins(1000)" class="p-3 rounded-xl bg-slate-800 hover:bg-blue-600/30 border border-blue-500/30 text-center">
                 <span class="block font-black text-base text-amber-400">1,000 Coins</span>
-                <span class="block text-xs text-slate-300 mt-0.5">UGX ${(1000 * UGX_PER_COIN).toLocaleString()}</span>
+                <span class="block text-xs text-slate-300 mt-0.5">${formatUsd(ugxToUsd(1000 * DEPOSIT_UGX_PER_COIN))}</span>
               </button>
             </div>
           </div>`;
       } else if (mode === 'withdraw') {
-        title.textContent = 'Withdraw Coins to UGX';
+        title.textContent = 'Withdraw to MoMo';
         body.innerHTML = `
           <form onsubmit="handleWithdrawCoins(event)" class="space-y-3.5">
-            <p class="text-xs text-slate-400">Available: <strong class="text-white">${Number(p.coins || 0).toLocaleString()} Coins</strong> (UGX ${(Number(p.coins || 0) * UGX_PER_COIN).toLocaleString()})</p>
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span>Available Balance: <strong class="text-white">${Number(p.coins || 0).toLocaleString()} Coins</strong></span>
+              <span class="px-2 py-0.5 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-300 font-semibold">Withdrawal Charge: ${WITHDRAWAL_FEE_PERCENT}%</span>
+            </div>
             <div>
               <label class="block text-xs text-sky-300 mb-1">Coins to Withdraw</label>
-              <input id="withdraw-coins-input" type="number" min="1" max="${Number(p.coins || 0)}" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-orange-500" />
+              <input id="withdraw-coins-input" oninput="updateWithdrawPreview()" type="number" min="1" max="${Number(p.coins || 0)}" placeholder="Enter coins amount" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-orange-500" />
+            </div>
+            <div class="p-3 rounded-xl bg-slate-800/80 border border-blue-500/20 space-y-1.5 text-sm">
+              <div class="flex justify-between text-slate-300">
+                <span>Withdrawal Charge (${WITHDRAWAL_FEE_PERCENT}%):</span>
+                <span id="withdraw-fee-amount" class="font-semibold text-orange-400">$0.00</span>
+              </div>
+              <div class="flex justify-between text-white font-bold pt-1 border-t border-slate-700/80">
+                <span>You Receive:</span>
+                <span id="withdraw-net-amount" class="text-sky-300">$0.00</span>
+              </div>
             </div>
             <div>
               <label class="block text-xs text-sky-300 mb-1">MoMo Number</label>
@@ -1014,10 +1077,12 @@
       const momoNumber = document.getElementById('withdraw-momo-input').value.trim();
       const currentCoins = Number(currentProfile.coins || 0);
       if (!amount || amount <= 0 || amount > currentCoins) return alert('Enter a valid coin amount within your balance.');
+
+      const { feeUsd, netUsd } = calculateWithdrawalSummary(amount);
       const nextCoins = currentCoins - amount;
       currentProfile = { ...currentProfile, coins: nextCoins, momo_number: momoNumber };
       viewingProfileData = currentProfile;
-      alert(`Withdrawal request for ${amount} Coins (UGX ${(amount * UGX_PER_COIN).toLocaleString()}) to ${momoNumber} recorded.`);
+      alert(`Withdrawal of ${amount} Coins submitted to ${momoNumber}.\nWithdrawal Charge (${WITHDRAWAL_FEE_PERCENT}%): ${formatUsd(feeUsd)}\nNet Payout: ${formatUsd(netUsd)}`);
       closeProfileSubModal();
       await renderProfileView(currentProfile);
     }
