@@ -965,6 +965,12 @@
       reader.readAsDataURL(file);
     }
 
+    const PAYMENT_METHODS = [
+      { value: 'MTN', label: 'MTN Mobile Money', sub: 'Instant MoMo transfer' },
+      { value: 'Airtel', label: 'Airtel Money', sub: 'Instant Airtel transfer' },
+      { value: 'Virtual Card', label: 'Virtual Card', sub: 'Visa / Mastercard virtual card' }
+    ];
+
     function syncProviderField(scope, provider) {
       const isCard = provider === 'Virtual Card';
       if (scope === 'deposit') {
@@ -977,8 +983,6 @@
           if (!isCard && !input.value) input.value = currentProfile.momo_number || '';
           if (isCard && input.value === (currentProfile.momo_number || '')) input.value = currentProfile.virtual_card || '';
         }
-        const chosenText = document.getElementById('deposit-chosen-method');
-        if (chosenText) chosenText.textContent = provider;
       } else {
         const label = document.getElementById('withdraw-account-label');
         const input = document.getElementById('withdraw-account-input');
@@ -988,9 +992,16 @@
           input.type = isCard ? 'text' : 'tel';
           input.value = isCard ? (currentProfile.virtual_card || '') : (currentProfile.momo_number || '');
         }
-        const chosenText = document.getElementById('withdraw-chosen-method');
-        if (chosenText) chosenText.textContent = provider;
       }
+    }
+
+    function toggleMethodMenu(scope) {
+      const menu = document.getElementById(`${scope}-method-menu`);
+      const chevron = document.getElementById(`${scope}-method-chevron`);
+      if (!menu) return;
+      const willOpen = menu.classList.contains('hidden');
+      menu.classList.toggle('hidden', !willOpen);
+      if (chevron) chevron.classList.toggle('rotate-180', willOpen);
     }
 
     function selectProvider(scope, provider) {
@@ -999,45 +1010,65 @@
       } else {
         selectedWithdrawProvider = provider;
       }
-      const activeBorderClass = scope === 'deposit' ? 'border-sky-400' : 'border-orange-400';
+      const meta = PAYMENT_METHODS.find(m => m.value === provider) || PAYMENT_METHODS[0];
+      const logoSlot = document.getElementById(`${scope}-trigger-logo`);
+      const labelSlot = document.getElementById(`${scope}-trigger-label`);
+      const subSlot = document.getElementById(`${scope}-trigger-sub`);
+      if (logoSlot) logoSlot.innerHTML = getProviderLogoHtml(meta.value);
+      if (labelSlot) labelSlot.textContent = meta.label;
+      if (subSlot) subSlot.textContent = meta.sub;
+
+      const checkColor = scope === 'deposit' ? 'text-sky-400' : 'text-orange-400';
       document.querySelectorAll(`[data-provider-scope="${scope}"]`).forEach(btn => {
         const active = btn.getAttribute('data-provider-value') === provider;
-        btn.classList.toggle(activeBorderClass, active);
         btn.classList.toggle('bg-slate-800', active);
-        btn.classList.toggle('ring-1', active);
-        btn.classList.toggle(scope === 'deposit' ? 'ring-sky-400' : 'ring-orange-400', active);
-        btn.classList.toggle('border-slate-700', !active);
-        btn.classList.toggle('bg-slate-900', !active);
         const badge = btn.querySelector('.method-check');
-        if (badge) badge.classList.toggle('hidden', !active);
+        if (badge) {
+          badge.className = `method-check fa-solid fa-circle-check ${checkColor} text-base ${active ? '' : 'hidden'}`;
+        }
       });
+
+      const menu = document.getElementById(`${scope}-method-menu`);
+      const chevron = document.getElementById(`${scope}-method-chevron`);
+      if (menu) menu.classList.add('hidden');
+      if (chevron) chevron.classList.remove('rotate-180');
+
       syncProviderField(scope, provider);
     }
 
     function renderMethodChooser(scope, selected) {
-      const methods = [
-        { value: 'MTN', label: 'MTN MoMo' },
-        { value: 'Airtel', label: 'Airtel Money' },
-        { value: 'Virtual Card', label: 'Virtual Card' }
-      ];
-      const activeBorder = scope === 'deposit' ? 'border-sky-400 ring-1 ring-sky-400' : 'border-orange-400 ring-1 ring-orange-400';
+      const current = PAYMENT_METHODS.find(m => m.value === selected) || PAYMENT_METHODS[0];
+      const focusRing = scope === 'deposit' ? 'border-sky-400/50 hover:border-sky-400' : 'border-orange-400/50 hover:border-orange-400';
       const checkColor = scope === 'deposit' ? 'text-sky-400' : 'text-orange-400';
 
       return `
-        <div class="space-y-1.5">
-          <div class="flex items-center justify-between text-xs">
-            <span class="text-sky-300 font-bold">Click to Choose Method</span>
-            <span class="text-slate-300">Selected: <strong id="${scope}-chosen-method" class="text-white">${escapeHtml(selected)}</strong></span>
-          </div>
-          <div class="grid grid-cols-3 gap-2">
-            ${methods.map(m => {
+        <div class="space-y-1.5 relative">
+          <label class="block text-xs text-sky-300 font-bold">Payment Method</label>
+          <button type="button" onclick="toggleMethodMenu('${scope}')"
+            class="w-full p-3 rounded-xl bg-slate-800 border ${focusRing} flex items-center justify-between gap-3 text-left transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <div id="${scope}-trigger-logo" class="shrink-0">${getProviderLogoHtml(current.value)}</div>
+              <div class="min-w-0">
+                <span id="${scope}-trigger-label" class="block text-sm font-bold text-white truncate">${current.label}</span>
+                <span id="${scope}-trigger-sub" class="block text-[11px] text-slate-400 truncate">${current.sub}</span>
+              </div>
+            </div>
+            <i id="${scope}-method-chevron" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform"></i>
+          </button>
+          <div id="${scope}-method-menu" class="hidden rounded-xl bg-slate-950 border border-slate-700 overflow-hidden divide-y divide-slate-800 shadow-xl">
+            ${PAYMENT_METHODS.map(m => {
               const active = m.value === selected;
               return `
                 <button type="button" data-provider-scope="${scope}" data-provider-value="${m.value}" onclick="selectProvider('${scope}', '${m.value}')"
-                  class="relative p-2.5 rounded-xl border ${active ? `${activeBorder} bg-slate-800` : 'border-slate-700 bg-slate-900'} flex flex-col items-center justify-center gap-1.5 transition active:scale-95">
-                  <i class="method-check fa-solid fa-circle-check ${checkColor} text-xs absolute top-1.5 right-1.5 ${active ? '' : 'hidden'}"></i>
-                  ${getProviderLogoHtml(m.value)}
-                  <span class="text-[11px] font-bold text-white/90 leading-tight">${m.label}</span>
+                  class="w-full p-3 flex items-center justify-between gap-3 text-left hover:bg-slate-800/80 transition ${active ? 'bg-slate-800' : ''}">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="shrink-0">${getProviderLogoHtml(m.value)}</div>
+                    <div class="min-w-0">
+                      <span class="block text-sm font-bold text-white truncate">${m.label}</span>
+                      <span class="block text-[11px] text-slate-400 truncate">${m.sub}</span>
+                    </div>
+                  </div>
+                  <i class="method-check fa-solid fa-circle-check ${checkColor} text-base ${active ? '' : 'hidden'}"></i>
                 </button>`;
             }).join('')}
           </div>
