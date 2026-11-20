@@ -430,13 +430,19 @@
       });
     })();
 
-    // Deposit & Withdrawal Pricing Config + Live Google USD Rate
+    // Deposit & Withdrawal Pricing Config + Live USD Rate
     const DEPOSIT_UGX_PER_COIN = 30;
+    const MAX_CUSTOM_COINS = 30000000;
+    const MIN_WITHDRAWAL_USD = 1;
+    const FEE_THRESHOLD_USD = 30;
     const WITHDRAWAL_FEE_PERCENT = 10;
+    const DAILY_MAX_WITHDRAWALS = 1;
+    const WEEKLY_MAX_WITHDRAWALS = 5;
     const _basePayoutFactor = 7.5; // Internal payout conversion (not displayed)
     const USERNAME_COOLDOWN_DAYS = 30;
 
-    let ugxPerUsd = 4222.218; // Live 1 USD -> UGX rate (auto-refreshed via Google/FX API)
+    let ugxPerUsd = 4222.218; // Live 1 USD -> UGX rate (auto-refreshed via FX API)
+    let withdrawalHistory = []; // Timestamps (ms) of withdrawals
 
     async function fetchLiveUsdRate() {
       try {
@@ -449,6 +455,7 @@
           if (document.getElementById('profile-modal') && !document.getElementById('profile-modal').classList.contains('hidden')) {
             await renderProfileView(viewingProfileData || currentProfile);
           }
+          updateCustomCoinPreview();
           updateWithdrawPreview();
         }
       } catch (_) {
@@ -462,6 +469,16 @@
 
     function formatUsd(usdAmount) {
       return `$${Number(usdAmount || 0).toFixed(2)}`;
+    }
+
+    function getWithdrawalCounts() {
+      const now = Date.now();
+      const oneDayMs = 24 * 60 * 60 * 1000;
+      const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+      withdrawalHistory = withdrawalHistory.filter(ts => now - ts < sevenDaysMs);
+      const dailyCount = withdrawalHistory.filter(ts => now - ts < oneDayMs).length;
+      const weeklyCount = withdrawalHistory.length;
+      return { dailyCount, weeklyCount };
     }
 
     let currentProfile = {
@@ -901,24 +918,61 @@
       reader.readAsDataURL(file);
     }
 
+    function updateCustomCoinPreview() {
+      const input = document.getElementById('custom-coins-input');
+      const priceEl = document.getElementById('custom-coins-usd');
+      if (!input || !priceEl) return;
+
+      const raw = Number(input.value);
+      if (!raw || raw < 1) {
+        priceEl.textContent = '$0.00';
+        return;
+      }
+      const clamped = Math.min(MAX_CUSTOM_COINS, Math.floor(raw));
+      priceEl.textContent = formatUsd(ugxToUsd(clamped * DEPOSIT_UGX_PER_COIN));
+    }
+
+    async function handleCustomCoinPurchase(e) {
+      e.preventDefault();
+      const input = document.getElementById('custom-coins-input');
+      const amount = parseInt(input.value, 10);
+      if (!amount || amount < 1) {
+        return alert('Enter at least 1 Coin.');
+      }
+      if (amount > MAX_CUSTOM_COINS) {
+        return alert(`Maximum coin purchase is ${MAX_CUSTOM_COINS.toLocaleString()} Coins.`);
+      }
+      await topUpCoins(amount);
+    }
+
     function calculateWithdrawalSummary(coins) {
       const qty = Math.max(0, Number(coins) || 0);
       const grossUgx = qty * _basePayoutFactor;
-      const feeUgx = grossUgx * (WITHDRAWAL_FEE_PERCENT / 100);
-      const netUgx = grossUgx - feeUgx;
+      const grossUsd = ugxToUsd(grossUgx);
+      const appliesFee = grossUsd >= FEE_THRESHOLD_USD;
+      const feePercent = appliesFee ? WITHDRAWAL_FEE_PERCENT : 0;
+      const feeUsd = appliesFee ? grossUsd * (WITHDRAWAL_FEE_PERCENT / 100) : 0;
+      const netUsd = grossUsd - feeUsd;
       return {
-        feeUsd: ugxToUsd(feeUgx),
-        netUsd: ugxToUsd(netUgx)
+        grossUsd,
+        appliesFee,
+        feePercent,
+        feeUsd,
+        netUsd
       };
     }
 
     function updateWithdrawPreview() {
       const input = document.getElementById('withdraw-coins-input');
+      const feeLabelEl = document.getElementById('withdraw-fee-label');
       const feeEl = document.getElementById('withdraw-fee-amount');
       const netEl = document.getElementById('withdraw-net-amount');
       if (!input || !feeEl || !netEl) return;
 
-      const { feeUsd, netUsd } = calculateWithdrawalSummary(input.value);
+      const { feePercent, feeUsd, netUsd } = calculateWithdrawalSummary(input.value);
+      if (feeLabelEl) {
+        feeLabelEl.textContent = `Withdrawal Charge (${feePercent}% on $${FEE_THRESHOLD_USD}+):`;
+      }
       feeEl.textContent = formatUsd(feeUsd);
       netEl.textContent = formatUsd(netUsd);
     }
@@ -970,8 +1024,8 @@
       } else if (mode === 'buy-coins') {
         title.textContent = 'Buy Coins (Deposit)';
         body.innerHTML = `
-          <div class="space-y-3">
-            <p class="text-xs text-slate-400">Live USD Rate Active • Instant Coin Top-Up</p>
+          <div class="space-y-3.5">
+            <p class="text-xs text-slate-400">Live USD Rate Active • Max Custom Amount: ${MAX_CUSTOM_COINS.toLocaleString()} Coins</p>
             <div class="grid grid-cols-3 gap-2.5">
               <button type="button" onclick="topUpCoins(100)" class="p-3 rounded-xl bg-slate-800 hover:bg-blue-600/30 border border-blue-500/30 text-center">
                 <span class="block font-black text-base text-amber-400">100 Coins</span>
@@ -986,14 +1040,33 @@
                 <span class="block text-xs text-slate-300 mt-0.5">${formatUsd(ugxToUsd(1000 * DEPOSIT_UGX_PER_COIN))}</span>
               </button>
             </div>
+            <form onsubmit="handleCustomCoinPurchase(event)" class="p-3.5 rounded-xl bg-slate-800/80 border border-blue-500/25 space-y-2.5">
+              <div class="flex items-center justify-between text-xs">
+                <label for="custom-coins-input" class="text-sky-300 font-bold">Custom Coins (Max 30,000,000)</label>
+                <span id="custom-coins-usd" class="font-extrabold text-amber-400">$0.00</span>
+              </div>
+              <input id="custom-coins-input" oninput="updateCustomCoinPreview()" type="number" min="1" max="${MAX_CUSTOM_COINS}" placeholder="Enter coins (up to 30,000,000)" required class="w-full bg-slate-900 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-sky-400" />
+              <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 hover:opacity-95 font-bold text-sm text-white">Buy Custom Coins</button>
+            </form>
           </div>`;
       } else if (mode === 'withdraw') {
+        const { dailyCount, weeklyCount } = getWithdrawalCounts();
         title.textContent = 'Withdraw to MoMo';
         body.innerHTML = `
           <form onsubmit="handleWithdrawCoins(event)" class="space-y-3.5">
-            <div class="flex items-center justify-between text-xs text-slate-400">
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
               <span>Available Balance: <strong class="text-white">${Number(p.coins || 0).toLocaleString()} Coins</strong></span>
-              <span class="px-2 py-0.5 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-300 font-semibold">Withdrawal Charge: ${WITHDRAWAL_FEE_PERCENT}%</span>
+              <span class="px-2 py-0.5 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-300 font-semibold">Min $${MIN_WITHDRAWAL_USD} • ${WITHDRAWAL_FEE_PERCENT}% Fee at $${FEE_THRESHOLD_USD}+</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="p-2.5 rounded-xl bg-slate-800/70 border border-blue-500/20">
+                <span class="text-slate-400 block">Daily Limit</span>
+                <span class="font-bold text-white">${dailyCount} / ${DAILY_MAX_WITHDRAWALS} used</span>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-800/70 border border-blue-500/20">
+                <span class="text-slate-400 block">Weekly Limit</span>
+                <span class="font-bold text-white">${weeklyCount} / ${WEEKLY_MAX_WITHDRAWALS} used</span>
+              </div>
             </div>
             <div>
               <label class="block text-xs text-sky-300 mb-1">Coins to Withdraw</label>
@@ -1001,7 +1074,7 @@
             </div>
             <div class="p-3 rounded-xl bg-slate-800/80 border border-blue-500/20 space-y-1.5 text-sm">
               <div class="flex justify-between text-slate-300">
-                <span>Withdrawal Charge (${WITHDRAWAL_FEE_PERCENT}%):</span>
+                <span id="withdraw-fee-label">Withdrawal Charge (0% on $${FEE_THRESHOLD_USD}+):</span>
                 <span id="withdraw-fee-amount" class="font-semibold text-orange-400">$0.00</span>
               </div>
               <div class="flex justify-between text-white font-bold pt-1 border-t border-slate-700/80">
@@ -1077,16 +1150,31 @@
 
     async function handleWithdrawCoins(e) {
       e.preventDefault();
+      const { dailyCount, weeklyCount } = getWithdrawalCounts();
+      if (dailyCount >= DAILY_MAX_WITHDRAWALS) {
+        return alert(`Daily withdrawal limit reached (${DAILY_MAX_WITHDRAWALS} withdrawal per day).`);
+      }
+      if (weeklyCount >= WEEKLY_MAX_WITHDRAWALS) {
+        return alert(`Weekly withdrawal limit reached (${WEEKLY_MAX_WITHDRAWALS} withdrawals per week).`);
+      }
+
       const amount = parseInt(document.getElementById('withdraw-coins-input').value, 10);
       const momoNumber = document.getElementById('withdraw-momo-input').value.trim();
       const currentCoins = Number(currentProfile.coins || 0);
-      if (!amount || amount <= 0 || amount > currentCoins) return alert('Enter a valid coin amount within your balance.');
+      if (!amount || amount <= 0 || amount > currentCoins) {
+        return alert('Enter a valid coin amount within your balance.');
+      }
 
-      const { feeUsd, netUsd } = calculateWithdrawalSummary(amount);
+      const { grossUsd, feePercent, feeUsd, netUsd } = calculateWithdrawalSummary(amount);
+      if (grossUsd < MIN_WITHDRAWAL_USD) {
+        return alert(`Minimum withdrawal is ${formatUsd(MIN_WITHDRAWAL_USD)} USD.`);
+      }
+
+      withdrawalHistory.push(Date.now());
       const nextCoins = currentCoins - amount;
       currentProfile = { ...currentProfile, coins: nextCoins, momo_number: momoNumber };
       viewingProfileData = currentProfile;
-      alert(`Withdrawal of ${amount} Coins submitted to ${momoNumber}.\nWithdrawal Charge (${WITHDRAWAL_FEE_PERCENT}%): ${formatUsd(feeUsd)}\nNet Payout: ${formatUsd(netUsd)}`);
+      alert(`Withdrawal of ${amount} Coins submitted to ${momoNumber}.\nWithdrawal Charge (${feePercent}%): ${formatUsd(feeUsd)}\nNet Payout: ${formatUsd(netUsd)}`);
       closeProfileSubModal();
       await renderProfileView(currentProfile);
     }
