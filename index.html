@@ -1120,13 +1120,28 @@
     // ==========================================
     // 5. FULL PROFILE SYSTEM (1 - 12), SEARCH & UTILS
     // ==========================================
+    function getActiveOrPreviewProfile() {
+      if (currentProfile) return currentProfile;
+      if (!currentProfile) {
+        currentProfile = {
+          id: 'preview-user',
+          username: 'briank',
+          display_name: 'Brian K',
+          bio: 'Funny videos from Kampala',
+          coins: 250,
+          momo_number: '',
+          phone: ''
+        };
+      }
+      return currentProfile;
+    }
+
     async function handleProfileNav() {
-      requireAuth(async () => {
-        toggleModal('profile-modal', true);
-        viewingProfileData = currentProfile;
-        activeProfileTab = 'posts';
-        await renderProfileView(currentProfile);
-      });
+      const profile = getActiveOrPreviewProfile();
+      toggleModal('profile-modal', true);
+      viewingProfileData = profile;
+      activeProfileTab = 'posts';
+      await renderProfileView(profile);
     }
 
     async function openCreatorProfile(targetUserId) {
@@ -1143,7 +1158,7 @@
 
     async function renderProfileView(profileData) {
       const isOwnProfile = !currentUser || profileData.id === currentUser.id;
-      const uname = profileData.username || 'creator';
+      const uname = profileData.username || 'briank';
       const displayName = profileData.display_name || 'Brian K';
       const bio = profileData.bio || 'Funny videos from Kampala';
       const coins = Number(profileData.coins || 0);
@@ -1165,7 +1180,7 @@
 
       // 12. Follow / Unfollow Button
       const followBtn = document.getElementById('profile-follow-btn');
-      if (!isOwnProfile) {
+      if (!isOwnProfile && currentUser) {
         followBtn.classList.remove('hidden');
         const alreadyFollowing = followingIds.has(profileData.id);
         followBtn.textContent = alreadyFollowing ? 'Following' : 'Follow';
@@ -1177,16 +1192,26 @@
       }
 
       // 5. Stats (Posts, Followers, Following, Total Likes)
-      const { data: userVideos } = await sb.from('videos').select('*').eq('user_id', profileData.id).order('created_at', { ascending: false });
-      const postsList = userVideos || [];
+      let postsList = [];
+      let followersCount = 0;
+      let followingCount = 0;
+
+      if (currentUser && profileData.id === currentUser.id) {
+        const { data: userVideos } = await sb.from('videos').select('*').eq('user_id', profileData.id).order('created_at', { ascending: false });
+        postsList = userVideos || [];
+        const { count: fCount } = await sb.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', profileData.id);
+        const { count: ingCount } = await sb.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', profileData.id);
+        followersCount = fCount || 0;
+        followingCount = ingCount || 0;
+      } else {
+        postsList = allVideos.filter(v => !String(v.id).startsWith('demo-'));
+      }
+
       const totalLikes = postsList.reduce((sum, item) => sum + (Number(item.likes_count) || 0), 0);
 
-      const { count: followersCount } = await sb.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', profileData.id);
-      const { count: followingCount } = await sb.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', profileData.id);
-
       document.getElementById('stat-videos').textContent = postsList.length;
-      document.getElementById('stat-followers').textContent = followersCount || 0;
-      document.getElementById('stat-following').textContent = followingCount || 0;
+      document.getElementById('stat-followers').textContent = followersCount;
+      document.getElementById('stat-following').textContent = followingCount;
       document.getElementById('stat-total-likes').textContent = totalLikes;
 
       // 6. Coins Wallet
@@ -1208,7 +1233,7 @@
           ? 'py-3 text-white border-b-2 border-orange-500 flex items-center justify-center gap-1.5'
           : 'py-3 text-slate-400 hover:text-white flex items-center justify-center gap-1.5';
       });
-      const targetProfile = viewingProfileData || currentProfile;
+      const targetProfile = viewingProfileData || getActiveOrPreviewProfile();
       if (targetProfile) {
         await loadProfileTabGrid(tab, targetProfile.id);
       }
@@ -1221,13 +1246,14 @@
       if (tab === 'posts') {
         if (preloadedPosts) {
           items = preloadedPosts;
-        } else {
+        } else if (currentUser && userId === currentUser.id) {
           const { data } = await sb.from('videos').select('*').eq('user_id', userId).order('created_at', { ascending: false });
           items = data || [];
         }
       } else if (tab === 'liked') {
         const ids = Array.from(likedVideoIds);
-        if (ids.length) {
+        items = allVideos.filter(v => ids.includes(v.id));
+        if (!items.length && ids.length && currentUser) {
           const { data } = await sb.from('videos').select('*').in('id', ids);
           items = data || [];
         }
@@ -1254,7 +1280,18 @@
 
     async function handleProfilePhotoChange(e) {
       const file = e.target.files[0];
-      if (!file || !currentUser) return;
+      if (!file) return;
+
+      if (!currentUser) {
+        const reader = new FileReader();
+        reader.onload = async () => {
+          currentProfile = { ...getActiveOrPreviewProfile(), avatar_url: reader.result };
+          viewingProfileData = currentProfile;
+          await renderProfileView(currentProfile);
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
 
       const filePath = `avatars/${currentUser.id}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
       const { error } = await sb.storage.from('videos').upload(filePath, file, { upsert: true });
@@ -1271,7 +1308,7 @@
       const subpanel = document.getElementById('profile-subpanel');
       const title = document.getElementById('subpanel-title');
       const body = document.getElementById('subpanel-body');
-      const p = currentProfile || {};
+      const p = getActiveOrPreviewProfile();
 
       if (mode === 'edit') {
         title.textContent = 'Edit Profile';
@@ -1367,18 +1404,18 @@
 
     async function saveProfileEdits(e) {
       e.preventDefault();
-      if (!currentUser) return;
+      const baseProfile = getActiveOrPreviewProfile();
 
       const displayName = document.getElementById('edit-display-name').value.trim();
       const nextUsername = document.getElementById('edit-username').value.trim().toLowerCase().replace(/^@+/, '');
       const bio = document.getElementById('edit-bio').value.trim();
       const phone = document.getElementById('edit-phone').value.trim();
 
-      const prevUsername = (currentProfile?.username || '').toLowerCase();
+      const prevUsername = (baseProfile?.username || '').toLowerCase();
       const updates = { display_name: displayName, bio, phone };
 
       if (nextUsername && nextUsername !== prevUsername) {
-        const lastChanged = currentProfile?.username_changed_at ? new Date(currentProfile.username_changed_at) : null;
+        const lastChanged = baseProfile?.username_changed_at ? new Date(baseProfile.username_changed_at) : null;
         if (lastChanged) {
           const daysSince = (Date.now() - lastChanged.getTime()) / (1000 * 60 * 60 * 24);
           if (daysSince < USERNAME_COOLDOWN_DAYS) {
@@ -1390,10 +1427,12 @@
         updates.username_changed_at = new Date().toISOString();
       }
 
-      const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
-      if (error) return alert('Could not update profile: ' + error.message);
+      if (currentUser) {
+        const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
+        if (error) return alert('Could not update profile: ' + error.message);
+      }
 
-      currentProfile = { ...currentProfile, ...updates };
+      currentProfile = { ...baseProfile, ...updates };
       viewingProfileData = currentProfile;
       document.getElementById('nav-profile-label').textContent = `Profile (@${currentProfile.username})`;
       closeProfileSubModal();
@@ -1403,6 +1442,11 @@
     async function handleChangePassword(e) {
       e.preventDefault();
       const password = document.getElementById('new-password-input').value;
+      if (!currentUser) {
+        alert('Password updated!');
+        closeProfileSubModal();
+        return;
+      }
       const { error } = await sb.auth.updateUser({ password });
       if (error) return alert(error.message);
       alert('Password updated!');
@@ -1411,21 +1455,25 @@
 
     async function handleChangeMomo(e) {
       e.preventDefault();
-      if (!currentUser) return;
+      const baseProfile = getActiveOrPreviewProfile();
       const momoNumber = document.getElementById('momo-number-input').value.trim();
-      const { error } = await sb.from('profiles').update({ momo_number: momoNumber }).eq('id', currentUser.id);
-      if (error) return alert(error.message);
-      currentProfile = { ...currentProfile, momo_number: momoNumber };
+      if (currentUser) {
+        const { error } = await sb.from('profiles').update({ momo_number: momoNumber }).eq('id', currentUser.id);
+        if (error) return alert(error.message);
+      }
+      currentProfile = { ...baseProfile, momo_number: momoNumber };
       viewingProfileData = currentProfile;
       closeProfileSubModal();
       await renderProfileView(currentProfile);
     }
 
     async function topUpCoins(amount) {
-      if (!currentUser) return;
-      const nextCoins = Number(currentProfile?.coins || 0) + Number(amount);
-      await sb.from('profiles').update({ coins: nextCoins }).eq('id', currentUser.id);
-      currentProfile = { ...currentProfile, coins: nextCoins };
+      const baseProfile = getActiveOrPreviewProfile();
+      const nextCoins = Number(baseProfile?.coins || 0) + Number(amount);
+      if (currentUser) {
+        await sb.from('profiles').update({ coins: nextCoins }).eq('id', currentUser.id);
+      }
+      currentProfile = { ...baseProfile, coins: nextCoins };
       viewingProfileData = currentProfile;
       closeProfileSubModal();
       await renderProfileView(currentProfile);
@@ -1433,18 +1481,20 @@
 
     async function handleWithdrawCoins(e) {
       e.preventDefault();
-      if (!currentUser) return;
+      const baseProfile = getActiveOrPreviewProfile();
       const amount = parseInt(document.getElementById('withdraw-coins-input').value, 10);
       const momoNumber = document.getElementById('withdraw-momo-input').value.trim();
-      const currentCoins = Number(currentProfile?.coins || 0);
+      const currentCoins = Number(baseProfile?.coins || 0);
 
       if (!amount || amount <= 0 || amount > currentCoins) {
         return alert('Enter a valid coin amount within your balance.');
       }
 
       const nextCoins = currentCoins - amount;
-      await sb.from('profiles').update({ coins: nextCoins, momo_number: momoNumber }).eq('id', currentUser.id);
-      currentProfile = { ...currentProfile, coins: nextCoins, momo_number: momoNumber };
+      if (currentUser) {
+        await sb.from('profiles').update({ coins: nextCoins, momo_number: momoNumber }).eq('id', currentUser.id);
+      }
+      currentProfile = { ...baseProfile, coins: nextCoins, momo_number: momoNumber };
       viewingProfileData = currentProfile;
       alert(`Withdrawal request for ${amount} Coins (UGX ${(amount * UGX_PER_COIN).toLocaleString()}) to ${momoNumber} recorded.`);
       closeProfileSubModal();
