@@ -5,11 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Mplanet — Short Videos & Creator Feed</title>
-  <!-- Tailwind CSS & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <!-- Supabase JS SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body, html {
@@ -18,76 +15,41 @@
       overflow: hidden; height: 100%; width: 100%;
       font-size: 16px;
     }
-    /* Coded Mplanet Brand Mark */
-    .mplanet-brand {
-      display: inline-flex;
-      align-items: center;
-      height: 40px;
-    }
-    .mplanet-brand-lg {
-      display: inline-flex;
-      align-items: center;
-      height: 50px;
-    }
-    /* Custom Planet Create / Upload Button */
+    .mplanet-brand { display: inline-flex; align-items: center; height: 40px; }
+    .mplanet-brand-lg { display: inline-flex; align-items: center; height: 50px; }
     .planet-btn {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 12px 14px;
-      margin: 6px 0;
-      border-radius: 16px;
+      width: 100%; display: flex; align-items: center; gap: 14px;
+      padding: 12px 14px; margin: 6px 0; border-radius: 16px;
       background: linear-gradient(135deg, rgba(37, 99, 235, 0.28), rgba(249, 115, 22, 0.22));
       border: 1px solid rgba(56, 189, 248, 0.45);
       box-shadow: 0 0 20px rgba(56, 189, 248, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-      cursor: pointer;
-      text-align: left;
+      cursor: pointer; text-align: left;
       transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
     }
     .planet-btn:hover {
       background: linear-gradient(135deg, rgba(37, 99, 235, 0.38), rgba(249, 115, 22, 0.32));
-      box-shadow: 0 0 24px rgba(249, 115, 22, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.2);
     }
-    .planet-btn:active {
-      transform: scale(0.97);
-    }
+    .planet-btn:active { transform: scale(0.97); }
     .planet-wrap {
-      position: relative;
-      width: 44px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      overflow: visible;
+      position: relative; width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; overflow: visible;
     }
     .planet-wrap .planet {
-      position: relative;
-      font-size: 24px;
-      line-height: 1;
-      z-index: 2;
+      position: relative; font-size: 24px; line-height: 1; z-index: 2;
       filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.55));
     }
-    /* Full tilted ring cradling the planet */
     .planet-wrap .ring {
-      position: absolute;
-      width: 46px;
-      height: 14px;
+      position: absolute; width: 46px; height: 14px;
       border: 2.2px solid #fb923c;
       border-top-color: rgba(251, 146, 60, 0.45);
       border-bottom-color: #fdba74;
-      border-radius: 50%;
-      transform: rotate(-20deg);
+      border-radius: 50%; transform: rotate(-20deg);
       box-shadow: 0 0 9px rgba(249, 115, 22, 0.7), inset 0 0 4px rgba(253, 186, 116, 0.5);
-      z-index: 3;
-      pointer-events: none;
+      z-index: 3; pointer-events: none;
     }
-    /* Front arc crossing in front of the planet */
     .planet-wrap .ring::after {
-      content: "";
-      position: absolute;
-      inset: -2.2px;
+      content: ""; position: absolute; inset: -2.2px;
       border: 2.4px solid transparent;
       border-bottom-color: #ffedd5;
       border-left-color: #fb923c;
@@ -95,39 +57,16 @@
       border-radius: 50%;
     }
     .planet-wrap .plus-star {
-      position: absolute;
-      top: -1px;
-      right: -2px;
-      width: 17px;
-      height: 17px;
-      border-radius: 50%;
+      position: absolute; top: -1px; right: -2px;
+      width: 17px; height: 17px; border-radius: 50%;
       background: linear-gradient(135deg, #38bdf8, #f97316);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 8px rgba(249, 115, 22, 0.85);
-      z-index: 4;
+      color: #fff; font-size: 12px; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 8px rgba(249, 115, 22, 0.85); z-index: 4;
     }
-    .btn-text {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.2;
-    }
-    .btn-text .main {
-      font-size: 16px;
-      font-weight: 800;
-      color: #ffffff;
-    }
-    .btn-text .sub {
-      font-size: 12px;
-      font-weight: 500;
-      color: #7dd3fc;
-      margin-top: 2px;
-    }
-    /* Vertical Snap Scroll Feed */
+    .btn-text { display: flex; flex-direction: column; line-height: 1.2; }
+    .btn-text .main { font-size: 16px; font-weight: 800; color: #ffffff; }
+    .btn-text .sub { font-size: 12px; font-weight: 500; color: #7dd3fc; margin-top: 2px; }
     #video-feed {
       height: 100dvh; width: 100%; overflow-y: scroll;
       scroll-snap-type: y mandatory; scroll-behavior: smooth;
@@ -138,13 +77,8 @@
       scroll-snap-align: start; scroll-snap-stop: always;
       background: #050b18; display: flex; align-items: center; justify-content: center;
     }
-    video {
-      width: 100%; height: 100%; object-fit: cover; max-width: 500px;
-    }
-    @keyframes spinDisc {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
+    video { width: 100%; height: 100%; object-fit: cover; max-width: 500px; }
+    @keyframes spinDisc { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .spinning-disc { animation: spinDisc 5s linear infinite; }
     @keyframes heartPop {
       0% { transform: scale(0.5); opacity: 1; }
@@ -159,7 +93,6 @@
 </head>
 <body>
 
-  <!-- Coded Mplanet Logo Template -->
   <template id="mplanet-logo-svg">
     <svg viewBox="0 0 410 112" class="h-full w-auto overflow-visible" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mplanet">
       <defs>
@@ -185,24 +118,14 @@
           <stop offset="100%" stop-color="#B45309" />
         </linearGradient>
       </defs>
-
-      <!-- Glossy Cosmic Blue "M" -->
       <path d="M12 96 V42 C12 29 29 25 36 35 L54 62 L72 35 C79 25 96 29 96 42 V96 C96 103 82 103 82 96 V56 L61 86 C57 92 51 92 47 86 L26 56 V96 C26 103 12 103 12 96 Z"
             fill="url(#mpBlueGloss)" stroke="#93C5FD" stroke-width="2" stroke-linejoin="round" />
-
-      <!-- Back Ring -->
       <ellipse cx="54" cy="27" rx="44" ry="11" transform="rotate(-16 54 27)"
                fill="none" stroke="url(#mpRingGrad)" stroke-width="4.5" opacity="0.85" />
-
-      <!-- Planet Sphere -->
       <circle cx="54" cy="27" r="18" fill="url(#mpPlanetSphere)" stroke="#BAE6FD" stroke-width="1.2" />
       <path d="M43 21 Q51 17 59 22 T68 25" fill="none" stroke="#E0F2FE" stroke-width="2.5" stroke-linecap="round" opacity="0.7" />
       <path d="M40 31 Q50 35 62 29" fill="none" stroke="#38BDF8" stroke-width="2.2" stroke-linecap="round" opacity="0.6" />
-
-      <!-- Front Ring -->
       <path d="M11 35 A44 11 -16 0 0 97 19" fill="none" stroke="url(#mpRingGrad)" stroke-width="5" stroke-linecap="round" />
-
-      <!-- Larger Glossy Orange "planet" Wordmark -->
       <text x="108" y="90" font-family="'Trebuchet MS', 'Segoe UI', Roboto, sans-serif"
             font-weight="900" font-size="82" letter-spacing="-1.5"
             fill="url(#mpOrangeGloss)" stroke="#FFEDD5" stroke-width="1.8" paint-order="stroke fill">
@@ -211,14 +134,12 @@
     </svg>
   </template>
 
-  <!-- Top Header Navigation with Top-Left Hamburger Button & Coded Mplanet Logo -->
+  <!-- Top Header Navigation -->
   <header class="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-3.5 py-3 bg-gradient-to-b from-slate-950/90 to-transparent max-w-[500px] mx-auto">
     <div class="flex items-center gap-2.5">
-      <!-- Hamburger Menu Trigger -->
-      <button type="button" onclick="toggleSidebar(true)" aria-label="Open Menu" class="text-white hover:text-sky-400 p-1.5 rounded-lg active:scale-95 transition">
+      <button id="hamburger-btn" type="button" aria-label="Open Menu" class="text-white hover:text-sky-400 p-1.5 rounded-lg active:scale-95 transition">
         <i class="fa-solid fa-bars text-2xl"></i>
       </button>
-      <!-- Mplanet Brand Container -->
       <a href="#" onclick="switchFeed('foryou'); return false;" class="mplanet-brand logo-slot"></a>
     </div>
 
@@ -234,31 +155,28 @@
   </header>
 
   <!-- Slide-Out Hamburger Menu Drawer -->
-  <div id="menu-drawer-backdrop" onclick="toggleSidebar(false)" class="hidden fixed inset-0 z-40 bg-slate-950/75 backdrop-blur-xs transition-opacity"></div>
-  <aside id="menu-drawer" class="fixed top-0 left-0 bottom-0 z-50 w-76 bg-slate-950 border-r border-blue-500/20 p-5 flex flex-col justify-between transform -translate-x-full transition-transform duration-200 ease-out">
+  <div id="menu-drawer-backdrop" class="hidden fixed inset-0 z-40 bg-slate-950/75 transition-opacity"></div>
+  <aside id="menu-drawer" class="fixed top-0 left-0 bottom-0 z-50 w-72 max-w-[82vw] bg-slate-950 border-r border-blue-500/20 p-5 flex flex-col justify-between transform -translate-x-full transition-transform duration-200 ease-out">
     <div>
-      <!-- Drawer Header with Coded Mplanet Logo -->
       <div class="flex items-center justify-between pb-4 border-b border-blue-500/20">
         <div class="mplanet-brand-lg logo-slot"></div>
-        <button type="button" onclick="toggleSidebar(false)" aria-label="Close Menu" class="text-white/70 hover:text-orange-400 p-1.5 transition">
+        <button id="close-drawer-btn" type="button" aria-label="Close Menu" class="text-white/70 hover:text-orange-400 p-1.5 transition">
           <i class="fa-solid fa-xmark text-2xl"></i>
         </button>
       </div>
 
-      <!-- Navigation Items -->
       <nav class="mt-6 flex flex-col gap-2 text-base">
-        <button type="button" onclick="toggleSidebar(false); switchFeed('foryou')" class="w-full flex items-center gap-4 px-3.5 py-3 rounded-xl text-white hover:bg-blue-500/15 transition text-left font-semibold">
+        <button type="button" onclick="closeDrawerOnly(); switchFeed('foryou')" class="w-full flex items-center gap-4 px-3.5 py-3 rounded-xl text-white hover:bg-blue-500/15 transition text-left font-semibold">
           <i class="fa-solid fa-house w-6 text-center text-xl text-sky-400"></i>
           <span>Home</span>
         </button>
 
-        <button type="button" onclick="toggleSidebar(false); openSearchModal()" class="w-full flex items-center gap-4 px-3.5 py-3 rounded-xl text-white/90 hover:bg-blue-500/15 transition text-left font-semibold">
+        <button type="button" onclick="closeDrawerOnly(); openSearchModal()" class="w-full flex items-center gap-4 px-3.5 py-3 rounded-xl text-white/90 hover:bg-blue-500/15 transition text-left font-semibold">
           <i class="fa-solid fa-compass w-6 text-center text-xl text-blue-400"></i>
           <span>Discover</span>
         </button>
 
-        <!-- Classic Live Button Placed Cleanly in Menu -->
-        <button type="button" onclick="toggleSidebar(false); openLiveModal()" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-white hover:bg-orange-500/15 transition text-left font-semibold">
+        <button type="button" onclick="closeDrawerOnly(); openLiveModal()" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-white hover:bg-orange-500/15 transition text-left font-semibold">
           <span class="flex items-center gap-4">
             <i class="fa-solid fa-video w-6 text-center text-xl text-orange-500"></i>
             <span>Live</span>
@@ -266,8 +184,7 @@
           <span class="px-2 py-0.5 rounded bg-orange-500 text-white text-[11px] font-extrabold tracking-wide">LIVE</span>
         </button>
 
-        <!-- Custom Planet Create / Upload Button -->
-        <button type="button" onclick="toggleSidebar(false); requireAuth(() => toggleModal('upload-modal', true))" class="planet-btn">
+        <button type="button" onclick="closeDrawerOnly(); toggleModal('upload-modal', true)" class="planet-btn">
           <span class="planet-wrap">
             <span class="planet">🌍</span>
             <span class="ring"></span>
@@ -279,19 +196,18 @@
           </span>
         </button>
 
-        <button type="button" onclick="toggleSidebar(false); requireAuth(() => openInboxModal())" class="w-full flex items-center gap-4 px-3.5 py-3 rounded-xl text-white/90 hover:bg-blue-500/15 transition text-left font-semibold">
+        <button type="button" onclick="closeDrawerOnly(); openInboxModal()" class="w-full flex items-center gap-4 px-3.5 py-3 rounded-xl text-white/90 hover:bg-blue-500/15 transition text-left font-semibold">
           <i class="fa-regular fa-message w-6 text-center text-xl text-sky-300"></i>
           <span>Inbox</span>
         </button>
 
-        <button type="button" onclick="toggleSidebar(false); handleProfileNav()" class="w-full flex items-center gap-4 px-3.5 py-3 rounded-xl text-white/90 hover:bg-blue-500/15 transition text-left font-semibold">
+        <button id="drawer-profile-btn" type="button" class="w-full flex items-center gap-4 px-3.5 py-3 rounded-xl text-white/90 hover:bg-blue-500/15 active:bg-blue-500/25 transition text-left font-semibold cursor-pointer">
           <i class="fa-regular fa-user w-6 text-center text-xl text-orange-400"></i>
           <span id="nav-profile-label">Profile</span>
         </button>
       </nav>
     </div>
 
-    <!-- Bottom Drawer Footer -->
     <div class="pt-4 border-t border-blue-500/20 text-sm text-slate-400">
       Mplanet Creator Platform
     </div>
@@ -304,12 +220,9 @@
   <div id="live-modal" onclick="if(event.target===this) closeLiveModal()" class="hidden fixed inset-0 z-50 bg-slate-950/90 flex items-center justify-center p-4">
     <div class="bg-slate-900 w-full max-w-md rounded-2xl p-5 border border-orange-500/35 shadow-2xl">
       <div class="flex justify-between items-center mb-4">
-        <div class="flex items-center gap-2.5">
-          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-extrabold uppercase bg-orange-500 text-white">
-            <i class="fa-solid fa-video"></i>
-            Mplanet Live
-          </span>
-        </div>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-extrabold uppercase bg-orange-500 text-white">
+          <i class="fa-solid fa-video"></i> Mplanet Live
+        </span>
         <button type="button" onclick="closeLiveModal()" aria-label="Back" class="text-white/60 hover:text-orange-400 p-1"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
       <div class="aspect-[9/12] w-full rounded-xl bg-slate-950 border border-blue-500/25 overflow-hidden relative flex flex-col items-center justify-center mb-4">
@@ -324,9 +237,7 @@
         <button type="button" onclick="startLivePreview()" class="flex-1 bg-gradient-to-r from-blue-600 to-orange-500 py-3 rounded-xl font-bold text-base shadow-lg">
           <i class="fa-solid fa-video mr-1.5"></i> Go Live Now
         </button>
-        <button type="button" onclick="closeLiveModal()" class="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 font-semibold text-base">
-          Back
-        </button>
+        <button type="button" onclick="closeLiveModal()" class="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 font-semibold text-base">Back</button>
       </div>
     </div>
   </div>
@@ -375,34 +286,11 @@
     </div>
   </div>
 
-  <!-- Auth Modal (Login / Sign Up) -->
-  <div id="auth-modal" onclick="if(event.target===this) toggleModal('auth-modal', false)" class="hidden fixed inset-0 z-50 bg-slate-950/90 flex items-center justify-center p-4">
-    <div class="bg-slate-900 w-full max-w-sm rounded-2xl p-6 border border-blue-500/30">
-      <div class="flex justify-between items-center mb-4">
-        <div class="flex items-center gap-2.5">
-          <button type="button" onclick="toggleModal('auth-modal', false)" aria-label="Back" class="text-white/70 hover:text-sky-400 p-1"><i class="fa-solid fa-arrow-left text-lg"></i></button>
-          <h2 class="font-bold text-2xl bg-gradient-to-r from-sky-400 to-orange-400 bg-clip-text text-transparent">Join Mplanet</h2>
-        </div>
-        <button type="button" onclick="toggleModal('auth-modal', false)" aria-label="Close Auth" class="text-white/60 hover:text-orange-400 p-1"><i class="fa-solid fa-xmark text-xl"></i></button>
-      </div>
-      <form onsubmit="handleAuth(event)" class="space-y-3.5">
-        <input id="auth-username" type="text" placeholder="Username (for new accounts)" class="w-full bg-slate-800 rounded-xl p-3.5 text-base outline-none focus:ring-1 focus:ring-blue-500" />
-        <input id="auth-email" type="email" placeholder="Email address" required class="w-full bg-slate-800 rounded-xl p-3.5 text-base outline-none focus:ring-1 focus:ring-blue-500" />
-        <input id="auth-password" type="password" placeholder="Password (min 6 chars)" required class="w-full bg-slate-800 rounded-xl p-3.5 text-base outline-none focus:ring-1 focus:ring-blue-500" />
-        <div class="flex gap-2.5 pt-2">
-          <button type="submit" onclick="authMode='login'" class="flex-1 bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-semibold text-base transition">Log In</button>
-          <button type="submit" onclick="authMode='signup'" class="flex-1 bg-orange-500 hover:bg-orange-400 py-3 rounded-xl font-semibold text-base transition">Sign Up</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <!-- Profile Modal (Full Profile Spec from Screenshots) -->
   <div id="profile-modal" class="hidden fixed inset-0 z-50 bg-slate-950 flex flex-col max-w-[500px] mx-auto overflow-y-auto">
-    <!-- Top Header -->
     <div class="sticky top-0 z-20 flex justify-between items-center px-4 py-3.5 bg-slate-950/95 border-b border-blue-500/20">
       <button type="button" onclick="toggleModal('profile-modal', false)" aria-label="Back" class="hover:text-sky-400 p-1"><i class="fa-solid fa-arrow-left text-xl"></i></button>
-      <span id="profile-header-username" class="font-bold text-base text-sky-300">@username</span>
+      <span id="profile-header-username" class="font-bold text-base text-sky-300">@briank</span>
       <div class="flex items-center gap-2">
         <button type="button" onclick="openProfileSubModal('settings')" aria-label="Settings" class="p-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-sky-400 transition">
           <i class="fa-solid fa-gear text-lg"></i>
@@ -413,12 +301,11 @@
 
     <!-- 1. Profile Photo, 2. Username, 3. Display Name, 4. Bio & 12. Follow/Unfollow -->
     <div class="px-5 pt-5 pb-4 flex flex-col items-center text-center border-b border-blue-500/20">
-      <!-- 1. Profile Photo (Circle photo, tap to change) -->
       <label class="relative cursor-pointer group mb-3" title="Tap to change profile photo">
         <input id="profile-photo-input" type="file" accept="image/*" onchange="handleProfilePhotoChange(event)" class="hidden" />
         <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-blue-600 via-sky-400 to-orange-500 p-0.5 shadow-lg shadow-blue-950 overflow-hidden">
           <div id="profile-avatar" class="w-full h-full rounded-full bg-slate-900 flex items-center justify-center text-3xl font-bold overflow-hidden">
-            M
+            B
           </div>
         </div>
         <span class="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-orange-500 border-2 border-slate-950 text-white text-xs flex items-center justify-center shadow">
@@ -426,21 +313,16 @@
         </span>
       </label>
 
-      <!-- 3. Display Name (Real name e.g. Brian K) -->
       <h3 id="profile-display-name" class="font-extrabold text-xl text-white">Brian K</h3>
-      <!-- 2. Username (@name - unique, can't change every day) -->
       <p id="profile-username-handle" class="text-sm font-semibold text-sky-400 mt-0.5">@briank</p>
       <p id="profile-username-note" class="text-[11px] text-slate-400 mt-0.5">Unique @name • Can't change every day</p>
-
-      <!-- 4. Bio (1 line: what you post, e.g. Funny videos from Kampala) -->
       <p id="profile-bio" class="text-sm text-white/90 mt-2 max-w-[340px] line-clamp-1">Funny videos from Kampala</p>
 
-      <!-- 12. Follow / Unfollow Button (shown when viewing someone else's profile) -->
       <button id="profile-follow-btn" type="button" onclick="toggleViewedProfileFollow()" class="hidden mt-3 px-6 py-2 rounded-full font-bold text-sm bg-orange-500 hover:bg-orange-400 text-white transition">
         Follow
       </button>
 
-      <!-- 5. Stats (Posts, Followers, Following, Total Likes) -->
+      <!-- 5. Stats -->
       <div class="grid grid-cols-4 gap-2 w-full mt-4 pt-3 border-t border-blue-500/15">
         <div class="text-center">
           <span id="stat-videos" class="font-extrabold text-base block text-white">0</span>
@@ -483,11 +365,11 @@
       </div>
       <div class="flex items-baseline justify-between mb-3">
         <div>
-          <span id="wallet-coins-balance" class="text-2xl font-black text-white">0</span>
+          <span id="wallet-coins-balance" class="text-2xl font-black text-white">250</span>
           <span class="text-xs font-bold text-amber-400 ml-1">Coins</span>
         </div>
         <div class="text-right">
-          <span id="wallet-ugx-balance" class="text-lg font-extrabold text-sky-300">UGX 0</span>
+          <span id="wallet-ugx-balance" class="text-lg font-extrabold text-sky-300">UGX 12,500</span>
         </div>
       </div>
       <div class="flex gap-2.5">
@@ -516,10 +398,8 @@
       </button>
     </div>
 
-    <!-- Posts Grid Container (My Posts / Liked / Saved) -->
     <div id="profile-videos-grid" class="grid grid-cols-3 gap-0.5 p-0.5 flex-1 min-h-[220px]"></div>
 
-    <!-- Sub-Panel Drawer inside Profile (Edit Profile / Settings / Buy Coins / Withdraw) -->
     <div id="profile-subpanel" class="hidden fixed inset-0 z-50 bg-slate-950/90 flex items-end justify-center max-w-[500px] mx-auto" onclick="if(event.target===this) closeProfileSubModal()">
       <div class="bg-slate-900 border-t border-blue-500/30 w-full rounded-t-2xl p-5 max-h-[82dvh] overflow-y-auto">
         <div class="flex justify-between items-center pb-3 mb-4 border-b border-blue-500/20">
@@ -542,7 +422,6 @@
   </div>
 
   <script>
-    // Mount coded Mplanet SVG logo into header & drawer
     (function mountLogos() {
       const tpl = document.getElementById('mplanet-logo-svg');
       if (!tpl) return;
@@ -551,31 +430,34 @@
       });
     })();
 
-    // ==========================================
-    // 1. SUPABASE CONFIGURATION
-    // ==========================================
-    const SUPABASE_URL = "YOUR_SUPABASE_URL";
-    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Supabase will be connected later
+    const SUPABASE_URL = "";
+    const SUPABASE_ANON_KEY = "";
+    const sb = null;
 
-    const UGX_PER_COIN = 50; // 1 Coin = 50 UGX conversion rate
+    const UGX_PER_COIN = 50;
     const USERNAME_COOLDOWN_DAYS = 30;
 
-    let currentUser = null;
-    let currentProfile = null;
-    let viewingProfileData = null;
+    let currentProfile = {
+      id: 'local-user',
+      username: 'briank',
+      display_name: 'Brian K',
+      bio: 'Funny videos from Kampala',
+      coins: 250,
+      momo_number: '',
+      phone: ''
+    };
+    let viewingProfileData = currentProfile;
     let activeProfileTab = 'posts';
     let allVideos = [];
     let likedVideoIds = new Set();
     let savedVideoIds = new Set();
     let followingIds = new Set();
     let activeVideoIdForComments = null;
-    let authMode = 'login';
     let isMuted = false;
     let liveMediaStream = null;
-    let ignoreNextPopstate = false;
 
-    const MODAL_IDS = ['live-modal', 'comments-modal', 'upload-modal', 'auth-modal', 'profile-modal', 'search-modal'];
+    const MODAL_IDS = ['live-modal', 'comments-modal', 'upload-modal', 'profile-modal', 'search-modal'];
 
     const DEMO_VIDEOS = [
       {
@@ -600,43 +482,32 @@
       }
     ];
 
-    // ==========================================
-    // 2. SIDEBAR DRAWER, LIVE, BACK NAV & INIT
-    // ==========================================
-    function isDrawerOpen() {
-      return !document.getElementById('menu-drawer').classList.contains('-translate-x-full');
+    function closeDrawerOnly() {
+      document.getElementById('menu-drawer-backdrop').classList.add('hidden');
+      document.getElementById('menu-drawer').classList.add('-translate-x-full');
     }
 
-    function getOpenModalId() {
-      return MODAL_IDS.find(id => !document.getElementById(id).classList.contains('hidden')) || null;
+    function openDrawerOnly() {
+      document.getElementById('menu-drawer-backdrop').classList.remove('hidden');
+      document.getElementById('menu-drawer').classList.remove('-translate-x-full');
     }
 
-    function pushOverlayState() {
-      if (window.history && (!window.history.state || !window.history.state.mplanetOverlay)) {
-        window.history.pushState({ mplanetOverlay: true }, '');
-      }
-    }
+    document.getElementById('hamburger-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openDrawerOnly();
+    });
+    document.getElementById('close-drawer-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeDrawerOnly();
+    });
+    document.getElementById('menu-drawer-backdrop').addEventListener('click', closeDrawerOnly);
 
-    function popOverlayStateIfNeeded() {
-      if (window.history && window.history.state && window.history.state.mplanetOverlay) {
-        ignoreNextPopstate = true;
-        window.history.back();
-      }
-    }
-
-    function toggleSidebar(open) {
-      const drawer = document.getElementById('menu-drawer');
-      const backdrop = document.getElementById('menu-drawer-backdrop');
-      if (open) {
-        backdrop.classList.remove('hidden');
-        drawer.classList.remove('-translate-x-full');
-        pushOverlayState();
-      } else {
-        backdrop.classList.add('hidden');
-        drawer.classList.add('-translate-x-full');
-        if (!getOpenModalId()) popOverlayStateIfNeeded();
-      }
-    }
+    document.getElementById('drawer-profile-btn').addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      closeDrawerOnly();
+      handleProfileNav();
+    });
 
     function openLiveModal() {
       toggleModal('live-modal', true);
@@ -654,7 +525,7 @@
       }
     }
 
-    function closeLiveModal(fromPopstate = false) {
+    function closeLiveModal() {
       if (liveMediaStream) {
         liveMediaStream.getTracks().forEach(t => t.stop());
         liveMediaStream = null;
@@ -664,12 +535,11 @@
       preview.classList.add('hidden');
       document.getElementById('live-placeholder').classList.remove('hidden');
       document.getElementById('live-modal').classList.add('hidden');
-      if (!fromPopstate && !isDrawerOpen()) popOverlayStateIfNeeded();
     }
 
-    function toggleModal(id, show, fromPopstate = false) {
+    function toggleModal(id, show) {
       if (id === 'live-modal' && !show) {
-        closeLiveModal(fromPopstate);
+        closeLiveModal();
         return;
       }
       if (id === 'profile-modal' && !show) {
@@ -678,37 +548,7 @@
       const el = document.getElementById(id);
       if (!el) return;
       el.classList.toggle('hidden', !show);
-      if (show) {
-        pushOverlayState();
-      } else if (!fromPopstate && !isDrawerOpen() && !getOpenModalId()) {
-        popOverlayStateIfNeeded();
-      }
     }
-
-    window.addEventListener('popstate', () => {
-      if (ignoreNextPopstate) {
-        ignoreNextPopstate = false;
-        return;
-      }
-      const subpanel = document.getElementById('profile-subpanel');
-      if (subpanel && !subpanel.classList.contains('hidden')) {
-        subpanel.classList.add('hidden');
-        return;
-      }
-      const openModal = getOpenModalId();
-      if (openModal) {
-        if (openModal === 'live-modal') {
-          closeLiveModal(true);
-        } else {
-          document.getElementById(openModal).classList.add('hidden');
-        }
-        return;
-      }
-      if (isDrawerOpen()) {
-        document.getElementById('menu-drawer-backdrop').classList.add('hidden');
-        document.getElementById('menu-drawer').classList.add('-translate-x-full');
-      }
-    });
 
     window.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
@@ -717,119 +557,35 @@
         closeProfileSubModal();
         return;
       }
-      const openModal = getOpenModalId();
-      if (openModal) {
-        toggleModal(openModal, false);
-      } else if (isDrawerOpen()) {
-        toggleSidebar(false);
-      }
+      const openId = MODAL_IDS.find(id => !document.getElementById(id).classList.contains('hidden'));
+      if (openId) toggleModal(openId, false);
+      else closeDrawerOnly();
     });
 
     async function initApp() {
-      const { data: { session } } = await sb.auth.getSession();
-      if (session?.user) {
-        await setAuthenticatedUser(session.user);
-      }
+      document.getElementById('nav-profile-label').textContent = `Profile (@${currentProfile.username})`;
       await loadFeed('foryou');
     }
 
-    async function setAuthenticatedUser(user) {
-      currentUser = user;
-      const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
-      currentProfile = profile || {
-        id: user.id,
-        username: (user.email || 'user').split('@')[0].toLowerCase(),
-        display_name: 'Brian K',
-        bio: 'Funny videos from Kampala',
-        coins: 0,
-        momo_number: '',
-        phone: ''
-      };
-      document.getElementById('nav-profile-label').textContent = currentProfile?.username ? `Profile (@${currentProfile.username})` : 'Profile';
-
-      const { data: likes } = await sb.from('likes').select('video_id').eq('user_id', user.id);
-      likedVideoIds = new Set((likes || []).map(l => l.video_id));
-
-      const { data: follows } = await sb.from('follows').select('following_id').eq('follower_id', user.id);
-      followingIds = new Set((follows || []).map(f => f.following_id));
-    }
-
-    async function handleAuth(e) {
-      e.preventDefault();
-      const email = document.getElementById('auth-email').value.trim();
-      const password = document.getElementById('auth-password').value;
-      const username = document.getElementById('auth-username').value.trim() || email.split('@')[0];
-
-      if (authMode === 'signup') {
-        const { data, error } = await sb.auth.signUp({ email, password });
-        if (error) return alert(error.message);
-        if (data.user) {
-          await sb.from('profiles').insert({
-            id: data.user.id,
-            username: username.toLowerCase(),
-            display_name: 'Brian K',
-            bio: 'Funny videos from Kampala',
-            coins: 0
-          });
-          await setAuthenticatedUser(data.user);
-          toggleModal('auth-modal', false);
-          loadFeed('foryou');
-        }
-      } else {
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
-        if (error) return alert(error.message);
-        await setAuthenticatedUser(data.user);
-        toggleModal('auth-modal', false);
-        loadFeed('foryou');
-      }
-    }
-
-    async function logoutUser() {
-      await sb.auth.signOut();
-      currentUser = null;
-      currentProfile = null;
-      viewingProfileData = null;
-      likedVideoIds.clear();
-      followingIds.clear();
-      document.getElementById('nav-profile-label').textContent = 'Profile';
+    function logoutUser() {
       toggleModal('profile-modal', false);
       loadFeed('foryou');
     }
 
-    function requireAuth(callback) {
-      if (!currentUser) {
-        toggleModal('auth-modal', true);
-      } else {
-        callback();
-      }
-    }
-
-    // ==========================================
-    // 3. FEED LOADING & INTERSECTION OBSERVER
-    // ==========================================
     async function loadFeed(mode = 'foryou') {
       document.getElementById('tab-foryou').className = mode === 'foryou' ? 'text-white border-b-2 border-orange-500 pb-0.5' : 'text-white/60 hover:text-white transition';
       document.getElementById('tab-following').className = mode === 'following' ? 'text-white border-b-2 border-orange-500 pb-0.5' : 'text-white/60 hover:text-white transition';
 
-      let query = sb.from('videos').select('*, profiles(id, username, display_name, bio, avatar_url)').order('created_at', { ascending: false });
-      if (mode === 'following' && currentUser) {
+      let videos = DEMO_VIDEOS;
+      if (mode === 'following') {
         const ids = Array.from(followingIds);
-        query = ids.length ? query.in('user_id', ids) : null;
+        videos = DEMO_VIDEOS.filter(v => ids.includes(v.profiles?.id));
       }
-
-      let videos = [];
-      if (query) {
-        const { data } = await query;
-        videos = data || [];
-      }
-
-      if (!videos.length && mode === 'foryou') videos = DEMO_VIDEOS;
       allVideos = videos;
       renderVideos(videos);
     }
 
     function switchFeed(mode) {
-      if (mode === 'following' && !currentUser) return toggleModal('auth-modal', true);
       loadFeed(mode);
     }
 
@@ -845,16 +601,12 @@
         const isSaved = savedVideoIds.has(v.id);
         const creator = v.profiles || { id: v.user_id, username: 'mplanet_user' };
         const isFollowing = followingIds.has(creator.id);
-        const showFollowBtn = (!currentUser || currentUser.id !== creator.id) && !isFollowing;
+        const showFollowBtn = !isFollowing;
 
         return `
         <div class="video-card" data-id="${v.id}" ondblclick="doubleTapLike(event, '${v.id}')">
           <video src="${v.video_url}" loop playsinline onclick="togglePlayPause(this)"></video>
-
-          <!-- Bottom Gradient Overlay & Action Bar -->
           <div class="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-slate-950/95 via-slate-950/75 to-transparent pt-12 pb-4 px-4">
-            
-            <!-- Creator Info, Caption & Audio -->
             <div class="mb-3 pointer-events-none">
               <h3 class="font-bold text-lg mb-1 text-sky-300">@${creator.username}</h3>
               <p class="text-base text-white/95 line-clamp-2 mb-1.5">${escapeHtml(v.caption || '')}</p>
@@ -863,11 +615,7 @@
                 <span class="truncate max-w-[280px]">${escapeHtml(v.music_name || 'Original Sound')}</span>
               </div>
             </div>
-
-            <!-- Transferred Bottom Action Buttons Row -->
             <div class="flex items-center justify-between pt-2.5 border-t border-blue-500/20">
-              
-              <!-- Creator Avatar + Follow -->
               <div class="relative flex items-center">
                 <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-blue-600 via-sky-400 to-orange-500 p-0.5">
                   <div class="w-full h-full rounded-full bg-slate-950 flex items-center justify-center font-bold text-base uppercase">
@@ -879,36 +627,25 @@
                   <i class="fa-solid fa-plus"></i>
                 </button>` : ''}
               </div>
-
-              <!-- Like Button -->
               <button type="button" onclick="toggleLike('${v.id}')" class="flex items-center gap-1.5 active:scale-110 transition">
                 <i id="like-icon-${v.id}" class="fa-solid fa-heart text-2xl ${isLiked ? 'text-orange-500' : 'text-white'}"></i>
                 <span id="like-count-${v.id}" class="text-sm font-bold">${v.likes_count || 0}</span>
               </button>
-
-              <!-- Comments Button -->
               <button type="button" onclick="openComments('${v.id}')" class="flex items-center gap-1.5 active:scale-110 transition">
                 <i class="fa-solid fa-comment-dots text-2xl text-sky-300"></i>
                 <span id="comment-count-${v.id}" class="text-sm font-bold">${v.comments_count || 0}</span>
               </button>
-
-              <!-- Bookmark / Save Button -->
               <button type="button" onclick="toggleSave('${v.id}')" class="flex items-center gap-1.5 active:scale-110 transition">
                 <i id="save-icon-${v.id}" class="fa-solid fa-bookmark text-2xl ${isSaved ? 'text-blue-400' : 'text-white'}"></i>
                 <span id="save-count-${v.id}" class="text-sm font-bold">${v.saves_count || 0}</span>
               </button>
-
-              <!-- Share Button -->
               <button type="button" onclick="shareVideo('${v.id}', '${creator.username}')" class="flex items-center gap-1.5 active:scale-110 transition">
                 <i class="fa-solid fa-share text-2xl text-white"></i>
                 <span class="text-sm font-bold">Share</span>
               </button>
-
-              <!-- Spinning Sound Disc / Mute Toggle -->
               <button type="button" onclick="toggleMuteAll()" title="Toggle Mute" class="relative w-10 h-10 rounded-full bg-slate-900 border-2 border-blue-500/60 flex items-center justify-center spinning-disc">
                 <i class="mute-icon fa-solid ${isMuted ? 'fa-volume-xmark text-orange-400' : 'fa-music text-sky-400'} text-sm"></i>
               </button>
-
             </div>
           </div>
         </div>`;
@@ -924,23 +661,17 @@
           if (!video) return;
           if (entry.isIntersecting) {
             video.muted = isMuted;
-            video.play().catch(() => {
-              video.muted = true;
-              video.play();
-            });
+            video.play().catch(() => { video.muted = true; video.play(); });
           } else {
             video.pause();
             video.currentTime = 0;
           }
         });
       }, { threshold: 0.65 });
-
       document.querySelectorAll('.video-card').forEach(card => observer.observe(card));
     }
 
-    function togglePlayPause(video) {
-      video.paused ? video.play() : video.pause();
-    }
+    function togglePlayPause(video) { video.paused ? video.play() : video.pause(); }
 
     function toggleMuteAll() {
       isMuted = !isMuted;
@@ -950,9 +681,6 @@
       });
     }
 
-    // ==========================================
-    // 4. LIKES, SAVES, COMMENTS, FOLLOWS & UPLOAD
-    // ==========================================
     function doubleTapLike(e, videoId) {
       const card = e.currentTarget;
       const heart = document.createElement('i');
@@ -961,7 +689,6 @@
       heart.style.top = `${e.clientY - 40}px`;
       card.appendChild(heart);
       setTimeout(() => heart.remove(), 750);
-
       if (!likedVideoIds.has(videoId)) toggleLike(videoId);
     }
 
@@ -976,63 +703,26 @@
     }
 
     async function toggleLike(videoId) {
-      if (videoId.startsWith('demo-')) {
-        const countEl = document.getElementById(`like-count-${videoId}`);
-        const iconEl = document.getElementById(`like-icon-${videoId}`);
-        const liked = likedVideoIds.has(videoId);
-        liked ? likedVideoIds.delete(videoId) : likedVideoIds.add(videoId);
-        iconEl.classList.toggle('text-orange-500', !liked);
-        iconEl.classList.toggle('text-white', liked);
-        countEl.textContent = parseInt(countEl.textContent) + (liked ? -1 : 1);
-        return;
-      }
-
-      requireAuth(async () => {
-        const countEl = document.getElementById(`like-count-${videoId}`);
-        const iconEl = document.getElementById(`like-icon-${videoId}`);
-        const isLiked = likedVideoIds.has(videoId);
-        const newCount = Math.max(0, parseInt(countEl.textContent) + (isLiked ? -1 : 1));
-
-        if (isLiked) {
-          likedVideoIds.delete(videoId);
-          await sb.from('likes').delete().match({ user_id: currentUser.id, video_id: videoId });
-        } else {
-          likedVideoIds.add(videoId);
-          await sb.from('likes').insert({ user_id: currentUser.id, video_id: videoId });
-        }
-        await sb.from('videos').update({ likes_count: newCount }).eq('id', videoId);
-        iconEl.classList.toggle('text-orange-500', !isLiked);
-        iconEl.classList.toggle('text-white', isLiked);
-        countEl.textContent = newCount;
-      });
+      const countEl = document.getElementById(`like-count-${videoId}`);
+      const iconEl = document.getElementById(`like-icon-${videoId}`);
+      const liked = likedVideoIds.has(videoId);
+      liked ? likedVideoIds.delete(videoId) : likedVideoIds.add(videoId);
+      iconEl.classList.toggle('text-orange-500', !liked);
+      iconEl.classList.toggle('text-white', liked);
+      const nextCount = Math.max(0, parseInt(countEl.textContent) + (liked ? -1 : 1));
+      countEl.textContent = nextCount;
     }
 
     async function toggleFollow(targetUserId, btnEl) {
-      if (targetUserId.startsWith('demo-')) return btnEl.remove();
-      requireAuth(async () => {
-        followingIds.add(targetUserId);
-        await sb.from('follows').insert({ follower_id: currentUser.id, following_id: targetUserId });
-        if (btnEl) btnEl.remove();
-      });
+      followingIds.add(targetUserId);
+      if (btnEl) btnEl.remove();
     }
 
     async function toggleViewedProfileFollow() {
-      if (!viewingProfileData || !currentUser || viewingProfileData.id === currentUser.id) return;
+      if (!viewingProfileData || viewingProfileData.id === currentProfile.id) return;
       const targetId = viewingProfileData.id;
-      const btn = document.getElementById('profile-follow-btn');
-      const isFollowing = followingIds.has(targetId);
-
-      if (isFollowing) {
-        followingIds.delete(targetId);
-        await sb.from('follows').delete().match({ follower_id: currentUser.id, following_id: targetId });
-        btn.textContent = 'Follow';
-        btn.className = 'mt-3 px-6 py-2 rounded-full font-bold text-sm bg-orange-500 hover:bg-orange-400 text-white transition';
-      } else {
-        followingIds.add(targetId);
-        await sb.from('follows').insert({ follower_id: currentUser.id, following_id: targetId });
-        btn.textContent = 'Following';
-        btn.className = 'mt-3 px-6 py-2 rounded-full font-bold text-sm bg-slate-800 hover:bg-slate-700 border border-sky-400/40 text-sky-300 transition';
-      }
+      if (followingIds.has(targetId)) followingIds.delete(targetId);
+      else followingIds.add(targetId);
       await renderProfileView(viewingProfileData);
     }
 
@@ -1040,20 +730,7 @@
       activeVideoIdForComments = videoId;
       toggleModal('comments-modal', true);
       const list = document.getElementById('comments-list');
-      list.innerHTML = `<p class="text-slate-400 text-center">Loading comments...</p>`;
-
-      if (videoId.startsWith('demo-')) {
-        list.innerHTML = `<div class="bg-slate-800/80 p-3 rounded-xl border border-blue-500/15"><span class="font-bold text-sky-400">@alex_ug</span>: Love Mplanet! 🚀🔥</div>`;
-        return;
-      }
-
-      const { data } = await sb.from('comments').select('*, profiles(username)').eq('video_id', videoId).order('created_at', { ascending: true });
-      list.innerHTML = (data || []).map(c => `
-        <div class="bg-slate-800/80 p-3 rounded-xl border border-blue-500/15">
-          <span class="font-bold text-sky-400 text-sm">@${c.profiles?.username || 'user'}</span>
-          <p class="text-white/95 mt-0.5">${escapeHtml(c.content)}</p>
-        </div>
-      `).join('') || `<p class="text-slate-400 text-center">No comments yet. Be the first!</p>`;
+      list.innerHTML = `<div class="bg-slate-800/80 p-3 rounded-xl border border-blue-500/15"><span class="font-bold text-sky-400">@alex_ug</span>: Love Mplanet! 🚀🔥</div>`;
     }
 
     async function submitComment(e) {
@@ -1061,110 +738,50 @@
       const input = document.getElementById('comment-input');
       const content = input.value.trim();
       if (!content || !activeVideoIdForComments) return;
-
-      if (activeVideoIdForComments.startsWith('demo-')) {
-        document.getElementById('comments-list').innerHTML += `<div class="bg-slate-800/80 p-3 rounded-xl border border-orange-500/20"><span class="font-bold text-orange-400">@you</span>: ${escapeHtml(content)}</div>`;
-        input.value = '';
-        return;
-      }
-
-      requireAuth(async () => {
-        await sb.from('comments').insert({
-          video_id: activeVideoIdForComments,
-          user_id: currentUser.id,
-          content
-        });
-        const countEl = document.getElementById(`comment-count-${activeVideoIdForComments}`);
-        const nextCount = parseInt(countEl.textContent) + 1;
-        await sb.from('videos').update({ comments_count: nextCount }).eq('id', activeVideoIdForComments);
-        countEl.textContent = nextCount;
-        input.value = '';
-        openComments(activeVideoIdForComments);
-      });
+      document.getElementById('comments-list').innerHTML += `<div class="bg-slate-800/80 p-3 rounded-xl border border-orange-500/20"><span class="font-bold text-orange-400">@${currentProfile.username}</span>: ${escapeHtml(content)}</div>`;
+      const countEl = document.getElementById(`comment-count-${activeVideoIdForComments}`);
+      countEl.textContent = parseInt(countEl.textContent) + 1;
+      input.value = '';
     }
 
     async function handleVideoUpload(e) {
       e.preventDefault();
       const file = document.getElementById('video-file').files[0];
       const caption = document.getElementById('video-caption').value.trim();
-      const musicName = document.getElementById('video-music').value.trim() || `Original Sound - ${currentProfile?.username || 'Mplanet'}`;
-      const btn = document.getElementById('upload-btn');
-
-      if (!file || !currentUser) return;
-      btn.disabled = true;
-      btn.textContent = 'Uploading to Mplanet...';
-
-      const filePath = `${currentUser.id}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
-      const { error: uploadErr } = await sb.storage.from('videos').upload(filePath, file);
-      if (uploadErr) {
-        btn.disabled = false;
-        btn.textContent = 'Publish Video';
-        return alert('Upload failed: ' + uploadErr.message);
-      }
-
-      const { data: { publicUrl } } = sb.storage.from('videos').getPublicUrl(filePath);
-      await sb.from('videos').insert({
-        user_id: currentUser.id,
-        video_url: publicUrl,
+      const musicName = document.getElementById('video-music').value.trim() || `Original Sound - ${currentProfile.username}`;
+      if (!file) return;
+      const localUrl = URL.createObjectURL(file);
+      const newPost = {
+        id: 'local-' + Date.now(),
+        video_url: localUrl,
         caption,
-        music_name: musicName
-      });
-
-      btn.disabled = false;
-      btn.textContent = 'Publish Video';
+        music_name: musicName,
+        likes_count: 0,
+        comments_count: 0,
+        saves_count: 0,
+        profiles: { id: currentProfile.id, username: currentProfile.username, display_name: currentProfile.display_name, bio: currentProfile.bio }
+      };
+      allVideos.unshift(newPost);
+      renderVideos(allVideos);
       e.target.reset();
       toggleModal('upload-modal', false);
-      loadFeed('foryou');
-    }
-
-    // ==========================================
-    // 5. FULL PROFILE SYSTEM (1 - 12), SEARCH & UTILS
-    // ==========================================
-    function getActiveOrPreviewProfile() {
-      if (currentProfile) return currentProfile;
-      if (!currentProfile) {
-        currentProfile = {
-          id: 'preview-user',
-          username: 'briank',
-          display_name: 'Brian K',
-          bio: 'Funny videos from Kampala',
-          coins: 250,
-          momo_number: '',
-          phone: ''
-        };
-      }
-      return currentProfile;
     }
 
     async function handleProfileNav() {
-      const profile = getActiveOrPreviewProfile();
-      toggleModal('profile-modal', true);
-      viewingProfileData = profile;
+      viewingProfileData = currentProfile;
       activeProfileTab = 'posts';
-      await renderProfileView(profile);
-    }
-
-    async function openCreatorProfile(targetUserId) {
-      if (!targetUserId || targetUserId.startsWith('demo-')) return;
-      requireAuth(async () => {
-        const { data: profile } = await sb.from('profiles').select('*').eq('id', targetUserId).single();
-        if (!profile) return;
-        toggleModal('profile-modal', true);
-        viewingProfileData = profile;
-        activeProfileTab = 'posts';
-        await renderProfileView(profile);
-      });
+      toggleModal('profile-modal', true);
+      await renderProfileView(currentProfile);
     }
 
     async function renderProfileView(profileData) {
-      const isOwnProfile = !currentUser || profileData.id === currentUser.id;
+      const isOwnProfile = profileData.id === currentProfile.id;
       const uname = profileData.username || 'briank';
       const displayName = profileData.display_name || 'Brian K';
       const bio = profileData.bio || 'Funny videos from Kampala';
       const coins = Number(profileData.coins || 0);
       const ugx = coins * UGX_PER_COIN;
 
-      // 1. Profile Photo
       const avatarEl = document.getElementById('profile-avatar');
       if (profileData.avatar_url) {
         avatarEl.innerHTML = `<img src="${profileData.avatar_url}" alt="${escapeHtml(displayName)}" class="w-full h-full object-cover" />`;
@@ -1172,54 +789,29 @@
         avatarEl.innerHTML = `<span>${uname[0].toUpperCase()}</span>`;
       }
 
-      // 2. Username & 3. Display Name & 4. Bio
       document.getElementById('profile-header-username').textContent = `@${uname}`;
       document.getElementById('profile-display-name').textContent = displayName;
       document.getElementById('profile-username-handle').textContent = `@${uname}`;
       document.getElementById('profile-bio').textContent = bio;
 
-      // 12. Follow / Unfollow Button
       const followBtn = document.getElementById('profile-follow-btn');
-      if (!isOwnProfile && currentUser) {
+      if (!isOwnProfile) {
         followBtn.classList.remove('hidden');
-        const alreadyFollowing = followingIds.has(profileData.id);
-        followBtn.textContent = alreadyFollowing ? 'Following' : 'Follow';
-        followBtn.className = alreadyFollowing
-          ? 'mt-3 px-6 py-2 rounded-full font-bold text-sm bg-slate-800 hover:bg-slate-700 border border-sky-400/40 text-sky-300 transition'
-          : 'mt-3 px-6 py-2 rounded-full font-bold text-sm bg-orange-500 hover:bg-orange-400 text-white transition';
+        followBtn.textContent = followingIds.has(profileData.id) ? 'Following' : 'Follow';
       } else {
         followBtn.classList.add('hidden');
       }
 
-      // 5. Stats (Posts, Followers, Following, Total Likes)
-      let postsList = [];
-      let followersCount = 0;
-      let followingCount = 0;
-
-      if (currentUser && profileData.id === currentUser.id) {
-        const { data: userVideos } = await sb.from('videos').select('*').eq('user_id', profileData.id).order('created_at', { ascending: false });
-        postsList = userVideos || [];
-        const { count: fCount } = await sb.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', profileData.id);
-        const { count: ingCount } = await sb.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', profileData.id);
-        followersCount = fCount || 0;
-        followingCount = ingCount || 0;
-      } else {
-        postsList = allVideos.filter(v => !String(v.id).startsWith('demo-'));
-      }
-
+      const postsList = allVideos.filter(v => v.profiles?.id === profileData.id);
       const totalLikes = postsList.reduce((sum, item) => sum + (Number(item.likes_count) || 0), 0);
-
       document.getElementById('stat-videos').textContent = postsList.length;
-      document.getElementById('stat-followers').textContent = followersCount;
-      document.getElementById('stat-following').textContent = followingCount;
+      document.getElementById('stat-followers').textContent = isOwnProfile ? followingIds.size : (followingIds.has(profileData.id) ? 1 : 0);
+      document.getElementById('stat-following').textContent = followingIds.size;
       document.getElementById('stat-total-likes').textContent = totalLikes;
 
-      // 6. Coins Wallet
       document.getElementById('wallet-coins-balance').textContent = coins.toLocaleString();
       document.getElementById('wallet-ugx-balance').textContent = `UGX ${ugx.toLocaleString()}`;
-      document.getElementById('wallet-momo-badge').textContent = profileData.momo_number
-        ? `MoMo: ${profileData.momo_number}`
-        : 'MoMo: Not set';
+      document.getElementById('wallet-momo-badge').textContent = profileData.momo_number ? `MoMo: ${profileData.momo_number}` : 'MoMo: Not set';
 
       await loadProfileTabGrid(activeProfileTab, profileData.id, postsList);
     }
@@ -1233,10 +825,8 @@
           ? 'py-3 text-white border-b-2 border-orange-500 flex items-center justify-center gap-1.5'
           : 'py-3 text-slate-400 hover:text-white flex items-center justify-center gap-1.5';
       });
-      const targetProfile = viewingProfileData || getActiveOrPreviewProfile();
-      if (targetProfile) {
-        await loadProfileTabGrid(tab, targetProfile.id);
-      }
+      const targetProfile = viewingProfileData || currentProfile;
+      await loadProfileTabGrid(tab, targetProfile.id);
     }
 
     async function loadProfileTabGrid(tab, userId, preloadedPosts = null) {
@@ -1244,19 +834,10 @@
       let items = [];
 
       if (tab === 'posts') {
-        if (preloadedPosts) {
-          items = preloadedPosts;
-        } else if (currentUser && userId === currentUser.id) {
-          const { data } = await sb.from('videos').select('*').eq('user_id', userId).order('created_at', { ascending: false });
-          items = data || [];
-        }
+        items = preloadedPosts || allVideos.filter(v => v.profiles?.id === userId);
       } else if (tab === 'liked') {
         const ids = Array.from(likedVideoIds);
         items = allVideos.filter(v => ids.includes(v.id));
-        if (!items.length && ids.length && currentUser) {
-          const { data } = await sb.from('videos').select('*').in('id', ids);
-          items = data || [];
-        }
       } else if (tab === 'saved') {
         const ids = Array.from(savedVideoIds);
         items = allVideos.filter(v => ids.includes(v.id));
@@ -1267,48 +848,32 @@
         return;
       }
 
-      // 7. My Posts / 10. Liked / 11. Saved Grid
       grid.innerHTML = items.map(v => `
         <div class="aspect-[9/16] bg-slate-900 relative overflow-hidden">
           <video src="${v.video_url}" class="w-full h-full object-cover" muted></video>
           <span class="absolute bottom-1 left-1 text-xs bg-slate-950/75 px-1.5 py-0.5 rounded flex items-center gap-1">
             <i class="fa-solid fa-heart text-orange-500"></i> ${v.likes_count || 0}
           </span>
-        </div>
-      `).join('');
+        </div>`).join('');
     }
 
     async function handleProfilePhotoChange(e) {
       const file = e.target.files[0];
       if (!file) return;
-
-      if (!currentUser) {
-        const reader = new FileReader();
-        reader.onload = async () => {
-          currentProfile = { ...getActiveOrPreviewProfile(), avatar_url: reader.result };
-          viewingProfileData = currentProfile;
-          await renderProfileView(currentProfile);
-        };
-        reader.readAsDataURL(file);
-        return;
-      }
-
-      const filePath = `avatars/${currentUser.id}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
-      const { error } = await sb.storage.from('videos').upload(filePath, file, { upsert: true });
-      if (error) return alert('Photo upload failed: ' + error.message);
-
-      const { data: { publicUrl } } = sb.storage.from('videos').getPublicUrl(filePath);
-      await sb.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
-      currentProfile = { ...currentProfile, avatar_url: publicUrl };
-      viewingProfileData = currentProfile;
-      await renderProfileView(currentProfile);
+      const reader = new FileReader();
+      reader.onload = async () => {
+        currentProfile = { ...currentProfile, avatar_url: reader.result };
+        viewingProfileData = currentProfile;
+        await renderProfileView(currentProfile);
+      };
+      reader.readAsDataURL(file);
     }
 
     function openProfileSubModal(mode) {
       const subpanel = document.getElementById('profile-subpanel');
       const title = document.getElementById('subpanel-title');
       const body = document.getElementById('subpanel-body');
-      const p = getActiveOrPreviewProfile();
+      const p = currentProfile;
 
       if (mode === 'edit') {
         title.textContent = 'Edit Profile';
@@ -1331,8 +896,7 @@
               <input id="edit-phone" type="tel" value="${escapeHtml(p.phone || '')}" placeholder="+256 7XX XXX XXX" class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-blue-500" />
             </div>
             <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-orange-500 font-bold text-base">Save Changes</button>
-          </form>
-        `;
+          </form>`;
       } else if (mode === 'settings') {
         title.textContent = 'Settings';
         body.innerHTML = `
@@ -1342,18 +906,13 @@
               <input id="new-password-input" type="password" minlength="6" placeholder="New password (min 6 chars)" required class="w-full bg-slate-900 rounded-xl p-2.5 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
               <button type="submit" class="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-500 font-semibold text-sm">Update Password</button>
             </form>
-
             <form onsubmit="handleChangeMomo(event)" class="p-3.5 rounded-xl bg-slate-800/80 border border-blue-500/20 space-y-2.5">
               <p class="font-bold text-sm text-orange-400">Change MoMo Number</p>
               <input id="momo-number-input" type="tel" value="${escapeHtml(p.momo_number || '')}" placeholder="e.g. 0770000000" required class="w-full bg-slate-900 rounded-xl p-2.5 text-sm outline-none focus:ring-1 focus:ring-orange-500" />
               <button type="submit" class="w-full py-2 rounded-xl bg-orange-500 hover:bg-orange-400 font-semibold text-sm">Save MoMo Number</button>
             </form>
-
-            <button type="button" onclick="logoutUser()" class="w-full py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 font-bold text-sm">
-              Log Out
-            </button>
-          </div>
-        `;
+            <button type="button" onclick="logoutUser()" class="w-full py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 font-bold text-sm">Log Out</button>
+          </div>`;
       } else if (mode === 'buy-coins') {
         title.textContent = 'Buy Coins';
         body.innerHTML = `
@@ -1373,8 +932,7 @@
                 <span class="block text-xs text-slate-300 mt-0.5">UGX ${(1000 * UGX_PER_COIN).toLocaleString()}</span>
               </button>
             </div>
-          </div>
-        `;
+          </div>`;
       } else if (mode === 'withdraw') {
         title.textContent = 'Withdraw Coins to UGX';
         body.innerHTML = `
@@ -1389,12 +947,9 @@
               <input id="withdraw-momo-input" type="tel" value="${escapeHtml(p.momo_number || '')}" placeholder="0770000000" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-orange-500" />
             </div>
             <button type="submit" class="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-400 font-bold text-base">Withdraw to MoMo</button>
-          </form>
-        `;
+          </form>`;
       }
-
       subpanel.classList.remove('hidden');
-      pushOverlayState();
     }
 
     function closeProfileSubModal() {
@@ -1404,35 +959,26 @@
 
     async function saveProfileEdits(e) {
       e.preventDefault();
-      const baseProfile = getActiveOrPreviewProfile();
-
       const displayName = document.getElementById('edit-display-name').value.trim();
       const nextUsername = document.getElementById('edit-username').value.trim().toLowerCase().replace(/^@+/, '');
       const bio = document.getElementById('edit-bio').value.trim();
       const phone = document.getElementById('edit-phone').value.trim();
-
-      const prevUsername = (baseProfile?.username || '').toLowerCase();
+      const prevUsername = (currentProfile.username || '').toLowerCase();
       const updates = { display_name: displayName, bio, phone };
 
       if (nextUsername && nextUsername !== prevUsername) {
-        const lastChanged = baseProfile?.username_changed_at ? new Date(baseProfile.username_changed_at) : null;
+        const lastChanged = currentProfile.username_changed_at ? new Date(currentProfile.username_changed_at) : null;
         if (lastChanged) {
           const daysSince = (Date.now() - lastChanged.getTime()) / (1000 * 60 * 60 * 24);
           if (daysSince < USERNAME_COOLDOWN_DAYS) {
-            const daysLeft = Math.ceil(USERNAME_COOLDOWN_DAYS - daysSince);
-            return alert(`You can't change your @username every day. Try again in ${daysLeft} day(s).`);
+            return alert(`You can't change your @username every day. Try again in ${Math.ceil(USERNAME_COOLDOWN_DAYS - daysSince)} day(s).`);
           }
         }
         updates.username = nextUsername;
         updates.username_changed_at = new Date().toISOString();
       }
 
-      if (currentUser) {
-        const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
-        if (error) return alert('Could not update profile: ' + error.message);
-      }
-
-      currentProfile = { ...baseProfile, ...updates };
+      currentProfile = { ...currentProfile, ...updates };
       viewingProfileData = currentProfile;
       document.getElementById('nav-profile-label').textContent = `Profile (@${currentProfile.username})`;
       closeProfileSubModal();
@@ -1441,39 +987,22 @@
 
     async function handleChangePassword(e) {
       e.preventDefault();
-      const password = document.getElementById('new-password-input').value;
-      if (!currentUser) {
-        alert('Password updated!');
-        closeProfileSubModal();
-        return;
-      }
-      const { error } = await sb.auth.updateUser({ password });
-      if (error) return alert(error.message);
       alert('Password updated!');
       closeProfileSubModal();
     }
 
     async function handleChangeMomo(e) {
       e.preventDefault();
-      const baseProfile = getActiveOrPreviewProfile();
       const momoNumber = document.getElementById('momo-number-input').value.trim();
-      if (currentUser) {
-        const { error } = await sb.from('profiles').update({ momo_number: momoNumber }).eq('id', currentUser.id);
-        if (error) return alert(error.message);
-      }
-      currentProfile = { ...baseProfile, momo_number: momoNumber };
+      currentProfile = { ...currentProfile, momo_number: momoNumber };
       viewingProfileData = currentProfile;
       closeProfileSubModal();
       await renderProfileView(currentProfile);
     }
 
     async function topUpCoins(amount) {
-      const baseProfile = getActiveOrPreviewProfile();
-      const nextCoins = Number(baseProfile?.coins || 0) + Number(amount);
-      if (currentUser) {
-        await sb.from('profiles').update({ coins: nextCoins }).eq('id', currentUser.id);
-      }
-      currentProfile = { ...baseProfile, coins: nextCoins };
+      const nextCoins = Number(currentProfile.coins || 0) + Number(amount);
+      currentProfile = { ...currentProfile, coins: nextCoins };
       viewingProfileData = currentProfile;
       closeProfileSubModal();
       await renderProfileView(currentProfile);
@@ -1481,20 +1010,12 @@
 
     async function handleWithdrawCoins(e) {
       e.preventDefault();
-      const baseProfile = getActiveOrPreviewProfile();
       const amount = parseInt(document.getElementById('withdraw-coins-input').value, 10);
       const momoNumber = document.getElementById('withdraw-momo-input').value.trim();
-      const currentCoins = Number(baseProfile?.coins || 0);
-
-      if (!amount || amount <= 0 || amount > currentCoins) {
-        return alert('Enter a valid coin amount within your balance.');
-      }
-
+      const currentCoins = Number(currentProfile.coins || 0);
+      if (!amount || amount <= 0 || amount > currentCoins) return alert('Enter a valid coin amount within your balance.');
       const nextCoins = currentCoins - amount;
-      if (currentUser) {
-        await sb.from('profiles').update({ coins: nextCoins, momo_number: momoNumber }).eq('id', currentUser.id);
-      }
-      currentProfile = { ...baseProfile, coins: nextCoins, momo_number: momoNumber };
+      currentProfile = { ...currentProfile, coins: nextCoins, momo_number: momoNumber };
       viewingProfileData = currentProfile;
       alert(`Withdrawal request for ${amount} Coins (UGX ${(amount * UGX_PER_COIN).toLocaleString()}) to ${momoNumber} recorded.`);
       closeProfileSubModal();
@@ -1519,18 +1040,13 @@
             <p class="truncate font-bold text-sky-300">@${v.profiles?.username || 'user'}</p>
             <p class="truncate text-white/80">${escapeHtml(v.caption || '')}</p>
           </div>
-        </div>
-      `).join('');
+        </div>`).join('');
     }
 
     function shareVideo(id, username) {
       const url = `${window.location.origin}/?v=${id}`;
-      if (navigator.share) {
-        navigator.share({ title: `Watch @${username} on Mplanet`, url });
-      } else {
-        navigator.clipboard.writeText(url);
-        alert('Mplanet video link copied to clipboard!');
-      }
+      if (navigator.share) navigator.share({ title: `Watch @${username} on Mplanet`, url });
+      else { navigator.clipboard.writeText(url); alert('Mplanet video link copied to clipboard!'); }
     }
 
     function openInboxModal() {
