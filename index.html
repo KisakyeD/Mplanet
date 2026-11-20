@@ -175,17 +175,13 @@
     </svg>
   </template>
 
-  <template id="bank-transfer-logo-svg">
-    <svg viewBox="0 0 120 48" class="h-7 w-auto shrink-0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bank Transfer">
-      <rect x="2" y="2" width="116" height="44" rx="9" fill="#0F172A" stroke="#38BDF8" stroke-width="1.4" />
-      <polygon points="30,11 16,18 44,18" fill="#38BDF8" />
-      <rect x="18" y="19" width="24" height="2.5" fill="#E2E8F0" />
-      <rect x="20" y="23" width="3.2" height="9" fill="#94A3B8" />
-      <rect x="28.4" y="23" width="3.2" height="9" fill="#94A3B8" />
-      <rect x="36.8" y="23" width="3.2" height="9" fill="#94A3B8" />
-      <rect x="17" y="33" width="26" height="2.8" rx="1" fill="#E2E8F0" />
-      <text x="80" y="23" text-anchor="middle" font-family="'Trebuchet MS', 'Segoe UI', sans-serif" font-weight="900" font-size="11.5" letter-spacing="0.6" fill="#FFFFFF">BANK</text>
-      <text x="80" y="34" text-anchor="middle" font-family="'Trebuchet MS', 'Segoe UI', sans-serif" font-weight="700" font-size="9.5" letter-spacing="0.4" fill="#7DD3FC">GLOBAL</text>
+  <template id="generic-method-logo-svg">
+    <svg viewBox="0 0 120 48" class="h-7 w-auto shrink-0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Payment Method">
+      <rect x="2" y="2" width="116" height="44" rx="9" fill="#1E293B" stroke="#38BDF8" stroke-width="1.4" />
+      <rect x="14" y="13" width="22" height="22" rx="6" fill="#2563EB" />
+      <path d="M21 24 L25 28 L31 20" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+      <text x="77" y="23" text-anchor="middle" font-family="'Trebuchet MS', 'Segoe UI', sans-serif" font-weight="900" font-size="10.5" letter-spacing="0.4" fill="#FFFFFF">PAY RAIL</text>
+      <text x="77" y="34" text-anchor="middle" font-family="'Trebuchet MS', 'Segoe UI', sans-serif" font-weight="700" font-size="9" fill="#7DD3FC">INSTANT</text>
     </svg>
   </template>
 
@@ -354,7 +350,7 @@
       </div>
     </div>
 
-    <!-- 1. Profile Photo, 2. Username, 3. Display Name, 4. Bio & 12. Follow/Unfollow -->
+    <!-- Profile Header -->
     <div class="px-5 pt-5 pb-4 flex flex-col items-center text-center border-b border-blue-500/20">
       <label class="relative cursor-pointer group mb-3" title="Tap to change profile photo">
         <input id="profile-photo-input" type="file" accept="image/*" onchange="handleProfilePhotoChange(event)" class="hidden" />
@@ -377,7 +373,7 @@
         Follow
       </button>
 
-      <!-- 5. Stats -->
+      <!-- Stats -->
       <div class="grid grid-cols-4 gap-2 w-full mt-4 pt-3 border-t border-blue-500/15">
         <div class="text-center">
           <span id="stat-videos" class="font-extrabold text-base block text-white">0</span>
@@ -397,7 +393,7 @@
         </div>
       </div>
 
-      <!-- 8. Edit Profile Button & 9. Settings Button -->
+      <!-- Edit & Settings -->
       <div class="flex gap-2.5 w-full mt-4">
         <button type="button" onclick="openProfileSubModal('edit')" class="flex-1 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-blue-500/25 font-semibold text-sm flex items-center justify-center gap-2 transition">
           <i class="fa-solid fa-pen-to-square text-sky-400"></i>
@@ -410,7 +406,7 @@
       </div>
     </div>
 
-    <!-- 6. Coins Wallet -->
+    <!-- Coins Wallet -->
     <div class="mx-4 mt-4 p-4 rounded-2xl bg-gradient-to-r from-blue-950/70 via-slate-900 to-orange-950/50 border border-blue-500/30">
       <div class="flex items-center justify-between gap-2 mb-2">
         <span class="text-xs font-extrabold uppercase tracking-wider text-sky-300 flex items-center gap-1.5 whitespace-nowrap">
@@ -424,7 +420,7 @@
           <span class="text-xs font-bold text-amber-400 ml-1">Coins</span>
         </div>
         <div class="text-right shrink-0">
-          <span id="wallet-usd-balance" class="text-sm font-extrabold text-sky-300 whitespace-nowrap">$6.04</span>
+          <span id="wallet-usd-balance" class="text-sm font-extrabold text-sky-300 whitespace-nowrap">≈ $6.04 USD</span>
         </div>
       </div>
       <div class="flex gap-2.5">
@@ -437,7 +433,7 @@
       </div>
     </div>
 
-    <!-- Tabs: 7. My Posts, 10. Liked Posts Tab, 11. Saved Posts Tab -->
+    <!-- Tabs -->
     <div class="grid grid-cols-3 border-b border-blue-500/20 mt-4 sticky top-[52px] bg-slate-950 z-10 text-sm font-bold">
       <button id="profile-tab-posts" type="button" onclick="switchProfileTab('posts')" class="py-3 text-white border-b-2 border-orange-500 flex items-center justify-center gap-1.5">
         <i class="fa-solid fa-table-cells text-xs"></i>
@@ -456,7 +452,7 @@
     <div id="profile-videos-grid" class="grid grid-cols-3 gap-0.5 p-0.5 flex-1 min-h-[220px]"></div>
 
     <div id="profile-subpanel" class="hidden fixed inset-0 z-50 bg-slate-950/90 flex items-end justify-center max-w-[500px] mx-auto" onclick="if(event.target===this) closeProfileSubModal()">
-      <div class="bg-slate-900 border-t border-blue-500/30 w-full rounded-t-2xl p-5 max-h-[82dvh] overflow-y-auto">
+      <div class="bg-slate-900 border-t border-blue-500/30 w-full rounded-t-2xl p-5 max-h-[85dvh] overflow-y-auto">
         <div class="flex justify-between items-center pb-3 mb-4 border-b border-blue-500/20">
           <button type="button" onclick="closeProfileSubModal()" aria-label="Back" class="text-white/70 hover:text-sky-400 p-1"><i class="fa-solid fa-arrow-left text-lg"></i></button>
           <h4 id="subpanel-title" class="font-bold text-lg text-sky-300">Profile Option</h4>
@@ -486,1158 +482,168 @@
       }
     })();
 
-    function getProviderLogoHtml(provider) {
-      const map = {
-        'Airtel': 'airtel-logo-svg',
-        'Virtual Card': 'virtual-card-logo-svg',
-        'MTN': 'mtn-logo-svg',
-        'Bank Transfer': 'bank-transfer-logo-svg'
-      };
-      const tpl = document.getElementById(map[provider] || 'virtual-card-logo-svg');
-      return tpl ? tpl.innerHTML : provider;
-    }
-
-    // Global USD Pricing Config
-    const COIN_DEPOSIT_USD = 0.0071; // Base USD top-up price per coin worldwide
+    // Global Pricing & Limits Config
+    const COIN_DEPOSIT_USD = 0.0071;
     const MAX_CUSTOM_COINS = 30000000;
     const MIN_WITHDRAWAL_USD = 1;
     const FEE_THRESHOLD_USD = 30;
     const WITHDRAWAL_FEE_PERCENT = 10;
     const DAILY_MAX_WITHDRAWALS = 1;
     const WEEKLY_MAX_WITHDRAWALS = 5;
-    const _basePayoutUsd = 0.00178; // Internal USD payout rate per coin
+    const _basePayoutUsd = 0.00178;
     const USERNAME_COOLDOWN_DAYS = 30;
 
-    const GLOBAL_REGIONS = [
-      { id: 'GLOBAL', label: 'Global (Card / Bank)', mobileMoney: false },
-      { id: 'UG', label: 'Uganda (MTN / Airtel / Card)', mobileMoney: true },
-      { id: 'KE', label: 'Kenya (Airtel / Mobile / Card)', mobileMoney: true },
-      { id: 'NG', label: 'Nigeria (Card / Bank Transfer)', mobileMoney: false }
-    ];
-
-    let selectedRegion = 'GLOBAL';
-    let withdrawalHistory = []; // Hidden timestamps (ms) for daily & weekly limits
-    let selectedDepositProvider = 'Virtual Card';
-    let selectedWithdrawProvider = 'Virtual Card';
-
-    function formatUsd(usdAmount) {
-      return `$${Number(usdAmount || 0).toFixed(2)}`;
-    }
-
-    function regionSupportsMobileMoney(regionId) {
-      return Boolean(GLOBAL_REGIONS.find(r => r.id === regionId)?.mobileMoney);
-    }
-
-    function isMobileMoneyProvider(provider) {
-      return provider === 'MTN' || provider === 'Airtel';
-    }
-
-    function getAvailablePaymentMethods(regionId) {
-      const base = [
-        { value: 'Virtual Card', label: 'Virtual Card', sub: 'Worldwide Visa / Mastercard' },
-        { value: 'Bank Transfer', label: 'Bank Transfer', sub: 'International & local bank rails' }
-      ];
-      if (regionSupportsMobileMoney(regionId)) {
-        base.push(
-          { value: 'MTN', label: 'MTN Mobile Money', sub: 'Regional mobile money' },
-          { value: 'Airtel', label: 'Airtel Money', sub: 'Regional mobile money' }
-        );
-      }
-      return base;
-    }
-
-    function getWithdrawalCounts() {
-      const now = Date.now();
-      const oneDayMs = 24 * 60 * 60 * 1000;
-      const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
-      withdrawalHistory = withdrawalHistory.filter(ts => now - ts < sevenDaysMs);
-      const dailyCount = withdrawalHistory.filter(ts => now - ts < oneDayMs).length;
-      const weeklyCount = withdrawalHistory.length;
-      return { dailyCount, weeklyCount };
-    }
-
-    let currentProfile = {
-      id: 'local-user',
-      username: 'briank',
-      display_name: 'Brian K',
-      bio: 'Funny videos from Kampala',
-      coins: 850,
-      momo_number: '',
-      bank_account: '',
-      virtual_card: '',
-      virtual_card_expiry: '',
-      virtual_card_cvv: '',
-      phone: ''
-    };
-    let viewingProfileData = currentProfile;
-    let activeProfileTab = 'posts';
-    let allVideos = [];
-    let likedVideoIds = new Set();
-    let savedVideoIds = new Set();
-    let followingIds = new Set();
-    let activeVideoIdForComments = null;
-    let isMuted = false;
-    let liveMediaStream = null;
-
-    const MODAL_IDS = ['live-modal', 'comments-modal', 'upload-modal', 'profile-modal', 'search-modal'];
-
-    const DEMO_VIDEOS = [
-      {
-        id: 'demo-1',
-        video_url: 'https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-1282-large.mp4',
-        caption: 'Welcome to Mplanet! Cosmic vibes tonight #mplanet #dance #viral',
-        music_name: 'Orbit Pulse - Mplanet Audio',
-        likes_count: 1420,
-        comments_count: 34,
-        saves_count: 56,
-        profiles: { id: 'demo-u1', username: 'maya_vibes', display_name: 'Maya Vibes', bio: 'Funny videos from Kampala' }
+    // Payment Method Definitions
+    const METHOD_CATALOG = {
+      'Virtual Card': {
+        value: 'Virtual Card',
+        label: 'Virtual Card',
+        sub: 'Visa / Mastercard virtual & debit card',
+        kind: 'card',
+        fieldLabel: 'Virtual Card Number',
+        placeholder: '4242 4242 4242 4242',
+        maxLength: 23,
+        profileKey: 'virtual_card'
       },
-      {
-        id: 'demo-2',
-        video_url: 'https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-flowers-1173-large.mp4',
-        caption: 'Morning breeze in Kampala #nature #uganda #peace',
-        music_name: 'Acoustic Breeze - Original',
-        likes_count: 890,
-        comments_count: 19,
-        saves_count: 24,
-        profiles: { id: 'demo-u2', username: 'kampala_explorer', display_name: 'Brian K', bio: 'Funny videos from Kampala' }
-      }
-    ];
-
-    function closeDrawerOnly() {
-      document.getElementById('menu-drawer-backdrop').classList.add('hidden');
-      document.getElementById('menu-drawer').classList.add('-translate-x-full');
-    }
-
-    function openDrawerOnly() {
-      document.getElementById('menu-drawer-backdrop').classList.remove('hidden');
-      document.getElementById('menu-drawer').classList.remove('-translate-x-full');
-    }
-
-    document.getElementById('hamburger-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      openDrawerOnly();
-    });
-    document.getElementById('close-drawer-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      closeDrawerOnly();
-    });
-    document.getElementById('menu-drawer-backdrop').addEventListener('click', closeDrawerOnly);
-
-    document.getElementById('drawer-profile-btn').addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      closeDrawerOnly();
-      handleProfileNav();
-    });
-
-    function openLiveModal() {
-      toggleModal('live-modal', true);
-    }
-
-    async function startLivePreview() {
-      try {
-        liveMediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        const preview = document.getElementById('live-preview-video');
-        preview.srcObject = liveMediaStream;
-        preview.classList.remove('hidden');
-        document.getElementById('live-placeholder').classList.add('hidden');
-      } catch (err) {
-        alert('Camera/microphone permission is needed to start a live broadcast.');
-      }
-    }
-
-    function closeLiveModal() {
-      if (liveMediaStream) {
-        liveMediaStream.getTracks().forEach(t => t.stop());
-        liveMediaStream = null;
-      }
-      const preview = document.getElementById('live-preview-video');
-      preview.srcObject = null;
-      preview.classList.add('hidden');
-      document.getElementById('live-placeholder').classList.remove('hidden');
-      document.getElementById('live-modal').classList.add('hidden');
-    }
-
-    function toggleModal(id, show) {
-      if (id === 'live-modal' && !show) {
-        closeLiveModal();
-        return;
-      }
-      if (id === 'profile-modal' && !show) {
-        closeProfileSubModal();
-      }
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.classList.toggle('hidden', !show);
-    }
-
-    window.addEventListener('keydown', (e) => {
-      if (e.key !== 'Escape') return;
-      const subpanel = document.getElementById('profile-subpanel');
-      if (subpanel && !subpanel.classList.contains('hidden')) {
-        closeProfileSubModal();
-        return;
-      }
-      const openId = MODAL_IDS.find(id => !document.getElementById(id).classList.contains('hidden'));
-      if (openId) toggleModal(openId, false);
-      else closeDrawerOnly();
-    });
-
-    async function initApp() {
-      document.getElementById('nav-profile-label').textContent = `Profile (@${currentProfile.username})`;
-      await loadFeed('foryou');
-    }
-
-    function logoutUser() {
-      toggleModal('profile-modal', false);
-      loadFeed('foryou');
-    }
-
-    async function loadFeed(mode = 'foryou') {
-      document.getElementById('tab-foryou').className = mode === 'foryou' ? 'text-white border-b-2 border-orange-500 pb-0.5' : 'text-white/60 hover:text-white transition';
-      document.getElementById('tab-following').className = mode === 'following' ? 'text-white border-b-2 border-orange-500 pb-0.5' : 'text-white/60 hover:text-white transition';
-
-      let videos = DEMO_VIDEOS;
-      if (mode === 'following') {
-        const ids = Array.from(followingIds);
-        videos = DEMO_VIDEOS.filter(v => ids.includes(v.profiles?.id));
-      }
-      allVideos = videos;
-      renderVideos(videos);
-    }
-
-    function switchFeed(mode) {
-      loadFeed(mode);
-    }
-
-    function renderVideos(videos) {
-      const container = document.getElementById('video-feed');
-      if (!videos.length) {
-        container.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-white/60 p-6 text-center text-base"><p>No videos here yet. Follow creators or upload the first clip!</p></div>`;
-        return;
-      }
-
-      container.innerHTML = videos.map(v => {
-        const isLiked = likedVideoIds.has(v.id);
-        const isSaved = savedVideoIds.has(v.id);
-        const creator = v.profiles || { id: v.user_id, username: 'mplanet_user' };
-        const isFollowing = followingIds.has(creator.id);
-        const showFollowBtn = !isFollowing;
-
-        return `
-        <div class="video-card" data-id="${v.id}" ondblclick="doubleTapLike(event, '${v.id}')">
-          <video src="${v.video_url}" loop playsinline onclick="togglePlayPause(this)"></video>
-          <div class="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-slate-950/95 via-slate-950/75 to-transparent pt-12 pb-4 px-4">
-            <div class="mb-3 pointer-events-none">
-              <h3 class="font-bold text-lg mb-1 text-sky-300">@${creator.username}</h3>
-              <p class="text-base text-white/95 line-clamp-2 mb-1.5">${escapeHtml(v.caption || '')}</p>
-              <div class="flex items-center gap-2 text-sm text-orange-300/90">
-                <i class="fa-solid fa-music"></i>
-                <span class="truncate max-w-[280px]">${escapeHtml(v.music_name || 'Original Sound')}</span>
-              </div>
-            </div>
-            <div class="flex items-center justify-between pt-2.5 border-t border-blue-500/20">
-              <div class="relative flex items-center">
-                <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-blue-600 via-sky-400 to-orange-500 p-0.5">
-                  <div class="w-full h-full rounded-full bg-slate-950 flex items-center justify-center font-bold text-base uppercase">
-                    ${creator.username[0]}
-                  </div>
-                </div>
-                ${showFollowBtn ? `
-                <button type="button" onclick="toggleFollow('${creator.id}', this)" class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-orange-500 text-white text-xs flex items-center justify-center shadow">
-                  <i class="fa-solid fa-plus"></i>
-                </button>` : ''}
-              </div>
-              <button type="button" onclick="toggleLike('${v.id}')" class="flex items-center gap-1.5 active:scale-110 transition">
-                <i id="like-icon-${v.id}" class="fa-solid fa-heart text-2xl ${isLiked ? 'text-orange-500' : 'text-white'}"></i>
-                <span id="like-count-${v.id}" class="text-sm font-bold">${v.likes_count || 0}</span>
-              </button>
-              <button type="button" onclick="openComments('${v.id}')" class="flex items-center gap-1.5 active:scale-110 transition">
-                <i class="fa-solid fa-comment-dots text-2xl text-sky-300"></i>
-                <span id="comment-count-${v.id}" class="text-sm font-bold">${v.comments_count || 0}</span>
-              </button>
-              <button type="button" onclick="toggleSave('${v.id}')" class="flex items-center gap-1.5 active:scale-110 transition">
-                <i id="save-icon-${v.id}" class="fa-solid fa-bookmark text-2xl ${isSaved ? 'text-blue-400' : 'text-white'}"></i>
-                <span id="save-count-${v.id}" class="text-sm font-bold">${v.saves_count || 0}</span>
-              </button>
-              <button type="button" onclick="shareVideo('${v.id}', '${creator.username}')" class="flex items-center gap-1.5 active:scale-110 transition">
-                <i class="fa-solid fa-share text-2xl text-white"></i>
-                <span class="text-sm font-bold">Share</span>
-              </button>
-              <button type="button" onclick="toggleMuteAll()" title="Toggle Mute" class="relative w-10 h-10 rounded-full bg-slate-900 border-2 border-blue-500/60 flex items-center justify-center spinning-disc">
-                <i class="mute-icon fa-solid ${isMuted ? 'fa-volume-xmark text-orange-400' : 'fa-music text-sky-400'} text-sm"></i>
-              </button>
-            </div>
-          </div>
-        </div>`;
-      }).join('');
-
-      setupAutoPlayObserver();
-    }
-
-    function setupAutoPlayObserver() {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          const video = entry.target.querySelector('video');
-          if (!video) return;
-          if (entry.isIntersecting) {
-            video.muted = isMuted;
-            video.play().catch(() => { video.muted = true; video.play(); });
-          } else {
-            video.pause();
-            video.currentTime = 0;
-          }
-        });
-      }, { threshold: 0.65 });
-      document.querySelectorAll('.video-card').forEach(card => observer.observe(card));
-    }
-
-    function togglePlayPause(video) { video.paused ? video.play() : video.pause(); }
-
-    function toggleMuteAll() {
-      isMuted = !isMuted;
-      document.querySelectorAll('video').forEach(v => v.muted = isMuted);
-      document.querySelectorAll('.mute-icon').forEach(i => {
-        i.className = `mute-icon fa-solid ${isMuted ? 'fa-volume-xmark text-orange-400' : 'fa-music text-sky-400'} text-sm`;
-      });
-    }
-
-    function doubleTapLike(e, videoId) {
-      const card = e.currentTarget;
-      const heart = document.createElement('i');
-      heart.className = 'fa-solid fa-heart heart-burst';
-      heart.style.left = `${e.clientX - 40}px`;
-      heart.style.top = `${e.clientY - 40}px`;
-      card.appendChild(heart);
-      setTimeout(() => heart.remove(), 750);
-      if (!likedVideoIds.has(videoId)) toggleLike(videoId);
-    }
-
-    function toggleSave(videoId) {
-      const countEl = document.getElementById(`save-count-${videoId}`);
-      const iconEl = document.getElementById(`save-icon-${videoId}`);
-      const isSaved = savedVideoIds.has(videoId);
-      isSaved ? savedVideoIds.delete(videoId) : savedVideoIds.add(videoId);
-      iconEl.classList.toggle('text-blue-400', !isSaved);
-      iconEl.classList.toggle('text-white', isSaved);
-      countEl.textContent = Math.max(0, parseInt(countEl.textContent) + (isSaved ? -1 : 1));
-    }
-
-    async function toggleLike(videoId) {
-      const countEl = document.getElementById(`like-count-${videoId}`);
-      const iconEl = document.getElementById(`like-icon-${videoId}`);
-      const liked = likedVideoIds.has(videoId);
-      liked ? likedVideoIds.delete(videoId) : likedVideoIds.add(videoId);
-      iconEl.classList.toggle('text-orange-500', !liked);
-      iconEl.classList.toggle('text-white', liked);
-      const nextCount = Math.max(0, parseInt(countEl.textContent) + (liked ? -1 : 1));
-      countEl.textContent = nextCount;
-    }
-
-    async function toggleFollow(targetUserId, btnEl) {
-      followingIds.add(targetUserId);
-      if (btnEl) btnEl.remove();
-    }
-
-    async function toggleViewedProfileFollow() {
-      if (!viewingProfileData || viewingProfileData.id === currentProfile.id) return;
-      const targetId = viewingProfileData.id;
-      if (followingIds.has(targetId)) followingIds.delete(targetId);
-      else followingIds.add(targetId);
-      await renderProfileView(viewingProfileData);
-    }
-
-    async function openComments(videoId) {
-      activeVideoIdForComments = videoId;
-      toggleModal('comments-modal', true);
-      const list = document.getElementById('comments-list');
-      list.innerHTML = `<div class="bg-slate-800/80 p-3 rounded-xl border border-blue-500/15"><span class="font-bold text-sky-400">@alex_ug</span>: Love Mplanet! 🚀🔥</div>`;
-    }
-
-    async function submitComment(e) {
-      e.preventDefault();
-      const input = document.getElementById('comment-input');
-      const content = input.value.trim();
-      if (!content || !activeVideoIdForComments) return;
-      document.getElementById('comments-list').innerHTML += `<div class="bg-slate-800/80 p-3 rounded-xl border border-orange-500/20"><span class="font-bold text-orange-400">@${currentProfile.username}</span>: ${escapeHtml(content)}</div>`;
-      const countEl = document.getElementById(`comment-count-${activeVideoIdForComments}`);
-      countEl.textContent = parseInt(countEl.textContent) + 1;
-      input.value = '';
-    }
-
-    async function handleVideoUpload(e) {
-      e.preventDefault();
-      const file = document.getElementById('video-file').files[0];
-      const caption = document.getElementById('video-caption').value.trim();
-      const musicName = document.getElementById('video-music').value.trim() || `Original Sound - ${currentProfile.username}`;
-      if (!file) return;
-      const localUrl = URL.createObjectURL(file);
-      const newPost = {
-        id: 'local-' + Date.now(),
-        video_url: localUrl,
-        caption,
-        music_name: musicName,
-        likes_count: 0,
-        comments_count: 0,
-        saves_count: 0,
-        profiles: { id: currentProfile.id, username: currentProfile.username, display_name: currentProfile.display_name, bio: currentProfile.bio }
-      };
-      allVideos.unshift(newPost);
-      renderVideos(allVideos);
-      e.target.reset();
-      toggleModal('upload-modal', false);
-    }
-
-    async function handleProfileNav() {
-      viewingProfileData = currentProfile;
-      activeProfileTab = 'posts';
-      toggleModal('profile-modal', true);
-      await renderProfileView(currentProfile);
-    }
-
-    function formatSavedPayoutBadge(profileData) {
-      if (profileData.virtual_card) {
-        const digits = String(profileData.virtual_card).replace(/\D/g, '');
-        return `Card: •••• ${digits.slice(-4) || 'Card'}`;
-      }
-      if (profileData.bank_account) {
-        return `Bank: ${String(profileData.bank_account).slice(-6)}`;
-      }
-      if (profileData.momo_number) {
-        return `Mobile: ${profileData.momo_number}`;
-      }
-      return 'Payout / Card: Not set';
-    }
-
-    async function renderProfileView(profileData) {
-      const isOwnProfile = profileData.id === currentProfile.id;
-      const uname = profileData.username || 'briank';
-      const displayName = profileData.display_name || 'Brian K';
-      const bio = profileData.bio || 'Funny videos from Kampala';
-      const coins = Number(profileData.coins || 0);
-      const walletUsd = coins * COIN_DEPOSIT_USD;
-
-      const avatarEl = document.getElementById('profile-avatar');
-      if (profileData.avatar_url) {
-        avatarEl.innerHTML = `<img src="${profileData.avatar_url}" alt="${escapeHtml(displayName)}" class="w-full h-full object-cover" />`;
-      } else {
-        avatarEl.innerHTML = `<span>${uname[0].toUpperCase()}</span>`;
-      }
-
-      document.getElementById('profile-header-username').textContent = `@${uname}`;
-      document.getElementById('profile-display-name').textContent = displayName;
-      document.getElementById('profile-username-handle').textContent = `@${uname}`;
-      document.getElementById('profile-bio').textContent = bio;
-
-      const followBtn = document.getElementById('profile-follow-btn');
-      if (!isOwnProfile) {
-        followBtn.classList.remove('hidden');
-        followBtn.textContent = followingIds.has(profileData.id) ? 'Following' : 'Follow';
-      } else {
-        followBtn.classList.add('hidden');
-      }
-
-      const postsList = allVideos.filter(v => v.profiles?.id === profileData.id);
-      const totalLikes = postsList.reduce((sum, item) => sum + (Number(item.likes_count) || 0), 0);
-      document.getElementById('stat-videos').textContent = postsList.length;
-      document.getElementById('stat-followers').textContent = isOwnProfile ? followingIds.size : (followingIds.has(profileData.id) ? 1 : 0);
-      document.getElementById('stat-following').textContent = followingIds.size;
-      document.getElementById('stat-total-likes').textContent = totalLikes;
-
-      document.getElementById('wallet-coins-balance').textContent = coins.toLocaleString();
-      const usdBalanceEl = document.getElementById('wallet-usd-balance');
-      if (usdBalanceEl) {
-        usdBalanceEl.textContent = `≈ ${formatUsd(walletUsd)} USD`;
-      }
-      document.getElementById('wallet-momo-badge').textContent = formatSavedPayoutBadge(profileData);
-
-      await loadProfileTabGrid(activeProfileTab, profileData.id, postsList);
-    }
-
-    async function switchProfileTab(tab) {
-      activeProfileTab = tab;
-      ['posts', 'liked', 'saved'].forEach(t => {
-        const btn = document.getElementById(`profile-tab-${t}`);
-        if (!btn) return;
-        btn.className = t === tab
-          ? 'py-3 text-white border-b-2 border-orange-500 flex items-center justify-center gap-1.5'
-          : 'py-3 text-slate-400 hover:text-white flex items-center justify-center gap-1.5';
-      });
-      const targetProfile = viewingProfileData || currentProfile;
-      await loadProfileTabGrid(tab, targetProfile.id);
-    }
-
-    async function loadProfileTabGrid(tab, userId, preloadedPosts = null) {
-      const grid = document.getElementById('profile-videos-grid');
-      let items = [];
-
-      if (tab === 'posts') {
-        items = preloadedPosts || allVideos.filter(v => v.profiles?.id === userId);
-      } else if (tab === 'liked') {
-        const ids = Array.from(likedVideoIds);
-        items = allVideos.filter(v => ids.includes(v.id));
-      } else if (tab === 'saved') {
-        const ids = Array.from(savedVideoIds);
-        items = allVideos.filter(v => ids.includes(v.id));
-      }
-
-      if (!items.length) {
-        grid.innerHTML = `<div class="col-span-3 py-10 text-center text-sm text-slate-400">No ${tab} posts yet.</div>`;
-        return;
-      }
-
-      grid.innerHTML = items.map(v => `
-        <div class="aspect-[9/16] bg-slate-900 relative overflow-hidden">
-          <video src="${v.video_url}" class="w-full h-full object-cover" muted></video>
-          <span class="absolute bottom-1 left-1 text-xs bg-slate-950/75 px-1.5 py-0.5 rounded flex items-center gap-1">
-            <i class="fa-solid fa-heart text-orange-500"></i> ${v.likes_count || 0}
-          </span>
-        </div>`).join('');
-    }
-
-    async function handleProfilePhotoChange(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = async () => {
-        currentProfile = { ...currentProfile, avatar_url: reader.result };
-        viewingProfileData = currentProfile;
-        await renderProfileView(currentProfile);
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function formatCardNumber(value) {
-      const digits = String(value || '').replace(/\D/g, '').slice(0, 19);
-      return digits.replace(/(\d{4})(?=\d)/g, '$1 ');
-    }
-
-    function formatCardExpiry(value) {
-      const digits = String(value || '').replace(/\D/g, '').slice(0, 4);
-      if (digits.length <= 2) return digits;
-      return `${digits.slice(0, 2)}/${digits.slice(2)}`;
-    }
-
-    function formatCardCvv(value) {
-      return String(value || '').replace(/\D/g, '').slice(0, 4);
-    }
-
-    function handleCardInputAutoFormat(scope, field, inputEl) {
-      if (!inputEl) return;
-      if (field === 'number') {
-        inputEl.value = formatCardNumber(inputEl.value);
-      } else if (field === 'expiry') {
-        inputEl.value = formatCardExpiry(inputEl.value);
-      } else if (field === 'cvv') {
-        inputEl.value = formatCardCvv(inputEl.value);
-      }
-    }
-
-    function renderCardExtraFields(scope, p) {
-      return `
-        <div id="${scope}-card-extra" class="grid grid-cols-2 gap-2.5">
-          <div>
-            <label for="${scope}-card-expiry" class="block text-xs text-sky-300 mb-1">Expiry Date (MM/YY)</label>
-            <input id="${scope}-card-expiry" oninput="handleCardInputAutoFormat('${scope}', 'expiry', this)" type="text" inputmode="numeric" maxlength="5" value="${escapeHtml(p.virtual_card_expiry || '')}" placeholder="MM/YY" class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-sky-400" />
-          </div>
-          <div>
-            <label for="${scope}-card-cvv" class="block text-xs text-sky-300 mb-1">CVV</label>
-            <input id="${scope}-card-cvv" oninput="handleCardInputAutoFormat('${scope}', 'cvv', this)" type="text" inputmode="numeric" maxlength="4" value="${escapeHtml(p.virtual_card_cvv || '')}" placeholder="123" class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-sky-400" />
-          </div>
-        </div>`;
-    }
-
-    function getAccountFieldConfig(provider) {
-      if (provider === 'Virtual Card') {
-        return {
-          label: 'Virtual Card Number',
-          placeholder: '4242 4242 4242 4242',
-          type: 'text',
-          inputMode: 'numeric',
-          maxLength: 23,
-          value: formatCardNumber(currentProfile.virtual_card || '')
-        };
-      }
-      if (provider === 'Bank Transfer') {
-        return {
-          label: 'IBAN / Bank Account Number',
-          placeholder: 'US29 NWBK 6016 1331 9268 19',
-          type: 'text',
-          inputMode: 'text',
-          maxLength: 34,
-          value: currentProfile.bank_account || ''
-        };
-      }
-      return {
-        label: `${provider} Mobile Money Number (with country code)`,
+      'MTN': {
+        value: 'MTN',
+        label: 'MTN Mobile Money',
+        sub: 'MTN MoMo mobile wallet',
+        kind: 'phone',
+        fieldLabel: 'MTN Mobile Money Number',
         placeholder: '+256 770 000 000',
-        type: 'tel',
-        inputMode: 'tel',
         maxLength: 22,
-        value: currentProfile.momo_number || ''
-      };
-    }
-
-    function syncProviderField(scope, provider) {
-      const isCard = provider === 'Virtual Card';
-      const label = document.getElementById(`${scope}-account-label`);
-      const input = document.getElementById(`${scope}-account-input`);
-      const extra = document.getElementById(`${scope}-card-extra`);
-      const expiryInput = document.getElementById(`${scope}-card-expiry`);
-      const cvvInput = document.getElementById(`${scope}-card-cvv`);
-      const cfg = getAccountFieldConfig(provider);
-
-      if (label && input) {
-        label.textContent = cfg.label;
-        input.placeholder = cfg.placeholder;
-        input.type = cfg.type;
-        input.inputMode = cfg.inputMode;
-        input.maxLength = cfg.maxLength;
-        input.setAttribute('oninput', isCard ? `handleCardInputAutoFormat('${scope}', 'number', this)` : '');
-        input.value = cfg.value;
+        profileKey: 'momo_number'
+      },
+      'Airtel': {
+        value: 'Airtel',
+        label: 'Airtel Money',
+        sub: 'Airtel Money mobile wallet',
+        kind: 'phone',
+        fieldLabel: 'Airtel Money Number',
+        placeholder: '+256 750 000 000',
+        maxLength: 22,
+        profileKey: 'momo_number'
+      },
+      'M-Pesa': {
+        value: 'M-Pesa',
+        label: 'M-Pesa',
+        sub: 'Safaricom / Vodacom mobile wallet',
+        kind: 'phone',
+        fieldLabel: 'M-Pesa Mobile Number',
+        placeholder: '+254 712 000 000',
+        maxLength: 22,
+        profileKey: 'momo_number'
+      },
+      'Orange Money': {
+        value: 'Orange Money',
+        label: 'Orange Money',
+        sub: 'Orange regional mobile wallet',
+        kind: 'phone',
+        fieldLabel: 'Orange Money Number',
+        placeholder: '+237 690 000 000',
+        maxLength: 22,
+        profileKey: 'momo_number'
+      },
+      'ACH / Wire': {
+        value: 'ACH / Wire',
+        label: 'US Bank (ACH / Wire)',
+        sub: 'Routing & bank account transfer',
+        kind: 'bank',
+        fieldLabel: 'Account & Routing Number',
+        placeholder: 'Acct: 123456789 • Routing: 021000021',
+        maxLength: 44,
+        profileKey: 'bank_account'
+      },
+      'SEPA / IBAN': {
+        value: 'SEPA / IBAN',
+        label: 'SEPA / IBAN Transfer',
+        sub: 'European IBAN & BIC bank transfer',
+        kind: 'bank',
+        fieldLabel: 'IBAN Number',
+        placeholder: 'DE89 3704 0044 0532 0130 00',
+        maxLength: 34,
+        profileKey: 'bank_account'
+      },
+      'Faster Payments': {
+        value: 'Faster Payments',
+        label: 'UK Faster Payments',
+        sub: 'Sort code & UK bank account',
+        kind: 'bank',
+        fieldLabel: 'Sort Code & Account Number',
+        placeholder: '20-00-00 • 12345678',
+        maxLength: 30,
+        profileKey: 'bank_account'
+      },
+      'UPI / IMPS': {
+        value: 'UPI / IMPS',
+        label: 'UPI / Bank Transfer',
+        sub: 'Instant UPI ID or bank account',
+        kind: 'bank',
+        fieldLabel: 'UPI ID or Account / IFSC',
+        placeholder: 'name@upi or Acct / IFSC',
+        maxLength: 40,
+        profileKey: 'bank_account'
+      },
+      'PIX / Bank': {
+        value: 'PIX / Bank',
+        label: 'PIX / Local Bank',
+        sub: 'Instant PIX key or bank account',
+        kind: 'bank',
+        fieldLabel: 'PIX Key or Bank Account',
+        placeholder: 'CPF / Email / Phone / PIX Key',
+        maxLength: 40,
+        profileKey: 'bank_account'
+      },
+      'Bank Transfer': {
+        value: 'Bank Transfer',
+        label: 'Bank Transfer',
+        sub: 'Local & international bank account',
+        kind: 'bank',
+        fieldLabel: 'Bank Account / IBAN',
+        placeholder: 'Enter bank account or IBAN',
+        maxLength: 34,
+        profileKey: 'bank_account'
       }
+    };
 
-      if (extra) {
-        extra.classList.toggle('hidden', !isCard);
-      }
-      if (expiryInput) {
-        expiryInput.required = isCard;
-        if (isCard && !expiryInput.value) expiryInput.value = formatCardExpiry(currentProfile.virtual_card_expiry || '');
-      }
-      if (cvvInput) {
-        cvvInput.required = isCard;
-        if (isCard && !cvvInput.value) cvvInput.value = formatCardCvv(currentProfile.virtual_card_cvv || '');
-      }
-    }
+    // Comprehensive Country Directory with Region-Specific Payment Methods
+    const COUNTRIES_DIRECTORY = [
+      // East & Central Africa
+      { code: 'UG', name: 'Uganda', region: 'East Africa', methods: ['MTN', 'Airtel', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'KE', name: 'Kenya', region: 'East Africa', methods: ['M-Pesa', 'Airtel', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'TZ', name: 'Tanzania', region: 'East Africa', methods: ['M-Pesa', 'Airtel', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'RW', name: 'Rwanda', region: 'East Africa', methods: ['MTN', 'Airtel', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'ET', name: 'Ethiopia', region: 'East Africa', methods: ['Virtual Card', 'Bank Transfer'] },
+      { code: 'SS', name: 'South Sudan', region: 'East Africa', methods: ['MTN', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'CD', name: 'DR Congo', region: 'Central Africa', methods: ['Airtel', 'Orange Money', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'CM', name: 'Cameroon', region: 'Central Africa', methods: ['MTN', 'Orange Money', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'CG', name: 'Congo-Brazzaville', region: 'Central Africa', methods: ['MTN', 'Airtel', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'GA', name: 'Gabon', region: 'Central Africa', methods: ['Airtel', 'Virtual Card', 'Bank Transfer'] },
 
-    function refreshMethodChooserUi(scope, provider) {
-      const methods = getAvailablePaymentMethods(selectedRegion);
-      const meta = methods.find(m => m.value === provider) || methods[0];
-      const logoSlot = document.getElementById(`${scope}-trigger-logo`);
-      const labelSlot = document.getElementById(`${scope}-trigger-label`);
-      const subSlot = document.getElementById(`${scope}-trigger-sub`);
-      if (logoSlot) logoSlot.innerHTML = getProviderLogoHtml(meta.value);
-      if (labelSlot) labelSlot.textContent = meta.label;
-      if (subSlot) subSlot.textContent = meta.sub;
+      // West & Southern Africa
+      { code: 'NG', name: 'Nigeria', region: 'West Africa', methods: ['Virtual Card', 'Bank Transfer'] },
+      { code: 'GH', name: 'Ghana', region: 'West Africa', methods: ['MTN', 'Airtel', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'CI', name: "Côte d'Ivoire", region: 'West Africa', methods: ['MTN', 'Orange Money', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'SN', name: 'Senegal', region: 'West Africa', methods: ['Orange Money', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'BJ', name: 'Benin', region: 'West Africa', methods: ['MTN', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'BF', name: 'Burkina Faso', region: 'West Africa', methods: ['Orange Money', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'ML', name: 'Mali', region: 'West Africa', methods: ['Orange Money', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'SL', name: 'Sierra Leone', region: 'West Africa', methods: ['Orange Money', 'Airtel', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'LR', name: 'Liberia', region: 'West Africa', methods: ['MTN', 'Orange Money', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'ZA', name: 'South Africa', region: 'Southern Africa', methods: ['Virtual Card', 'Bank Transfer'] },
+      { code: 'ZM', name: 'Zambia', region: 'Southern Africa', methods: ['MTN', 'Airtel', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'BW', name: 'Botswana', region: 'Southern Africa', methods: ['Orange Money', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'NA', name: 'Namibia', region: 'Southern Africa', methods: ['Virtual Card', 'Bank Transfer'] },
+      { code: 'MW', name: 'Malawi', region: 'Southern Africa', methods: ['Airtel', 'Virtual Card', 'Bank Transfer'] },
+      { code: 'MZ', name: 'Mozambique', region: 'Southern Africa', methods: ['M-Pesa', 'Virtual Card', 'Bank Transfer'] },
 
-      const checkColor = scope === 'deposit' ? 'text-sky-400' : 'text-orange-400';
-      document.querySelectorAll(`[data-provider-scope="${scope}"]`).forEach(btn => {
-        const active = btn.getAttribute('data-provider-value') === meta.value;
-        btn.classList.toggle('bg-slate-800', active);
-        const badge = btn.querySelector('.method-check');
-        if (badge) {
-          badge.className = `method-check fa-solid fa-circle-check ${checkColor} text-base ${active ? '' : 'hidden'}`;
-        }
-      });
-    }
+      // North America
+      { code: 'US', name: 'United States', region: 'North America', methods: ['Virtual Card', 'ACH / Wire'] },
+      { code: 'CA', name: 'Canada', region: 'North America', methods: ['Virtual Card', 'Bank Transfer'] },
+      { code: 'MX', name: 'Mexico', region: 'North America', methods: ['Virtual Card', 'Bank Transfer'] },
 
-    function handleRegionChange(scope, nextRegion) {
-      selectedRegion = nextRegion;
-      const methods = getAvailablePaymentMethods(nextRegion);
-      const menu = document.getElementById(`${scope}-method-menu`);
-      const checkColor = scope === 'deposit' ? 'text-sky-400' : 'text-orange-400';
-      const currentProvider = scope === 'deposit' ? selectedDepositProvider : selectedWithdrawProvider;
-      const resolvedProvider = methods.some(m => m.value === currentProvider) ? currentProvider : 'Virtual Card';
-
-      if (scope === 'deposit') {
-        selectedDepositProvider = resolvedProvider;
-      } else {
-        selectedWithdrawProvider = resolvedProvider;
-      }
-
-      if (menu) {
-        menu.innerHTML = methods.map(m => {
-          const active = m.value === resolvedProvider;
-          return `
-            <button type="button" data-provider-scope="${scope}" data-provider-value="${m.value}" onclick="selectProvider('${scope}', '${m.value}')"
-              class="w-full p-3 flex items-center justify-between gap-3 text-left hover:bg-slate-800/80 transition ${active ? 'bg-slate-800' : ''}">
-              <div class="flex items-center gap-3 min-w-0">
-                <div class="shrink-0">${getProviderLogoHtml(m.value)}</div>
-                <div class="min-w-0">
-                  <span class="block text-sm font-bold text-white truncate">${m.label}</span>
-                  <span class="block text-[11px] text-slate-400 truncate">${m.sub}</span>
-                </div>
-              </div>
-              <i class="method-check fa-solid fa-circle-check ${checkColor} text-base ${active ? '' : 'hidden'}"></i>
-            </button>`;
-        }).join('');
-      }
-
-      refreshMethodChooserUi(scope, resolvedProvider);
-      syncProviderField(scope, resolvedProvider);
-    }
-
-    function toggleMethodMenu(scope) {
-      const menu = document.getElementById(`${scope}-method-menu`);
-      const chevron = document.getElementById(`${scope}-method-chevron`);
-      if (!menu) return;
-      const willOpen = menu.classList.contains('hidden');
-      menu.classList.toggle('hidden', !willOpen);
-      if (chevron) chevron.classList.toggle('rotate-180', willOpen);
-    }
-
-    function selectProvider(scope, provider) {
-      if (scope === 'deposit') {
-        selectedDepositProvider = provider;
-      } else {
-        selectedWithdrawProvider = provider;
-      }
-      refreshMethodChooserUi(scope, provider);
-
-      const menu = document.getElementById(`${scope}-method-menu`);
-      const chevron = document.getElementById(`${scope}-method-chevron`);
-      if (menu) menu.classList.add('hidden');
-      if (chevron) chevron.classList.remove('rotate-180');
-
-      syncProviderField(scope, provider);
-    }
-
-    function renderMethodChooser(scope, selected) {
-      const methods = getAvailablePaymentMethods(selectedRegion);
-      const current = methods.find(m => m.value === selected) || methods[0];
-      const focusRing = scope === 'deposit' ? 'border-sky-400/50 hover:border-sky-400' : 'border-orange-400/50 hover:border-orange-400';
-      const checkColor = scope === 'deposit' ? 'text-sky-400' : 'text-orange-400';
-
-      return `
-        <div class="space-y-3">
-          <div>
-            <label for="${scope}-region-select" class="block text-xs text-sky-300 font-bold mb-1">Region / Availability</label>
-            <select id="${scope}-region-select" onchange="handleRegionChange('${scope}', this.value)"
-              class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-sm text-white outline-none focus:ring-1 focus:ring-sky-400">
-              ${GLOBAL_REGIONS.map(r => `<option value="${r.id}" ${r.id === selectedRegion ? 'selected' : ''}>${r.label}</option>`).join('')}
-            </select>
-          </div>
-          <div class="space-y-1.5 relative">
-            <label class="block text-xs text-sky-300 font-bold">Payment Method</label>
-            <button type="button" onclick="toggleMethodMenu('${scope}')"
-              class="w-full p-3 rounded-xl bg-slate-800 border ${focusRing} flex items-center justify-between gap-3 text-left transition">
-              <div class="flex items-center gap-3 min-w-0">
-                <div id="${scope}-trigger-logo" class="shrink-0">${getProviderLogoHtml(current.value)}</div>
-                <div class="min-w-0">
-                  <span id="${scope}-trigger-label" class="block text-sm font-bold text-white truncate">${current.label}</span>
-                  <span id="${scope}-trigger-sub" class="block text-[11px] text-slate-400 truncate">${current.sub}</span>
-                </div>
-              </div>
-              <i id="${scope}-method-chevron" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform"></i>
-            </button>
-            <div id="${scope}-method-menu" class="hidden rounded-xl bg-slate-950 border border-slate-700 overflow-hidden divide-y divide-slate-800 shadow-xl">
-              ${methods.map(m => {
-                const active = m.value === current.value;
-                return `
-                  <button type="button" data-provider-scope="${scope}" data-provider-value="${m.value}" onclick="selectProvider('${scope}', '${m.value}')"
-                    class="w-full p-3 flex items-center justify-between gap-3 text-left hover:bg-slate-800/80 transition ${active ? 'bg-slate-800' : ''}">
-                    <div class="flex items-center gap-3 min-w-0">
-                      <div class="shrink-0">${getProviderLogoHtml(m.value)}</div>
-                      <div class="min-w-0">
-                        <span class="block text-sm font-bold text-white truncate">${m.label}</span>
-                        <span class="block text-[11px] text-slate-400 truncate">${m.sub}</span>
-                      </div>
-                    </div>
-                    <i class="method-check fa-solid fa-circle-check ${checkColor} text-base ${active ? '' : 'hidden'}"></i>
-                  </button>`;
-              }).join('')}
-            </div>
-          </div>
-        </div>`;
-    }
-
-    function updateCustomCoinPreview() {
-      const input = document.getElementById('custom-coins-input');
-      const priceEl = document.getElementById('custom-coins-usd');
-      if (!input || !priceEl) return;
-
-      const raw = Number(input.value);
-      if (!raw || raw < 1) {
-        priceEl.textContent = '$0.00 USD';
-        return;
-      }
-      const clamped = Math.min(MAX_CUSTOM_COINS, Math.floor(raw));
-      priceEl.textContent = `${formatUsd(clamped * COIN_DEPOSIT_USD)} USD`;
-    }
-
-    async function handleCustomCoinPurchase(e) {
-      e.preventDefault();
-      const input = document.getElementById('custom-coins-input');
-      const amount = parseInt(input.value, 10);
-      if (!amount || amount < 1) {
-        return alert('Enter at least 1 Coin.');
-      }
-      if (amount > MAX_CUSTOM_COINS) {
-        return alert(`Maximum coin purchase is ${MAX_CUSTOM_COINS.toLocaleString()} Coins.`);
-      }
-      const accountVal = (document.getElementById('deposit-account-input')?.value || '').trim();
-      await topUpCoins(amount, accountVal);
-    }
-
-    function calculateWithdrawalSummary(coins) {
-      const qty = Math.max(0, Number(coins) || 0);
-      const grossUsd = qty * _basePayoutUsd;
-      const appliesFee = grossUsd >= FEE_THRESHOLD_USD;
-      const feePercent = appliesFee ? WITHDRAWAL_FEE_PERCENT : 0;
-      const feeUsd = appliesFee ? grossUsd * (WITHDRAWAL_FEE_PERCENT / 100) : 0;
-      const netUsd = grossUsd - feeUsd;
-      return {
-        grossUsd,
-        appliesFee,
-        feePercent,
-        feeUsd,
-        netUsd
-      };
-    }
-
-    function updateWithdrawPreview() {
-      const input = document.getElementById('withdraw-coins-input');
-      const feeLabelEl = document.getElementById('withdraw-fee-label');
-      const feeEl = document.getElementById('withdraw-fee-amount');
-      const netEl = document.getElementById('withdraw-net-amount');
-      if (!input || !feeEl || !netEl) return;
-
-      const { feePercent, feeUsd, netUsd } = calculateWithdrawalSummary(input.value);
-      if (feeLabelEl) {
-        feeLabelEl.textContent = `Withdrawal Charge (${feePercent}% on $${FEE_THRESHOLD_USD}+):`;
-      }
-      feeEl.textContent = formatUsd(feeUsd);
-      netEl.textContent = `${formatUsd(netUsd)} USD`;
-    }
-
-    function openProfileSubModal(mode) {
-      const subpanel = document.getElementById('profile-subpanel');
-      const title = document.getElementById('subpanel-title');
-      const body = document.getElementById('subpanel-body');
-      const p = currentProfile;
-
-      if (mode === 'edit') {
-        title.textContent = 'Edit Profile';
-        body.innerHTML = `
-          <form onsubmit="saveProfileEdits(event)" class="space-y-3.5">
-            <div>
-              <label class="block text-xs text-sky-300 mb-1">Display Name</label>
-              <input id="edit-display-name" type="text" value="${escapeHtml(p.display_name || 'Brian K')}" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-blue-500" />
-            </div>
-            <div>
-              <label class="block text-xs text-sky-300 mb-1">Username (@name — can't change every day)</label>
-              <input id="edit-username" type="text" value="${escapeHtml(p.username || '')}" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-blue-500" />
-            </div>
-            <div>
-              <label class="block text-xs text-sky-300 mb-1">Bio (1 line)</label>
-              <input id="edit-bio" type="text" maxlength="100" value="${escapeHtml(p.bio || 'Funny videos from Kampala')}" class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-blue-500" />
-            </div>
-            <div>
-              <label class="block text-xs text-sky-300 mb-1">Phone Number (International)</label>
-              <input id="edit-phone" type="tel" value="${escapeHtml(p.phone || '')}" placeholder="+256 7XX XXX XXX" class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-blue-500" />
-            </div>
-            <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-orange-500 font-bold text-base">Save Changes</button>
-          </form>`;
-      } else if (mode === 'settings') {
-        title.textContent = 'Settings';
-        body.innerHTML = `
-          <div class="space-y-4">
-            <form onsubmit="handleChangePassword(event)" class="p-3.5 rounded-xl bg-slate-800/80 border border-blue-500/20 space-y-2.5">
-              <p class="font-bold text-sm text-sky-300">Change Password</p>
-              <input id="new-password-input" type="password" minlength="6" placeholder="New password (min 6 chars)" required class="w-full bg-slate-900 rounded-xl p-2.5 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
-              <button type="submit" class="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-500 font-semibold text-sm">Update Password</button>
-            </form>
-            <form onsubmit="handleChangeMomo(event)" class="p-3.5 rounded-xl bg-slate-800/80 border border-blue-500/20 space-y-2.5">
-              <p class="font-bold text-sm text-orange-400">Default Payout Mobile Number</p>
-              <input id="momo-number-input" type="tel" value="${escapeHtml(p.momo_number || '')}" placeholder="e.g. +256 770 000 000" required class="w-full bg-slate-900 rounded-xl p-2.5 text-sm outline-none focus:ring-1 focus:ring-orange-500" />
-              <button type="submit" class="w-full py-2 rounded-xl bg-orange-500 hover:bg-orange-400 font-semibold text-sm">Save Mobile Number</button>
-            </form>
-            <button type="button" onclick="logoutUser()" class="w-full py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 font-bold text-sm">Log Out</button>
-          </div>`;
-      } else if (mode === 'buy-coins') {
-        const cfg = getAccountFieldConfig(selectedDepositProvider);
-        const isCard = selectedDepositProvider === 'Virtual Card';
-        title.textContent = 'Buy Coins (USD)';
-        body.innerHTML = `
-          <div class="space-y-3.5">
-            ${renderMethodChooser('deposit', selectedDepositProvider)}
-            <div>
-              <label id="deposit-account-label" class="block text-xs text-sky-300 mb-1">${cfg.label}</label>
-              <input id="deposit-account-input" oninput="${isCard ? `handleCardInputAutoFormat('deposit', 'number', this)` : ''}" type="${cfg.type}" inputmode="${cfg.inputMode}" maxlength="${cfg.maxLength}" value="${escapeHtml(cfg.value)}" placeholder="${cfg.placeholder}" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-sky-400" />
-            </div>
-            ${renderCardExtraFields('deposit', p)}
-            <p class="text-xs text-slate-400">Global USD Pricing • Max Custom Amount: ${MAX_CUSTOM_COINS.toLocaleString()} Coins</p>
-            <div class="grid grid-cols-3 gap-2.5">
-              <button type="button" onclick="topUpCoins(100)" class="p-3 rounded-xl bg-slate-800 hover:bg-blue-600/30 border border-blue-500/30 text-center">
-                <span class="block font-black text-base text-amber-400">100 Coins</span>
-                <span class="block text-xs text-slate-300 mt-0.5">${formatUsd(100 * COIN_DEPOSIT_USD)}</span>
-              </button>
-              <button type="button" onclick="topUpCoins(500)" class="p-3 rounded-xl bg-slate-800 hover:bg-blue-600/30 border border-blue-500/30 text-center">
-                <span class="block font-black text-base text-amber-400">500 Coins</span>
-                <span class="block text-xs text-slate-300 mt-0.5">${formatUsd(500 * COIN_DEPOSIT_USD)}</span>
-              </button>
-              <button type="button" onclick="topUpCoins(1000)" class="p-3 rounded-xl bg-slate-800 hover:bg-blue-600/30 border border-blue-500/30 text-center">
-                <span class="block font-black text-base text-amber-400">1,000 Coins</span>
-                <span class="block text-xs text-slate-300 mt-0.5">${formatUsd(1000 * COIN_DEPOSIT_USD)}</span>
-              </button>
-            </div>
-            <form onsubmit="handleCustomCoinPurchase(event)" class="p-3.5 rounded-xl bg-slate-800/80 border border-blue-500/25 space-y-2.5">
-              <div class="flex items-center justify-between text-xs">
-                <label for="custom-coins-input" class="text-sky-300 font-bold">Custom Coins (Max 30,000,000)</label>
-                <span id="custom-coins-usd" class="font-extrabold text-amber-400">$0.00 USD</span>
-              </div>
-              <input id="custom-coins-input" oninput="updateCustomCoinPreview()" type="number" min="1" max="${MAX_CUSTOM_COINS}" placeholder="Enter coins (up to 30,000,000)" required class="w-full bg-slate-900 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-sky-400" />
-              <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 hover:opacity-95 font-bold text-sm text-white">Buy Custom Coins</button>
-            </form>
-          </div>`;
-        syncProviderField('deposit', selectedDepositProvider);
-      } else if (mode === 'withdraw') {
-        const cfg = getAccountFieldConfig(selectedWithdrawProvider);
-        const isCard = selectedWithdrawProvider === 'Virtual Card';
-        title.textContent = 'Withdraw (USD)';
-        body.innerHTML = `
-          <form onsubmit="handleWithdrawCoins(event)" class="space-y-3.5">
-            ${renderMethodChooser('withdraw', selectedWithdrawProvider)}
-            <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
-              <span>Available Balance: <strong class="text-white">${Number(p.coins || 0).toLocaleString()} Coins</strong></span>
-              <span class="px-2 py-0.5 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-300 font-semibold">Min $${MIN_WITHDRAWAL_USD} • ${WITHDRAWAL_FEE_PERCENT}% Fee at $${FEE_THRESHOLD_USD}+</span>
-            </div>
-            <div>
-              <label class="block text-xs text-sky-300 mb-1">Coins to Withdraw</label>
-              <input id="withdraw-coins-input" oninput="updateWithdrawPreview()" type="number" min="1" max="${Number(p.coins || 0)}" placeholder="Enter coins amount" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-orange-500" />
-            </div>
-            <div class="p-3 rounded-xl bg-slate-800/80 border border-blue-500/20 space-y-1.5 text-sm">
-              <div class="flex justify-between text-slate-300">
-                <span id="withdraw-fee-label">Withdrawal Charge (0% on $${FEE_THRESHOLD_USD}+):</span>
-                <span id="withdraw-fee-amount" class="font-semibold text-orange-400">$0.00</span>
-              </div>
-              <div class="flex justify-between text-white font-bold pt-1 border-t border-slate-700/80">
-                <span>You Receive:</span>
-                <span id="withdraw-net-amount" class="text-sky-300">$0.00 USD</span>
-              </div>
-            </div>
-            <div>
-              <label id="withdraw-account-label" class="block text-xs text-sky-300 mb-1">${cfg.label}</label>
-              <input id="withdraw-account-input" oninput="${isCard ? `handleCardInputAutoFormat('withdraw', 'number', this)` : ''}" type="${cfg.type}" inputmode="${cfg.inputMode}" maxlength="${cfg.maxLength}" value="${escapeHtml(cfg.value)}" placeholder="${cfg.placeholder}" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-orange-500" />
-            </div>
-            ${renderCardExtraFields('withdraw', p)}
-            <button type="submit" class="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-400 font-bold text-base">Withdraw</button>
-          </form>`;
-        syncProviderField('withdraw', selectedWithdrawProvider);
-      }
-      subpanel.classList.remove('hidden');
-    }
-
-    function closeProfileSubModal() {
-      const subpanel = document.getElementById('profile-subpanel');
-      if (subpanel) subpanel.classList.add('hidden');
-    }
-
-    async function saveProfileEdits(e) {
-      e.preventDefault();
-      const displayName = document.getElementById('edit-display-name').value.trim();
-      const nextUsername = document.getElementById('edit-username').value.trim().toLowerCase().replace(/^@+/, '');
-      const bio = document.getElementById('edit-bio').value.trim();
-      const phone = document.getElementById('edit-phone').value.trim();
-      const prevUsername = (currentProfile.username || '').toLowerCase();
-      const updates = { display_name: displayName, bio, phone };
-
-      if (nextUsername && nextUsername !== prevUsername) {
-        const lastChanged = currentProfile.username_changed_at ? new Date(currentProfile.username_changed_at) : null;
-        if (lastChanged) {
-          const daysSince = (Date.now() - lastChanged.getTime()) / (1000 * 60 * 60 * 24);
-          if (daysSince < USERNAME_COOLDOWN_DAYS) {
-            return alert(`You can't change your @username every day. Try again in ${Math.ceil(USERNAME_COOLDOWN_DAYS - daysSince)} day(s).`);
-          }
-        }
-        updates.username = nextUsername;
-        updates.username_changed_at = new Date().toISOString();
-      }
-
-      currentProfile = { ...currentProfile, ...updates };
-      viewingProfileData = currentProfile;
-      document.getElementById('nav-profile-label').textContent = `Profile (@${currentProfile.username})`;
-      closeProfileSubModal();
-      await renderProfileView(currentProfile);
-    }
-
-    async function handleChangePassword(e) {
-      e.preventDefault();
-      alert('Password updated!');
-      closeProfileSubModal();
-    }
-
-    async function handleChangeMomo(e) {
-      e.preventDefault();
-      const momoNumber = document.getElementById('momo-number-input').value.trim();
-      currentProfile = { ...currentProfile, momo_number: momoNumber };
-      viewingProfileData = currentProfile;
-      closeProfileSubModal();
-      await renderProfileView(currentProfile);
-    }
-
-    function validateAndExtractCardDetails(scope, rawAccountVal) {
-      const cardNumber = formatCardNumber(rawAccountVal);
-      const cardExpiry = formatCardExpiry(document.getElementById(`${scope}-card-expiry`)?.value || '');
-      const cardCvv = formatCardCvv(document.getElementById(`${scope}-card-cvv`)?.value || '');
-      const digitsOnly = cardNumber.replace(/\D/g, '');
-      if (digitsOnly.length < 12) {
-        alert('Enter a valid Virtual Card number.');
-        return null;
-      }
-      const expiryMatch = cardExpiry.match(/^(0[1-9]|1[0-2])\/(\d{2})$/);
-      if (!expiryMatch) {
-        alert('Enter a valid card expiry date in MM/YY format.');
-        return null;
-      }
-      const expMonth = parseInt(expiryMatch[1], 10);
-      const expYear = 2000 + parseInt(expiryMatch[2], 10);
-      const now = new Date();
-      const currentMonth = now.getMonth() + 1;
-      const currentYear = now.getFullYear();
-      if (expYear < currentYear || (expYear === currentYear && expMonth < currentMonth)) {
-        alert('This virtual card is expired. Enter a valid future MM/YY date.');
-        return null;
-      }
-      if (cardCvv.length < 3) {
-        alert('Enter a valid 3 or 4 digit CVV.');
-        return null;
-      }
-      return { cardNumber, cardExpiry, cardCvv };
-    }
-
-    function applyDestinationPatch(provider, accountVal) {
-      if (provider === 'Virtual Card') {
-        const cardData = validateAndExtractCardDetails('deposit', accountVal);
-        if (!cardData) return null;
-        return {
-          patch: {
-            virtual_card: cardData.cardNumber,
-            virtual_card_expiry: cardData.cardExpiry,
-            virtual_card_cvv: cardData.cardCvv
-          },
-          destination: cardData.cardNumber
-        };
-      }
-      if (provider === 'Bank Transfer') {
-        return {
-          patch: { bank_account: accountVal },
-          destination: accountVal
-        };
-      }
-      return {
-        patch: { momo_number: accountVal },
-        destination: accountVal
-      };
-    }
-
-    async function topUpCoins(amount, accountOverride = null) {
-      const accountVal = (accountOverride ?? document.getElementById('deposit-account-input')?.value ?? '').trim();
-      if (!accountVal) {
-        return alert('Enter your payment details to continue.');
-      }
-      const nextCoins = Number(currentProfile.coins || 0) + Number(amount);
-      let profilePatch = { coins: nextCoins };
-
-      if (selectedDepositProvider === 'Virtual Card') {
-        const cardData = validateAndExtractCardDetails('deposit', accountVal);
-        if (!cardData) return;
-        profilePatch = {
-          coins: nextCoins,
-          virtual_card: cardData.cardNumber,
-          virtual_card_expiry: cardData.cardExpiry,
-          virtual_card_cvv: cardData.cardCvv
-        };
-      } else if (selectedDepositProvider === 'Bank Transfer') {
-        profilePatch = { coins: nextCoins, bank_account: accountVal };
-      } else {
-        profilePatch = { coins: nextCoins, momo_number: accountVal };
-      }
-
-      const totalUsd = formatUsd(Number(amount) * COIN_DEPOSIT_USD);
-      currentProfile = { ...currentProfile, ...profilePatch };
-      viewingProfileData = currentProfile;
-      alert(`${selectedDepositProvider} (${selectedRegion}) deposit of ${Number(amount).toLocaleString()} Coins (${totalUsd} USD) completed.`);
-      closeProfileSubModal();
-      await renderProfileView(currentProfile);
-    }
-
-    async function handleWithdrawCoins(e) {
-      e.preventDefault();
-      const { dailyCount, weeklyCount } = getWithdrawalCounts();
-      if (dailyCount >= DAILY_MAX_WITHDRAWALS) {
-        return alert('You have reached your daily withdrawal limit. Please try again tomorrow.');
-      }
-      if (weeklyCount >= WEEKLY_MAX_WITHDRAWALS) {
-        return alert('You have reached your weekly withdrawal limit. Please try again next week.');
-      }
-
-      const amount = parseInt(document.getElementById('withdraw-coins-input').value, 10);
-      const accountVal = document.getElementById('withdraw-account-input').value.trim();
-      const currentCoins = Number(currentProfile.coins || 0);
-      if (!amount || amount <= 0 || amount > currentCoins) {
-        return alert('Enter a valid coin amount within your balance.');
-      }
-
-      const { grossUsd, feePercent, feeUsd, netUsd } = calculateWithdrawalSummary(amount);
-      if (grossUsd < MIN_WITHDRAWAL_USD) {
-        return alert(`Minimum withdrawal is ${formatUsd(MIN_WITHDRAWAL_USD)} USD.`);
-      }
-
-      let profilePatch = { coins: currentCoins - amount };
-      let destinationDisplay = accountVal;
-
-      if (selectedWithdrawProvider === 'Virtual Card') {
-        const cardData = validateAndExtractCardDetails('withdraw', accountVal);
-        if (!cardData) return;
-        profilePatch = {
-          coins: currentCoins - amount,
-          virtual_card: cardData.cardNumber,
-          virtual_card_expiry: cardData.cardExpiry,
-          virtual_card_cvv: cardData.cardCvv
-        };
-        destinationDisplay = cardData.cardNumber;
-      } else if (selectedWithdrawProvider === 'Bank Transfer') {
-        profilePatch = { coins: currentCoins - amount, bank_account: accountVal };
-      } else {
-        profilePatch = { coins: currentCoins - amount, momo_number: accountVal };
-      }
-
-      withdrawalHistory.push(Date.now());
-      currentProfile = { ...currentProfile, ...profilePatch };
-      viewingProfileData = currentProfile;
-      alert(`${selectedWithdrawProvider} (${selectedRegion}) withdrawal of ${amount} Coins submitted to ${destinationDisplay}.\nWithdrawal Charge (${feePercent}%): ${formatUsd(feeUsd)}\nNet Payout: ${formatUsd(netUsd)} USD`);
-      closeProfileSubModal();
-      await renderProfileView(currentProfile);
-    }
-
-    function openSearchModal() {
-      toggleModal('search-modal', true);
-      filterVideos('');
-    }
-
-    function filterVideos(query) {
-      const q = query.toLowerCase();
-      const matches = allVideos.filter(v =>
-        (v.caption || '').toLowerCase().includes(q) ||
-        (v.profiles?.username || '').toLowerCase().includes(q)
-      );
-      document.getElementById('search-results').innerHTML = matches.map(v => `
-        <div onclick="toggleModal('search-modal', false)" class="aspect-[9/16] bg-slate-900 border border-blue-500/20 rounded-xl overflow-hidden relative cursor-pointer">
-          <video src="${v.video_url}" class="w-full h-full object-cover" muted></video>
-          <div class="absolute bottom-0 inset-x-0 p-2.5 bg-gradient-to-t from-slate-950 to-transparent text-sm">
-            <p class="truncate font-bold text-sky-300">@${v.profiles?.username || 'user'}</p>
-            <p class="truncate text-white/80">${escapeHtml(v.caption || '')}</p>
-          </div>
-        </div>`).join('');
-    }
-
-    function shareVideo(id, username) {
-      const url = `${window.location.origin}/?v=${id}`;
-      if (navigator.share) navigator.share({ title: `Watch @${username} on Mplanet`, url });
-      else { navigator.clipboard.writeText(url); alert('Mplanet video link copied to clipboard!'); }
-    }
-
-    function openInboxModal() {
-      alert('Notifications: You are all caught up on likes, comments, and new followers!');
-    }
-
-    function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m]));
-    }
-
-    initApp();
-  </script>
-</body>
-</html>
+      // Europe
+      { code: 'GB', name: 'United Kingdom', region: 'Europe', methods: ['Virtual Card', 'Faster Payments'] },
+      { code: 'DE', name: 'Germany', region: 'Europe', methods: ['Virtual Card', 'SEPA / IBAN'] },
+      { code: 'FR', name: 'France', region: 'Europe', methods: ['Virtual Card', 'SEPA / IBAN']
