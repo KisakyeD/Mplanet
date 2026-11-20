@@ -175,6 +175,20 @@
     </svg>
   </template>
 
+  <template id="bank-transfer-logo-svg">
+    <svg viewBox="0 0 120 48" class="h-7 w-auto shrink-0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bank Transfer">
+      <rect x="2" y="2" width="116" height="44" rx="9" fill="#0F172A" stroke="#38BDF8" stroke-width="1.4" />
+      <polygon points="30,11 16,18 44,18" fill="#38BDF8" />
+      <rect x="18" y="19" width="24" height="2.5" fill="#E2E8F0" />
+      <rect x="20" y="23" width="3.2" height="9" fill="#94A3B8" />
+      <rect x="28.4" y="23" width="3.2" height="9" fill="#94A3B8" />
+      <rect x="36.8" y="23" width="3.2" height="9" fill="#94A3B8" />
+      <rect x="17" y="33" width="26" height="2.8" rx="1" fill="#E2E8F0" />
+      <text x="80" y="23" text-anchor="middle" font-family="'Trebuchet MS', 'Segoe UI', sans-serif" font-weight="900" font-size="11.5" letter-spacing="0.6" fill="#FFFFFF">BANK</text>
+      <text x="80" y="34" text-anchor="middle" font-family="'Trebuchet MS', 'Segoe UI', sans-serif" font-weight="700" font-size="9.5" letter-spacing="0.4" fill="#7DD3FC">GLOBAL</text>
+    </svg>
+  </template>
+
   <!-- Top Header Navigation -->
   <header class="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-3.5 py-3 bg-gradient-to-b from-slate-950/90 to-transparent max-w-[500px] mx-auto">
     <div class="flex items-center gap-2.5">
@@ -402,15 +416,15 @@
         <span class="text-xs font-extrabold uppercase tracking-wider text-sky-300 flex items-center gap-1.5 whitespace-nowrap">
           <i class="fa-solid fa-coins text-amber-400"></i> Coins Wallet
         </span>
-        <span id="wallet-momo-badge" class="text-xs text-slate-400 truncate">MoMo: Not set</span>
+        <span id="wallet-momo-badge" class="text-xs text-slate-400 truncate">Payout / Card: Not set</span>
       </div>
       <div class="flex items-baseline justify-between gap-2 mb-3">
         <div class="min-w-0">
           <span id="wallet-coins-balance" class="text-2xl font-black text-white">850</span>
           <span class="text-xs font-bold text-amber-400 ml-1">Coins</span>
         </div>
-        <div class="hidden text-right shrink-0">
-          <span id="wallet-usd-balance" class="hidden text-lg font-extrabold text-sky-300 whitespace-nowrap">$6.16</span>
+        <div class="text-right shrink-0">
+          <span id="wallet-usd-balance" class="text-sm font-extrabold text-sky-300 whitespace-nowrap">$6.04</span>
         </div>
       </div>
       <div class="flex gap-2.5">
@@ -476,53 +490,60 @@
       const map = {
         'Airtel': 'airtel-logo-svg',
         'Virtual Card': 'virtual-card-logo-svg',
-        'MTN': 'mtn-logo-svg'
+        'MTN': 'mtn-logo-svg',
+        'Bank Transfer': 'bank-transfer-logo-svg'
       };
-      const tpl = document.getElementById(map[provider] || 'mtn-logo-svg');
+      const tpl = document.getElementById(map[provider] || 'virtual-card-logo-svg');
       return tpl ? tpl.innerHTML : provider;
     }
 
-    // Deposit & Withdrawal Pricing Config + Live USD Rate
-    const DEPOSIT_UGX_PER_COIN = 30;
+    // Global USD Pricing Config
+    const COIN_DEPOSIT_USD = 0.0071; // Base USD top-up price per coin worldwide
     const MAX_CUSTOM_COINS = 30000000;
     const MIN_WITHDRAWAL_USD = 1;
     const FEE_THRESHOLD_USD = 30;
     const WITHDRAWAL_FEE_PERCENT = 10;
     const DAILY_MAX_WITHDRAWALS = 1;
     const WEEKLY_MAX_WITHDRAWALS = 5;
-    const _basePayoutFactor = 7.5; // Internal payout conversion (not displayed)
+    const _basePayoutUsd = 0.00178; // Internal USD payout rate per coin
     const USERNAME_COOLDOWN_DAYS = 30;
 
-    let ugxPerUsd = 4222.218; // Live 1 USD -> UGX rate (auto-refreshed via FX API)
+    const GLOBAL_REGIONS = [
+      { id: 'GLOBAL', label: 'Global (Card / Bank)', mobileMoney: false },
+      { id: 'UG', label: 'Uganda (MTN / Airtel / Card)', mobileMoney: true },
+      { id: 'KE', label: 'Kenya (Airtel / Mobile / Card)', mobileMoney: true },
+      { id: 'NG', label: 'Nigeria (Card / Bank Transfer)', mobileMoney: false }
+    ];
+
+    let selectedRegion = 'GLOBAL';
     let withdrawalHistory = []; // Hidden timestamps (ms) for daily & weekly limits
-    let selectedDepositProvider = 'MTN';
-    let selectedWithdrawProvider = 'MTN';
-
-    async function fetchLiveUsdRate() {
-      try {
-        const res = await fetch('https://open.er-api.com/v6/latest/USD');
-        if (!res.ok) return;
-        const data = await res.json();
-        const rate = Number(data?.rates?.UGX);
-        if (rate && rate > 0) {
-          ugxPerUsd = rate;
-          if (document.getElementById('profile-modal') && !document.getElementById('profile-modal').classList.contains('hidden')) {
-            await renderProfileView(viewingProfileData || currentProfile);
-          }
-          updateCustomCoinPreview();
-          updateWithdrawPreview();
-        }
-      } catch (_) {
-        // Keep current/fallback live rate if network request is blocked
-      }
-    }
-
-    function ugxToUsd(ugxAmount) {
-      return Number(ugxAmount || 0) / ugxPerUsd;
-    }
+    let selectedDepositProvider = 'Virtual Card';
+    let selectedWithdrawProvider = 'Virtual Card';
 
     function formatUsd(usdAmount) {
       return `$${Number(usdAmount || 0).toFixed(2)}`;
+    }
+
+    function regionSupportsMobileMoney(regionId) {
+      return Boolean(GLOBAL_REGIONS.find(r => r.id === regionId)?.mobileMoney);
+    }
+
+    function isMobileMoneyProvider(provider) {
+      return provider === 'MTN' || provider === 'Airtel';
+    }
+
+    function getAvailablePaymentMethods(regionId) {
+      const base = [
+        { value: 'Virtual Card', label: 'Virtual Card', sub: 'Worldwide Visa / Mastercard' },
+        { value: 'Bank Transfer', label: 'Bank Transfer', sub: 'International & local bank rails' }
+      ];
+      if (regionSupportsMobileMoney(regionId)) {
+        base.push(
+          { value: 'MTN', label: 'MTN Mobile Money', sub: 'Regional mobile money' },
+          { value: 'Airtel', label: 'Airtel Money', sub: 'Regional mobile money' }
+        );
+      }
+      return base;
     }
 
     function getWithdrawalCounts() {
@@ -542,6 +563,7 @@
       bio: 'Funny videos from Kampala',
       coins: 850,
       momo_number: '',
+      bank_account: '',
       virtual_card: '',
       virtual_card_expiry: '',
       virtual_card_cvv: '',
@@ -664,7 +686,6 @@
 
     async function initApp() {
       document.getElementById('nav-profile-label').textContent = `Profile (@${currentProfile.username})`;
-      await fetchLiveUsdRate();
       await loadFeed('foryou');
     }
 
@@ -872,8 +893,21 @@
       viewingProfileData = currentProfile;
       activeProfileTab = 'posts';
       toggleModal('profile-modal', true);
-      await fetchLiveUsdRate();
       await renderProfileView(currentProfile);
+    }
+
+    function formatSavedPayoutBadge(profileData) {
+      if (profileData.virtual_card) {
+        const digits = String(profileData.virtual_card).replace(/\D/g, '');
+        return `Card: •••• ${digits.slice(-4) || 'Card'}`;
+      }
+      if (profileData.bank_account) {
+        return `Bank: ${String(profileData.bank_account).slice(-6)}`;
+      }
+      if (profileData.momo_number) {
+        return `Mobile: ${profileData.momo_number}`;
+      }
+      return 'Payout / Card: Not set';
     }
 
     async function renderProfileView(profileData) {
@@ -882,7 +916,7 @@
       const displayName = profileData.display_name || 'Brian K';
       const bio = profileData.bio || 'Funny videos from Kampala';
       const coins = Number(profileData.coins || 0);
-      const walletUsd = ugxToUsd(coins * DEPOSIT_UGX_PER_COIN);
+      const walletUsd = coins * COIN_DEPOSIT_USD;
 
       const avatarEl = document.getElementById('profile-avatar');
       if (profileData.avatar_url) {
@@ -914,10 +948,9 @@
       document.getElementById('wallet-coins-balance').textContent = coins.toLocaleString();
       const usdBalanceEl = document.getElementById('wallet-usd-balance');
       if (usdBalanceEl) {
-        usdBalanceEl.textContent = formatUsd(walletUsd);
-        usdBalanceEl.classList.add('hidden');
+        usdBalanceEl.textContent = `≈ ${formatUsd(walletUsd)} USD`;
       }
-      document.getElementById('wallet-momo-badge').textContent = profileData.momo_number ? `MoMo: ${profileData.momo_number}` : 'MoMo: Not set';
+      document.getElementById('wallet-momo-badge').textContent = formatSavedPayoutBadge(profileData);
 
       await loadProfileTabGrid(activeProfileTab, profileData.id, postsList);
     }
@@ -975,12 +1008,6 @@
       reader.readAsDataURL(file);
     }
 
-    const PAYMENT_METHODS = [
-      { value: 'MTN', label: 'MTN Mobile Money', sub: 'Instant MoMo transfer' },
-      { value: 'Airtel', label: 'Airtel Money', sub: 'Instant Airtel transfer' },
-      { value: 'Virtual Card', label: 'Virtual Card', sub: 'Visa / Mastercard virtual card' }
-    ];
-
     function formatCardNumber(value) {
       const digits = String(value || '').replace(/\D/g, '').slice(0, 19);
       return digits.replace(/(\d{4})(?=\d)/g, '$1 ');
@@ -1021,6 +1048,37 @@
         </div>`;
     }
 
+    function getAccountFieldConfig(provider) {
+      if (provider === 'Virtual Card') {
+        return {
+          label: 'Virtual Card Number',
+          placeholder: '4242 4242 4242 4242',
+          type: 'text',
+          inputMode: 'numeric',
+          maxLength: 23,
+          value: formatCardNumber(currentProfile.virtual_card || '')
+        };
+      }
+      if (provider === 'Bank Transfer') {
+        return {
+          label: 'IBAN / Bank Account Number',
+          placeholder: 'US29 NWBK 6016 1331 9268 19',
+          type: 'text',
+          inputMode: 'text',
+          maxLength: 34,
+          value: currentProfile.bank_account || ''
+        };
+      }
+      return {
+        label: `${provider} Mobile Money Number (with country code)`,
+        placeholder: '+256 770 000 000',
+        type: 'tel',
+        inputMode: 'tel',
+        maxLength: 22,
+        value: currentProfile.momo_number || ''
+      };
+    }
+
     function syncProviderField(scope, provider) {
       const isCard = provider === 'Virtual Card';
       const label = document.getElementById(`${scope}-account-label`);
@@ -1028,19 +1086,16 @@
       const extra = document.getElementById(`${scope}-card-extra`);
       const expiryInput = document.getElementById(`${scope}-card-expiry`);
       const cvvInput = document.getElementById(`${scope}-card-cvv`);
+      const cfg = getAccountFieldConfig(provider);
 
       if (label && input) {
-        label.textContent = isCard ? 'Virtual Card Number' : `${provider} Mobile Money Number`;
-        input.placeholder = isCard ? '4242 4242 4242 4242' : '0770000000';
-        input.type = isCard ? 'text' : 'tel';
-        input.inputMode = isCard ? 'numeric' : 'tel';
-        input.maxLength = isCard ? 23 : 20;
+        label.textContent = cfg.label;
+        input.placeholder = cfg.placeholder;
+        input.type = cfg.type;
+        input.inputMode = cfg.inputMode;
+        input.maxLength = cfg.maxLength;
         input.setAttribute('oninput', isCard ? `handleCardInputAutoFormat('${scope}', 'number', this)` : '');
-        if (isCard) {
-          input.value = formatCardNumber(currentProfile.virtual_card || '');
-        } else {
-          input.value = currentProfile.momo_number || '';
-        }
+        input.value = cfg.value;
       }
 
       if (extra) {
@@ -1054,6 +1109,63 @@
         cvvInput.required = isCard;
         if (isCard && !cvvInput.value) cvvInput.value = formatCardCvv(currentProfile.virtual_card_cvv || '');
       }
+    }
+
+    function refreshMethodChooserUi(scope, provider) {
+      const methods = getAvailablePaymentMethods(selectedRegion);
+      const meta = methods.find(m => m.value === provider) || methods[0];
+      const logoSlot = document.getElementById(`${scope}-trigger-logo`);
+      const labelSlot = document.getElementById(`${scope}-trigger-label`);
+      const subSlot = document.getElementById(`${scope}-trigger-sub`);
+      if (logoSlot) logoSlot.innerHTML = getProviderLogoHtml(meta.value);
+      if (labelSlot) labelSlot.textContent = meta.label;
+      if (subSlot) subSlot.textContent = meta.sub;
+
+      const checkColor = scope === 'deposit' ? 'text-sky-400' : 'text-orange-400';
+      document.querySelectorAll(`[data-provider-scope="${scope}"]`).forEach(btn => {
+        const active = btn.getAttribute('data-provider-value') === meta.value;
+        btn.classList.toggle('bg-slate-800', active);
+        const badge = btn.querySelector('.method-check');
+        if (badge) {
+          badge.className = `method-check fa-solid fa-circle-check ${checkColor} text-base ${active ? '' : 'hidden'}`;
+        }
+      });
+    }
+
+    function handleRegionChange(scope, nextRegion) {
+      selectedRegion = nextRegion;
+      const methods = getAvailablePaymentMethods(nextRegion);
+      const menu = document.getElementById(`${scope}-method-menu`);
+      const checkColor = scope === 'deposit' ? 'text-sky-400' : 'text-orange-400';
+      const currentProvider = scope === 'deposit' ? selectedDepositProvider : selectedWithdrawProvider;
+      const resolvedProvider = methods.some(m => m.value === currentProvider) ? currentProvider : 'Virtual Card';
+
+      if (scope === 'deposit') {
+        selectedDepositProvider = resolvedProvider;
+      } else {
+        selectedWithdrawProvider = resolvedProvider;
+      }
+
+      if (menu) {
+        menu.innerHTML = methods.map(m => {
+          const active = m.value === resolvedProvider;
+          return `
+            <button type="button" data-provider-scope="${scope}" data-provider-value="${m.value}" onclick="selectProvider('${scope}', '${m.value}')"
+              class="w-full p-3 flex items-center justify-between gap-3 text-left hover:bg-slate-800/80 transition ${active ? 'bg-slate-800' : ''}">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="shrink-0">${getProviderLogoHtml(m.value)}</div>
+                <div class="min-w-0">
+                  <span class="block text-sm font-bold text-white truncate">${m.label}</span>
+                  <span class="block text-[11px] text-slate-400 truncate">${m.sub}</span>
+                </div>
+              </div>
+              <i class="method-check fa-solid fa-circle-check ${checkColor} text-base ${active ? '' : 'hidden'}"></i>
+            </button>`;
+        }).join('');
+      }
+
+      refreshMethodChooserUi(scope, resolvedProvider);
+      syncProviderField(scope, resolvedProvider);
     }
 
     function toggleMethodMenu(scope) {
@@ -1071,23 +1183,7 @@
       } else {
         selectedWithdrawProvider = provider;
       }
-      const meta = PAYMENT_METHODS.find(m => m.value === provider) || PAYMENT_METHODS[0];
-      const logoSlot = document.getElementById(`${scope}-trigger-logo`);
-      const labelSlot = document.getElementById(`${scope}-trigger-label`);
-      const subSlot = document.getElementById(`${scope}-trigger-sub`);
-      if (logoSlot) logoSlot.innerHTML = getProviderLogoHtml(meta.value);
-      if (labelSlot) labelSlot.textContent = meta.label;
-      if (subSlot) subSlot.textContent = meta.sub;
-
-      const checkColor = scope === 'deposit' ? 'text-sky-400' : 'text-orange-400';
-      document.querySelectorAll(`[data-provider-scope="${scope}"]`).forEach(btn => {
-        const active = btn.getAttribute('data-provider-value') === provider;
-        btn.classList.toggle('bg-slate-800', active);
-        const badge = btn.querySelector('.method-check');
-        if (badge) {
-          badge.className = `method-check fa-solid fa-circle-check ${checkColor} text-base ${active ? '' : 'hidden'}`;
-        }
-      });
+      refreshMethodChooserUi(scope, provider);
 
       const menu = document.getElementById(`${scope}-method-menu`);
       const chevron = document.getElementById(`${scope}-method-chevron`);
@@ -1098,40 +1194,50 @@
     }
 
     function renderMethodChooser(scope, selected) {
-      const current = PAYMENT_METHODS.find(m => m.value === selected) || PAYMENT_METHODS[0];
+      const methods = getAvailablePaymentMethods(selectedRegion);
+      const current = methods.find(m => m.value === selected) || methods[0];
       const focusRing = scope === 'deposit' ? 'border-sky-400/50 hover:border-sky-400' : 'border-orange-400/50 hover:border-orange-400';
       const checkColor = scope === 'deposit' ? 'text-sky-400' : 'text-orange-400';
 
       return `
-        <div class="space-y-1.5 relative">
-          <label class="block text-xs text-sky-300 font-bold">Payment Method</label>
-          <button type="button" onclick="toggleMethodMenu('${scope}')"
-            class="w-full p-3 rounded-xl bg-slate-800 border ${focusRing} flex items-center justify-between gap-3 text-left transition">
-            <div class="flex items-center gap-3 min-w-0">
-              <div id="${scope}-trigger-logo" class="shrink-0">${getProviderLogoHtml(current.value)}</div>
-              <div class="min-w-0">
-                <span id="${scope}-trigger-label" class="block text-sm font-bold text-white truncate">${current.label}</span>
-                <span id="${scope}-trigger-sub" class="block text-[11px] text-slate-400 truncate">${current.sub}</span>
+        <div class="space-y-3">
+          <div>
+            <label for="${scope}-region-select" class="block text-xs text-sky-300 font-bold mb-1">Region / Availability</label>
+            <select id="${scope}-region-select" onchange="handleRegionChange('${scope}', this.value)"
+              class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-sm text-white outline-none focus:ring-1 focus:ring-sky-400">
+              ${GLOBAL_REGIONS.map(r => `<option value="${r.id}" ${r.id === selectedRegion ? 'selected' : ''}>${r.label}</option>`).join('')}
+            </select>
+          </div>
+          <div class="space-y-1.5 relative">
+            <label class="block text-xs text-sky-300 font-bold">Payment Method</label>
+            <button type="button" onclick="toggleMethodMenu('${scope}')"
+              class="w-full p-3 rounded-xl bg-slate-800 border ${focusRing} flex items-center justify-between gap-3 text-left transition">
+              <div class="flex items-center gap-3 min-w-0">
+                <div id="${scope}-trigger-logo" class="shrink-0">${getProviderLogoHtml(current.value)}</div>
+                <div class="min-w-0">
+                  <span id="${scope}-trigger-label" class="block text-sm font-bold text-white truncate">${current.label}</span>
+                  <span id="${scope}-trigger-sub" class="block text-[11px] text-slate-400 truncate">${current.sub}</span>
+                </div>
               </div>
-            </div>
-            <i id="${scope}-method-chevron" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform"></i>
-          </button>
-          <div id="${scope}-method-menu" class="hidden rounded-xl bg-slate-950 border border-slate-700 overflow-hidden divide-y divide-slate-800 shadow-xl">
-            ${PAYMENT_METHODS.map(m => {
-              const active = m.value === selected;
-              return `
-                <button type="button" data-provider-scope="${scope}" data-provider-value="${m.value}" onclick="selectProvider('${scope}', '${m.value}')"
-                  class="w-full p-3 flex items-center justify-between gap-3 text-left hover:bg-slate-800/80 transition ${active ? 'bg-slate-800' : ''}">
-                  <div class="flex items-center gap-3 min-w-0">
-                    <div class="shrink-0">${getProviderLogoHtml(m.value)}</div>
-                    <div class="min-w-0">
-                      <span class="block text-sm font-bold text-white truncate">${m.label}</span>
-                      <span class="block text-[11px] text-slate-400 truncate">${m.sub}</span>
+              <i id="${scope}-method-chevron" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform"></i>
+            </button>
+            <div id="${scope}-method-menu" class="hidden rounded-xl bg-slate-950 border border-slate-700 overflow-hidden divide-y divide-slate-800 shadow-xl">
+              ${methods.map(m => {
+                const active = m.value === current.value;
+                return `
+                  <button type="button" data-provider-scope="${scope}" data-provider-value="${m.value}" onclick="selectProvider('${scope}', '${m.value}')"
+                    class="w-full p-3 flex items-center justify-between gap-3 text-left hover:bg-slate-800/80 transition ${active ? 'bg-slate-800' : ''}">
+                    <div class="flex items-center gap-3 min-w-0">
+                      <div class="shrink-0">${getProviderLogoHtml(m.value)}</div>
+                      <div class="min-w-0">
+                        <span class="block text-sm font-bold text-white truncate">${m.label}</span>
+                        <span class="block text-[11px] text-slate-400 truncate">${m.sub}</span>
+                      </div>
                     </div>
-                  </div>
-                  <i class="method-check fa-solid fa-circle-check ${checkColor} text-base ${active ? '' : 'hidden'}"></i>
-                </button>`;
-            }).join('')}
+                    <i class="method-check fa-solid fa-circle-check ${checkColor} text-base ${active ? '' : 'hidden'}"></i>
+                  </button>`;
+              }).join('')}
+            </div>
           </div>
         </div>`;
     }
@@ -1143,11 +1249,11 @@
 
       const raw = Number(input.value);
       if (!raw || raw < 1) {
-        priceEl.textContent = '$0.00';
+        priceEl.textContent = '$0.00 USD';
         return;
       }
       const clamped = Math.min(MAX_CUSTOM_COINS, Math.floor(raw));
-      priceEl.textContent = formatUsd(ugxToUsd(clamped * DEPOSIT_UGX_PER_COIN));
+      priceEl.textContent = `${formatUsd(clamped * COIN_DEPOSIT_USD)} USD`;
     }
 
     async function handleCustomCoinPurchase(e) {
@@ -1166,8 +1272,7 @@
 
     function calculateWithdrawalSummary(coins) {
       const qty = Math.max(0, Number(coins) || 0);
-      const grossUgx = qty * _basePayoutFactor;
-      const grossUsd = ugxToUsd(grossUgx);
+      const grossUsd = qty * _basePayoutUsd;
       const appliesFee = grossUsd >= FEE_THRESHOLD_USD;
       const feePercent = appliesFee ? WITHDRAWAL_FEE_PERCENT : 0;
       const feeUsd = appliesFee ? grossUsd * (WITHDRAWAL_FEE_PERCENT / 100) : 0;
@@ -1193,7 +1298,7 @@
         feeLabelEl.textContent = `Withdrawal Charge (${feePercent}% on $${FEE_THRESHOLD_USD}+):`;
       }
       feeEl.textContent = formatUsd(feeUsd);
-      netEl.textContent = formatUsd(netUsd);
+      netEl.textContent = `${formatUsd(netUsd)} USD`;
     }
 
     function openProfileSubModal(mode) {
@@ -1219,7 +1324,7 @@
               <input id="edit-bio" type="text" maxlength="100" value="${escapeHtml(p.bio || 'Funny videos from Kampala')}" class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-blue-500" />
             </div>
             <div>
-              <label class="block text-xs text-sky-300 mb-1">Phone Number</label>
+              <label class="block text-xs text-sky-300 mb-1">Phone Number (International)</label>
               <input id="edit-phone" type="tel" value="${escapeHtml(p.phone || '')}" placeholder="+256 7XX XXX XXX" class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-blue-500" />
             </div>
             <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-orange-500 font-bold text-base">Save Changes</button>
@@ -1234,42 +1339,43 @@
               <button type="submit" class="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-500 font-semibold text-sm">Update Password</button>
             </form>
             <form onsubmit="handleChangeMomo(event)" class="p-3.5 rounded-xl bg-slate-800/80 border border-blue-500/20 space-y-2.5">
-              <p class="font-bold text-sm text-orange-400">Change MoMo Number</p>
-              <input id="momo-number-input" type="tel" value="${escapeHtml(p.momo_number || '')}" placeholder="e.g. 0770000000" required class="w-full bg-slate-900 rounded-xl p-2.5 text-sm outline-none focus:ring-1 focus:ring-orange-500" />
-              <button type="submit" class="w-full py-2 rounded-xl bg-orange-500 hover:bg-orange-400 font-semibold text-sm">Save MoMo Number</button>
+              <p class="font-bold text-sm text-orange-400">Default Payout Mobile Number</p>
+              <input id="momo-number-input" type="tel" value="${escapeHtml(p.momo_number || '')}" placeholder="e.g. +256 770 000 000" required class="w-full bg-slate-900 rounded-xl p-2.5 text-sm outline-none focus:ring-1 focus:ring-orange-500" />
+              <button type="submit" class="w-full py-2 rounded-xl bg-orange-500 hover:bg-orange-400 font-semibold text-sm">Save Mobile Number</button>
             </form>
             <button type="button" onclick="logoutUser()" class="w-full py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 font-bold text-sm">Log Out</button>
           </div>`;
       } else if (mode === 'buy-coins') {
+        const cfg = getAccountFieldConfig(selectedDepositProvider);
         const isCard = selectedDepositProvider === 'Virtual Card';
-        title.textContent = 'Buy Coins (Deposit)';
+        title.textContent = 'Buy Coins (USD)';
         body.innerHTML = `
           <div class="space-y-3.5">
             ${renderMethodChooser('deposit', selectedDepositProvider)}
             <div>
-              <label id="deposit-account-label" class="block text-xs text-sky-300 mb-1">${isCard ? 'Virtual Card Number' : `${selectedDepositProvider} Mobile Money Number`}</label>
-              <input id="deposit-account-input" oninput="${isCard ? `handleCardInputAutoFormat('deposit', 'number', this)` : ''}" type="${isCard ? 'text' : 'tel'}" inputmode="${isCard ? 'numeric' : 'tel'}" maxlength="${isCard ? 23 : 20}" value="${escapeHtml(isCard ? formatCardNumber(p.virtual_card || '') : (p.momo_number || ''))}" placeholder="${isCard ? '4242 4242 4242 4242' : '0770000000'}" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-sky-400" />
+              <label id="deposit-account-label" class="block text-xs text-sky-300 mb-1">${cfg.label}</label>
+              <input id="deposit-account-input" oninput="${isCard ? `handleCardInputAutoFormat('deposit', 'number', this)` : ''}" type="${cfg.type}" inputmode="${cfg.inputMode}" maxlength="${cfg.maxLength}" value="${escapeHtml(cfg.value)}" placeholder="${cfg.placeholder}" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-sky-400" />
             </div>
             ${renderCardExtraFields('deposit', p)}
-            <p class="text-xs text-slate-400">Live USD Rate Active • Max Custom Amount: ${MAX_CUSTOM_COINS.toLocaleString()} Coins</p>
+            <p class="text-xs text-slate-400">Global USD Pricing • Max Custom Amount: ${MAX_CUSTOM_COINS.toLocaleString()} Coins</p>
             <div class="grid grid-cols-3 gap-2.5">
               <button type="button" onclick="topUpCoins(100)" class="p-3 rounded-xl bg-slate-800 hover:bg-blue-600/30 border border-blue-500/30 text-center">
                 <span class="block font-black text-base text-amber-400">100 Coins</span>
-                <span class="block text-xs text-slate-300 mt-0.5">${formatUsd(ugxToUsd(100 * DEPOSIT_UGX_PER_COIN))}</span>
+                <span class="block text-xs text-slate-300 mt-0.5">${formatUsd(100 * COIN_DEPOSIT_USD)}</span>
               </button>
               <button type="button" onclick="topUpCoins(500)" class="p-3 rounded-xl bg-slate-800 hover:bg-blue-600/30 border border-blue-500/30 text-center">
                 <span class="block font-black text-base text-amber-400">500 Coins</span>
-                <span class="block text-xs text-slate-300 mt-0.5">${formatUsd(ugxToUsd(500 * DEPOSIT_UGX_PER_COIN))}</span>
+                <span class="block text-xs text-slate-300 mt-0.5">${formatUsd(500 * COIN_DEPOSIT_USD)}</span>
               </button>
               <button type="button" onclick="topUpCoins(1000)" class="p-3 rounded-xl bg-slate-800 hover:bg-blue-600/30 border border-blue-500/30 text-center">
                 <span class="block font-black text-base text-amber-400">1,000 Coins</span>
-                <span class="block text-xs text-slate-300 mt-0.5">${formatUsd(ugxToUsd(1000 * DEPOSIT_UGX_PER_COIN))}</span>
+                <span class="block text-xs text-slate-300 mt-0.5">${formatUsd(1000 * COIN_DEPOSIT_USD)}</span>
               </button>
             </div>
             <form onsubmit="handleCustomCoinPurchase(event)" class="p-3.5 rounded-xl bg-slate-800/80 border border-blue-500/25 space-y-2.5">
               <div class="flex items-center justify-between text-xs">
                 <label for="custom-coins-input" class="text-sky-300 font-bold">Custom Coins (Max 30,000,000)</label>
-                <span id="custom-coins-usd" class="font-extrabold text-amber-400">$0.00</span>
+                <span id="custom-coins-usd" class="font-extrabold text-amber-400">$0.00 USD</span>
               </div>
               <input id="custom-coins-input" oninput="updateCustomCoinPreview()" type="number" min="1" max="${MAX_CUSTOM_COINS}" placeholder="Enter coins (up to 30,000,000)" required class="w-full bg-slate-900 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-sky-400" />
               <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 hover:opacity-95 font-bold text-sm text-white">Buy Custom Coins</button>
@@ -1277,8 +1383,9 @@
           </div>`;
         syncProviderField('deposit', selectedDepositProvider);
       } else if (mode === 'withdraw') {
+        const cfg = getAccountFieldConfig(selectedWithdrawProvider);
         const isCard = selectedWithdrawProvider === 'Virtual Card';
-        title.textContent = 'Withdraw';
+        title.textContent = 'Withdraw (USD)';
         body.innerHTML = `
           <form onsubmit="handleWithdrawCoins(event)" class="space-y-3.5">
             ${renderMethodChooser('withdraw', selectedWithdrawProvider)}
@@ -1297,12 +1404,12 @@
               </div>
               <div class="flex justify-between text-white font-bold pt-1 border-t border-slate-700/80">
                 <span>You Receive:</span>
-                <span id="withdraw-net-amount" class="text-sky-300">$0.00</span>
+                <span id="withdraw-net-amount" class="text-sky-300">$0.00 USD</span>
               </div>
             </div>
             <div>
-              <label id="withdraw-account-label" class="block text-xs text-sky-300 mb-1">${isCard ? 'Virtual Card Number' : `${selectedWithdrawProvider} Mobile Money Number`}</label>
-              <input id="withdraw-account-input" oninput="${isCard ? `handleCardInputAutoFormat('withdraw', 'number', this)` : ''}" type="${isCard ? 'text' : 'tel'}" inputmode="${isCard ? 'numeric' : 'tel'}" maxlength="${isCard ? 23 : 20}" value="${escapeHtml(isCard ? formatCardNumber(p.virtual_card || '') : (p.momo_number || ''))}" placeholder="${isCard ? '4242 4242 4242 4242' : '0770000000'}" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-orange-500" />
+              <label id="withdraw-account-label" class="block text-xs text-sky-300 mb-1">${cfg.label}</label>
+              <input id="withdraw-account-input" oninput="${isCard ? `handleCardInputAutoFormat('withdraw', 'number', this)` : ''}" type="${cfg.type}" inputmode="${cfg.inputMode}" maxlength="${cfg.maxLength}" value="${escapeHtml(cfg.value)}" placeholder="${cfg.placeholder}" required class="w-full bg-slate-800 rounded-xl p-3 text-base outline-none focus:ring-1 focus:ring-orange-500" />
             </div>
             ${renderCardExtraFields('withdraw', p)}
             <button type="submit" class="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-400 font-bold text-base">Withdraw</button>
@@ -1369,8 +1476,18 @@
         alert('Enter a valid Virtual Card number.');
         return null;
       }
-      if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExpiry)) {
+      const expiryMatch = cardExpiry.match(/^(0[1-9]|1[0-2])\/(\d{2})$/);
+      if (!expiryMatch) {
         alert('Enter a valid card expiry date in MM/YY format.');
+        return null;
+      }
+      const expMonth = parseInt(expiryMatch[1], 10);
+      const expYear = 2000 + parseInt(expiryMatch[2], 10);
+      const now = new Date();
+      const currentMonth = now.getMonth() + 1;
+      const currentYear = now.getFullYear();
+      if (expYear < currentYear || (expYear === currentYear && expMonth < currentMonth)) {
+        alert('This virtual card is expired. Enter a valid future MM/YY date.');
         return null;
       }
       if (cardCvv.length < 3) {
@@ -1380,13 +1497,38 @@
       return { cardNumber, cardExpiry, cardCvv };
     }
 
+    function applyDestinationPatch(provider, accountVal) {
+      if (provider === 'Virtual Card') {
+        const cardData = validateAndExtractCardDetails('deposit', accountVal);
+        if (!cardData) return null;
+        return {
+          patch: {
+            virtual_card: cardData.cardNumber,
+            virtual_card_expiry: cardData.cardExpiry,
+            virtual_card_cvv: cardData.cardCvv
+          },
+          destination: cardData.cardNumber
+        };
+      }
+      if (provider === 'Bank Transfer') {
+        return {
+          patch: { bank_account: accountVal },
+          destination: accountVal
+        };
+      }
+      return {
+        patch: { momo_number: accountVal },
+        destination: accountVal
+      };
+    }
+
     async function topUpCoins(amount, accountOverride = null) {
       const accountVal = (accountOverride ?? document.getElementById('deposit-account-input')?.value ?? '').trim();
       if (!accountVal) {
-        return alert(selectedDepositProvider === 'Virtual Card' ? 'Enter your Virtual Card number.' : `Enter your ${selectedDepositProvider} number.`);
+        return alert('Enter your payment details to continue.');
       }
       const nextCoins = Number(currentProfile.coins || 0) + Number(amount);
-      let profilePatch = { coins: nextCoins, momo_number: accountVal };
+      let profilePatch = { coins: nextCoins };
 
       if (selectedDepositProvider === 'Virtual Card') {
         const cardData = validateAndExtractCardDetails('deposit', accountVal);
@@ -1397,11 +1539,16 @@
           virtual_card_expiry: cardData.cardExpiry,
           virtual_card_cvv: cardData.cardCvv
         };
+      } else if (selectedDepositProvider === 'Bank Transfer') {
+        profilePatch = { coins: nextCoins, bank_account: accountVal };
+      } else {
+        profilePatch = { coins: nextCoins, momo_number: accountVal };
       }
 
+      const totalUsd = formatUsd(Number(amount) * COIN_DEPOSIT_USD);
       currentProfile = { ...currentProfile, ...profilePatch };
       viewingProfileData = currentProfile;
-      alert(`${selectedDepositProvider} deposit of ${Number(amount).toLocaleString()} Coins completed.`);
+      alert(`${selectedDepositProvider} (${selectedRegion}) deposit of ${Number(amount).toLocaleString()} Coins (${totalUsd} USD) completed.`);
       closeProfileSubModal();
       await renderProfileView(currentProfile);
     }
@@ -1428,7 +1575,7 @@
         return alert(`Minimum withdrawal is ${formatUsd(MIN_WITHDRAWAL_USD)} USD.`);
       }
 
-      let profilePatch = { coins: currentCoins - amount, momo_number: accountVal };
+      let profilePatch = { coins: currentCoins - amount };
       let destinationDisplay = accountVal;
 
       if (selectedWithdrawProvider === 'Virtual Card') {
@@ -1441,12 +1588,16 @@
           virtual_card_cvv: cardData.cardCvv
         };
         destinationDisplay = cardData.cardNumber;
+      } else if (selectedWithdrawProvider === 'Bank Transfer') {
+        profilePatch = { coins: currentCoins - amount, bank_account: accountVal };
+      } else {
+        profilePatch = { coins: currentCoins - amount, momo_number: accountVal };
       }
 
       withdrawalHistory.push(Date.now());
       currentProfile = { ...currentProfile, ...profilePatch };
       viewingProfileData = currentProfile;
-      alert(`${selectedWithdrawProvider} withdrawal of ${amount} Coins submitted to ${destinationDisplay}.\nWithdrawal Charge (${feePercent}%): ${formatUsd(feeUsd)}\nNet Payout: ${formatUsd(netUsd)}`);
+      alert(`${selectedWithdrawProvider} (${selectedRegion}) withdrawal of ${amount} Coins submitted to ${destinationDisplay}.\nWithdrawal Charge (${feePercent}%): ${formatUsd(feeUsd)}\nNet Payout: ${formatUsd(netUsd)} USD`);
       closeProfileSubModal();
       await renderProfileView(currentProfile);
     }
