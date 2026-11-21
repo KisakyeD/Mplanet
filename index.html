@@ -411,32 +411,34 @@
         </span>
         <div class="flex items-center gap-1.5 shrink-0">
           <span id="wallet-momo-badge" class="text-xs text-slate-400 truncate max-w-[140px]">Payout / Card: Not set</span>
-          <button type="button" onclick="openProfileSubModal('history')" class="p-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-sky-300 transition relative" title="Transaction History" aria-label="Transaction History">
-            <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+          <button type="button" onclick="toggleWalletMenu(event)" class="p-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-white transition relative" title="Wallet Menu" aria-label="Wallet Menu">
+            <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
             <span id="wallet-pending-dot" class="hidden absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400"></span>
           </button>
-          <button type="button" onclick="toggleWalletMenu(event)" class="p-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-white transition" title="Wallet Actions" aria-label="Wallet Actions">
-            <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
-          </button>
         </div>
       </div>
 
-      <div id="wallet-action-menu" class="hidden absolute right-4 top-12 z-20 w-44 rounded-xl bg-slate-900 border border-blue-500/30 shadow-2xl overflow-hidden divide-y divide-slate-800">
-        <button type="button" onclick="closeWalletMenu(); openProfileSubModal('buy-coins')" class="w-full px-3.5 py-2.5 text-left text-sm font-bold text-sky-300 hover:bg-slate-800 flex items-center gap-2 transition">
-          <i class="fa-solid fa-plus-circle text-sky-400"></i>
+      <div id="wallet-action-menu" class="hidden absolute right-4 top-12 z-20 w-40 rounded-xl bg-slate-900 border border-blue-500/30 shadow-2xl overflow-hidden">
+        <button type="button" onclick="closeWalletMenu(); openProfileSubModal('history')" class="w-full px-3.5 py-2.5 text-left text-sm font-bold text-sky-300 hover:bg-slate-800 flex items-center gap-2 transition">
+          <i class="fa-solid fa-clock-rotate-left text-sky-400"></i>
+          <span>History</span>
+        </button>
+      </div>
+
+      <div class="mb-3">
+        <span id="wallet-coins-balance" class="text-2xl font-black text-white">850</span>
+        <span class="text-xs font-bold text-amber-400 ml-1">Coins</span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2.5">
+        <button type="button" onclick="openProfileSubModal('buy-coins')" class="py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold text-sm flex items-center justify-center gap-1.5 transition">
+          <i class="fa-solid fa-plus-circle"></i>
           <span>Deposit</span>
         </button>
-        <button type="button" onclick="closeWalletMenu(); openProfileSubModal('withdraw')" class="w-full px-3.5 py-2.5 text-left text-sm font-bold text-orange-400 hover:bg-slate-800 flex items-center gap-2 transition">
-          <i class="fa-solid fa-money-bill-transfer text-orange-400"></i>
+        <button type="button" onclick="openProfileSubModal('withdraw')" class="py-2.5 px-3 rounded-xl bg-orange-500 hover:bg-orange-400 text-white font-extrabold text-sm flex items-center justify-center gap-1.5 transition">
+          <i class="fa-solid fa-money-bill-transfer"></i>
           <span>Withdraw</span>
         </button>
-      </div>
-
-      <div class="flex items-baseline justify-between gap-2">
-        <div class="min-w-0">
-          <span id="wallet-coins-balance" class="text-2xl font-black text-white">850</span>
-          <span class="text-xs font-bold text-amber-400 ml-1">Coins</span>
-        </div>
       </div>
     </div>
 
@@ -479,14 +481,14 @@
   </div>
 
   <script>
-    const COIN_DEPOSIT_USD = 0.0071;
+    const COIN_DEPOSIT_RATE = 0.0071;
     const MAX_CUSTOM_COINS = 30000000;
-    const MIN_WITHDRAWAL_USD = 1;
-    const FEE_THRESHOLD_USD = 30;
+    const MIN_WITHDRAWAL_COINS = 562;
+    const FEE_THRESHOLD_COINS = 16854;
     const WITHDRAWAL_FEE_PERCENT = 10;
     const DAILY_MAX_WITHDRAWALS = 1;
     const WEEKLY_MAX_WITHDRAWALS = 5;
-    const _basePayoutUsd = 0.00178;
+    const _basePayoutRate = 0.00178;
     const USERNAME_COOLDOWN_DAYS = 30;
 
     const METHOD_CATALOG = {
@@ -680,9 +682,6 @@
         method: 'MTN',
         destination: '+256 770 *** 210',
         coins: 500,
-        grossUsd: 3.55,
-        feeUsd: 0,
-        netUsd: 3.55,
         note: 'Initial wallet top-up',
         createdAt: new Date(Date.now() - 3600 * 1000 * 26).toISOString(),
         updatedAt: new Date(Date.now() - 3600 * 1000 * 26 + 45000).toISOString()
@@ -764,7 +763,7 @@
 
     document.addEventListener('click', (e) => {
       const menu = document.getElementById('wallet-action-menu');
-      if (menu && !menu.classList.contains('hidden') && !e.target.closest('#wallet-action-menu') && !e.target.closest('[aria-label="Wallet Actions"]')) {
+      if (menu && !menu.classList.contains('hidden') && !e.target.closest('#wallet-action-menu') && !e.target.closest('[aria-label="Wallet Menu"]')) {
         menu.classList.add('hidden');
       }
     });
@@ -786,10 +785,6 @@
       };
       const tpl = document.getElementById(map[provider] || 'generic-method-logo-svg');
       return tpl ? tpl.innerHTML : provider;
-    }
-
-    function formatUsd(usdAmount) {
-      return `$${Number(usdAmount || 0).toFixed(2)}`;
     }
 
     function maskDestination(kind, rawValue) {
@@ -1488,17 +1483,15 @@
 
     function calculateWithdrawalSummary(coins) {
       const qty = Math.max(0, Number(coins) || 0);
-      const grossUsd = qty * _basePayoutUsd;
-      const appliesFee = grossUsd >= FEE_THRESHOLD_USD;
+      const appliesFee = qty >= FEE_THRESHOLD_COINS;
       const feePercent = appliesFee ? WITHDRAWAL_FEE_PERCENT : 0;
-      const feeUsd = appliesFee ? grossUsd * (WITHDRAWAL_FEE_PERCENT / 100) : 0;
-      const netUsd = grossUsd - feeUsd;
+      const feeCoins = appliesFee ? Math.round(qty * (WITHDRAWAL_FEE_PERCENT / 100)) : 0;
+      const netCoins = Math.max(0, qty - feeCoins);
       return {
-        grossUsd,
         appliesFee,
         feePercent,
-        feeUsd,
-        netUsd
+        feeCoins,
+        netCoins
       };
     }
 
@@ -1509,9 +1502,7 @@
       if (!input || !feeEl || !netEl) return;
 
       const qty = Math.max(0, parseInt(input.value, 10) || 0);
-      const { appliesFee } = calculateWithdrawalSummary(qty);
-      const feeCoins = appliesFee ? Math.round(qty * (WITHDRAWAL_FEE_PERCENT / 100)) : 0;
-      const netCoins = Math.max(0, qty - feeCoins);
+      const { feeCoins, netCoins } = calculateWithdrawalSummary(qty);
 
       feeEl.textContent = `${feeCoins.toLocaleString()} Coins`;
       netEl.textContent = `${netCoins.toLocaleString()} Coins`;
@@ -1685,7 +1676,7 @@
             <button type="button" onclick="logoutUser()" class="w-full py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 font-bold text-sm">Log Out</button>
           </div>`;
       } else if (mode === 'history') {
-        title.textContent = 'Deposit & Withdraw History';
+        title.textContent = 'History';
         renderTransactionHistoryPanel();
       } else if (mode === 'buy-coins') {
         const methods = getCountryMethods(selectedCountryCode);
@@ -1890,7 +1881,6 @@
 
       const country = getCountryByCode(selectedCountryCode);
       const spec = getMethodSpec(selectedDepositProvider);
-      const totalUsdNum = Number(amount) * COIN_DEPOSIT_USD;
       const txId = createTxRef('DEP');
 
       walletTransactions.unshift({
@@ -1901,9 +1891,6 @@
         method: selectedDepositProvider,
         destination: maskDestination(spec.kind, built.destination),
         coins: Number(amount),
-        grossUsd: totalUsdNum,
-        feeUsd: 0,
-        netUsd: totalUsdNum,
         note: 'Awaiting payment confirmation',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -1933,11 +1920,11 @@
         return alert('Enter a valid coin amount within your balance.');
       }
 
-      const { grossUsd, feeUsd, netUsd } = calculateWithdrawalSummary(amount);
-      if (grossUsd < MIN_WITHDRAWAL_USD) {
-        return alert(`Minimum withdrawal is ${formatUsd(MIN_WITHDRAWAL_USD)} USD.`);
+      if (amount < MIN_WITHDRAWAL_COINS) {
+        return alert(`Minimum withdrawal is ${MIN_WITHDRAWAL_COINS.toLocaleString()} Coins.`);
       }
 
+      const { feeCoins, netCoins } = calculateWithdrawalSummary(amount);
       const built = buildAccountPatch('withdraw', selectedWithdrawProvider, accountVal, { coins: currentCoins - amount });
       if (!built) return;
 
@@ -1954,9 +1941,8 @@
         method: selectedWithdrawProvider,
         destination: maskDestination(spec.kind, built.destination),
         coins: amount,
-        grossUsd,
-        feeUsd,
-        netUsd,
+        feeCoins,
+        netCoins,
         note: 'Coins held — payout processing',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
