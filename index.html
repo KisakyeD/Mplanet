@@ -404,33 +404,39 @@
     </div>
 
     <!-- Coins Wallet -->
-    <div class="mx-4 mt-4 p-4 rounded-2xl bg-gradient-to-r from-blue-950/70 via-slate-900 to-orange-950/50 border border-blue-500/30">
+    <div class="mx-4 mt-4 p-4 rounded-2xl bg-gradient-to-r from-blue-950/70 via-slate-900 to-orange-950/50 border border-blue-500/30 relative">
       <div class="flex items-center justify-between gap-2 mb-2">
         <span class="text-xs font-extrabold uppercase tracking-wider text-sky-300 flex items-center gap-1.5 whitespace-nowrap">
           <i class="fa-solid fa-coins text-amber-400"></i> Coins Wallet
         </span>
-        <span id="wallet-momo-badge" class="text-xs text-slate-400 truncate">Payout / Card: Not set</span>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <span id="wallet-momo-badge" class="text-xs text-slate-400 truncate max-w-[140px]">Payout / Card: Not set</span>
+          <button type="button" onclick="openProfileSubModal('history')" class="p-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-sky-300 transition relative" title="Transaction History" aria-label="Transaction History">
+            <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+            <span id="wallet-pending-dot" class="hidden absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400"></span>
+          </button>
+          <button type="button" onclick="toggleWalletMenu(event)" class="p-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-white transition" title="Wallet Actions" aria-label="Wallet Actions">
+            <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
+          </button>
+        </div>
       </div>
-      <div class="flex items-baseline justify-between gap-2 mb-3">
+
+      <div id="wallet-action-menu" class="hidden absolute right-4 top-12 z-20 w-44 rounded-xl bg-slate-900 border border-blue-500/30 shadow-2xl overflow-hidden divide-y divide-slate-800">
+        <button type="button" onclick="closeWalletMenu(); openProfileSubModal('buy-coins')" class="w-full px-3.5 py-2.5 text-left text-sm font-bold text-sky-300 hover:bg-slate-800 flex items-center gap-2 transition">
+          <i class="fa-solid fa-plus-circle text-sky-400"></i>
+          <span>Deposit</span>
+        </button>
+        <button type="button" onclick="closeWalletMenu(); openProfileSubModal('withdraw')" class="w-full px-3.5 py-2.5 text-left text-sm font-bold text-orange-400 hover:bg-slate-800 flex items-center gap-2 transition">
+          <i class="fa-solid fa-money-bill-transfer text-orange-400"></i>
+          <span>Withdraw</span>
+        </button>
+      </div>
+
+      <div class="flex items-baseline justify-between gap-2">
         <div class="min-w-0">
           <span id="wallet-coins-balance" class="text-2xl font-black text-white">850</span>
           <span class="text-xs font-bold text-amber-400 ml-1">Coins</span>
         </div>
-        <div class="text-right shrink-0">
-          <span id="wallet-usd-balance" class="text-sm font-extrabold text-sky-300 whitespace-nowrap">≈ $6.04 USD</span>
-        </div>
-      </div>
-      <div class="flex gap-2">
-        <button type="button" onclick="openProfileSubModal('buy-coins')" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 hover:opacity-95 font-bold text-sm text-white transition">
-          <i class="fa-solid fa-plus-circle mr-1"></i> Buy Coins
-        </button>
-        <button type="button" onclick="openProfileSubModal('withdraw')" class="flex-1 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-400 font-bold text-sm text-white transition">
-          <i class="fa-solid fa-money-bill-transfer mr-1"></i> Withdraw
-        </button>
-        <button type="button" onclick="openProfileSubModal('history')" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-blue-500/30 font-bold text-sm text-sky-300 transition relative" title="Transaction History">
-          <i class="fa-solid fa-clock-rotate-left"></i>
-          <span id="wallet-pending-dot" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-        </button>
       </div>
     </div>
 
@@ -745,6 +751,24 @@
       }
     }
 
+    function toggleWalletMenu(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('wallet-action-menu');
+      if (menu) menu.classList.toggle('hidden');
+    }
+
+    function closeWalletMenu() {
+      const menu = document.getElementById('wallet-action-menu');
+      if (menu) menu.classList.add('hidden');
+    }
+
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('wallet-action-menu');
+      if (menu && !menu.classList.contains('hidden') && !e.target.closest('#wallet-action-menu') && !e.target.closest('[aria-label="Wallet Actions"]')) {
+        menu.classList.add('hidden');
+      }
+    });
+
     function getCountryByCode(code) {
       return COUNTRIES_DIRECTORY.find(c => c.code === code) || COUNTRIES_DIRECTORY[0];
     }
@@ -868,6 +892,7 @@
         return;
       }
       if (id === 'profile-modal' && !show) {
+        closeWalletMenu();
         closeProfileSubModal();
       }
       const el = document.getElementById(id);
@@ -877,6 +902,7 @@
 
     window.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
+      closeWalletMenu();
       const subpanel = document.getElementById('profile-subpanel');
       if (subpanel && !subpanel.classList.contains('hidden')) {
         closeProfileSubModal();
@@ -1121,7 +1147,6 @@
       const displayName = profileData.display_name || 'Brian K';
       const bio = profileData.bio || 'Funny videos from Kampala';
       const coins = Number(profileData.coins || 0);
-      const walletUsd = coins * COIN_DEPOSIT_USD;
 
       const avatarEl = document.getElementById('profile-avatar');
       if (profileData.avatar_url) {
@@ -1151,10 +1176,6 @@
       document.getElementById('stat-total-likes').textContent = totalLikes;
 
       document.getElementById('wallet-coins-balance').textContent = coins.toLocaleString();
-      const usdBalanceEl = document.getElementById('wallet-usd-balance');
-      if (usdBalanceEl) {
-        usdBalanceEl.textContent = `≈ ${formatUsd(walletUsd)} USD`;
-      }
       document.getElementById('wallet-momo-badge').textContent = formatSavedPayoutBadge(profileData);
 
       const pendingDot = document.getElementById('wallet-pending-dot');
@@ -1444,11 +1465,11 @@
 
       const raw = Number(input.value);
       if (!raw || raw < 1) {
-        priceEl.textContent = '$0.00 USD';
+        priceEl.textContent = '0 Coins';
         return;
       }
       const clamped = Math.min(MAX_CUSTOM_COINS, Math.floor(raw));
-      priceEl.textContent = `${formatUsd(clamped * COIN_DEPOSIT_USD)} USD`;
+      priceEl.textContent = `${clamped.toLocaleString()} Coins`;
     }
 
     async function handleCustomCoinPurchase(e) {
@@ -1483,17 +1504,17 @@
 
     function updateWithdrawPreview() {
       const input = document.getElementById('withdraw-coins-input');
-      const feeLabelEl = document.getElementById('withdraw-fee-label');
       const feeEl = document.getElementById('withdraw-fee-amount');
       const netEl = document.getElementById('withdraw-net-amount');
       if (!input || !feeEl || !netEl) return;
 
-      const { feePercent, feeUsd, netUsd } = calculateWithdrawalSummary(input.value);
-      if (feeLabelEl) {
-        feeLabelEl.textContent = `Withdrawal Charge (${feePercent}% on $${FEE_THRESHOLD_USD}+):`;
-      }
-      feeEl.textContent = formatUsd(feeUsd);
-      netEl.textContent = `${formatUsd(netUsd)} USD`;
+      const qty = Math.max(0, parseInt(input.value, 10) || 0);
+      const { appliesFee } = calculateWithdrawalSummary(qty);
+      const feeCoins = appliesFee ? Math.round(qty * (WITHDRAWAL_FEE_PERCENT / 100)) : 0;
+      const netCoins = Math.max(0, qty - feeCoins);
+
+      feeEl.textContent = `${feeCoins.toLocaleString()} Coins`;
+      netEl.textContent = `${netCoins.toLocaleString()} Coins`;
     }
 
     function setHistoryFilter(filter) {
@@ -1592,11 +1613,9 @@
                       </div>
 
                       <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-700/60">
-                        <span class="text-slate-300 font-semibold">${isDeposit ? '+' : '-'}${Number(tx.coins).toLocaleString()} Coins (${formatUsd(tx.netUsd)} USD)</span>
+                        <span class="text-slate-300 font-semibold">${isDeposit ? '+' : '-'}${Number(tx.coins).toLocaleString()} Coins</span>
                         <span class="text-slate-400">${escapeHtml(tx.destination)}</span>
                       </div>
-
-                      ${tx.feeUsd > 0 ? `<div class="text-[11px] text-orange-300">Fee charged: ${formatUsd(tx.feeUsd)} USD</div>` : ''}
 
                       <div class="flex items-center justify-between text-[11px] text-slate-400">
                         <span>${escapeHtml(tx.note || '')}</span>
@@ -1621,6 +1640,7 @@
     }
 
     function openProfileSubModal(mode) {
+      closeWalletMenu();
       const subpanel = document.getElementById('profile-subpanel');
       const title = document.getElementById('subpanel-title');
       const body = document.getElementById('subpanel-body');
@@ -1675,7 +1695,7 @@
         const spec = getMethodSpec(selectedDepositProvider);
         const isCard = spec.kind === 'card';
 
-        title.textContent = 'Buy Coins (Deposit)';
+        title.textContent = 'Deposit Coins';
         body.innerHTML = `
           <div class="space-y-3.5">
             ${renderRegionAndMethodSection('deposit', selectedDepositProvider)}
@@ -1683,29 +1703,25 @@
             <div class="p-3.5 rounded-2xl bg-slate-800/60 border border-slate-700/80 space-y-3">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-extrabold uppercase tracking-wider text-sky-300">2. Select Coin Package</span>
-                <span class="text-[11px] text-slate-400">USD Pricing</span>
               </div>
               <div class="grid grid-cols-3 gap-2">
                 <button type="button" onclick="topUpCoins(100)" class="p-2.5 rounded-xl bg-slate-900 hover:bg-blue-600/30 border border-blue-500/30 text-center transition">
                   <span class="block font-black text-sm text-amber-400">100 Coins</span>
-                  <span class="block text-xs text-slate-300 mt-0.5">${formatUsd(100 * COIN_DEPOSIT_USD)}</span>
                 </button>
                 <button type="button" onclick="topUpCoins(500)" class="p-2.5 rounded-xl bg-slate-900 hover:bg-blue-600/30 border border-blue-500/30 text-center transition">
                   <span class="block font-black text-sm text-amber-400">500 Coins</span>
-                  <span class="block text-xs text-slate-300 mt-0.5">${formatUsd(500 * COIN_DEPOSIT_USD)}</span>
                 </button>
                 <button type="button" onclick="topUpCoins(1000)" class="p-2.5 rounded-xl bg-slate-900 hover:bg-blue-600/30 border border-blue-500/30 text-center transition">
                   <span class="block font-black text-sm text-amber-400">1,000 Coins</span>
-                  <span class="block text-xs text-slate-300 mt-0.5">${formatUsd(1000 * COIN_DEPOSIT_USD)}</span>
                 </button>
               </div>
               <form onsubmit="handleCustomCoinPurchase(event)" class="pt-2 border-t border-slate-700/70 space-y-2">
                 <div class="flex items-center justify-between text-xs">
                   <label for="custom-coins-input" class="text-slate-300 font-semibold">Custom Coins (Max 30,000,000)</label>
-                  <span id="custom-coins-usd" class="font-extrabold text-amber-400">$0.00 USD</span>
+                  <span id="custom-coins-usd" class="font-extrabold text-amber-400">0 Coins</span>
                 </div>
                 <input id="custom-coins-input" oninput="updateCustomCoinPreview()" type="number" min="1" max="${MAX_CUSTOM_COINS}" placeholder="Enter coins (up to 30,000,000)" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm outline-none focus:ring-1 focus:ring-sky-400" />
-                <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 hover:opacity-95 font-bold text-sm text-white">Buy Custom Coins</button>
+                <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 hover:opacity-95 font-bold text-sm text-white">Deposit Custom Coins</button>
               </form>
             </div>
 
@@ -1738,16 +1754,12 @@
               <input id="withdraw-coins-input" oninput="updateWithdrawPreview()" type="number" min="1" max="${Number(p.coins || 0)}" placeholder="Enter coins to withdraw" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm outline-none focus:ring-1 focus:ring-orange-500" />
               <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 space-y-1 text-xs">
                 <div class="flex justify-between text-slate-400">
-                  <span>Minimum Withdrawal:</span>
-                  <span class="text-slate-200 font-semibold">${formatUsd(MIN_WITHDRAWAL_USD)} USD</span>
-                </div>
-                <div class="flex justify-between text-slate-400">
-                  <span id="withdraw-fee-label">Withdrawal Charge (0% on $${FEE_THRESHOLD_USD}+):</span>
-                  <span id="withdraw-fee-amount" class="font-semibold text-orange-400">$0.00</span>
+                  <span>Withdrawal Fee:</span>
+                  <span id="withdraw-fee-amount" class="font-semibold text-orange-400">0 Coins</span>
                 </div>
                 <div class="flex justify-between text-white font-bold pt-1 border-t border-slate-800 text-sm">
                   <span>Estimated Payout:</span>
-                  <span id="withdraw-net-amount" class="text-sky-300">$0.00 USD</span>
+                  <span id="withdraw-net-amount" class="text-sky-300">0 Coins</span>
                 </div>
               </div>
             </div>
