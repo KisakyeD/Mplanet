@@ -403,6 +403,7 @@
       </div>
     </div>
 
+    <!-- Coins Wallet -->
     <div class="mx-4 mt-4 p-4 rounded-2xl bg-gradient-to-r from-blue-950/70 via-slate-900 to-orange-950/50 border border-blue-500/30">
       <div class="flex items-center justify-between gap-2 mb-2">
         <span class="text-xs font-extrabold uppercase tracking-wider text-sky-300 flex items-center gap-1.5 whitespace-nowrap">
@@ -419,12 +420,16 @@
           <span id="wallet-usd-balance" class="text-sm font-extrabold text-sky-300 whitespace-nowrap">≈ $6.04 USD</span>
         </div>
       </div>
-      <div class="flex gap-2.5">
+      <div class="flex gap-2">
         <button type="button" onclick="openProfileSubModal('buy-coins')" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 hover:opacity-95 font-bold text-sm text-white transition">
           <i class="fa-solid fa-plus-circle mr-1"></i> Buy Coins
         </button>
         <button type="button" onclick="openProfileSubModal('withdraw')" class="flex-1 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-400 font-bold text-sm text-white transition">
           <i class="fa-solid fa-money-bill-transfer mr-1"></i> Withdraw
+        </button>
+        <button type="button" onclick="openProfileSubModal('history')" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-blue-500/30 font-bold text-sm text-sky-300 transition relative" title="Transaction History">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span id="wallet-pending-dot" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400"></span>
         </button>
       </div>
     </div>
@@ -660,6 +665,24 @@
 
     let selectedCountryCode = 'UG';
     let withdrawalHistory = [];
+    let walletTransactions = [
+      {
+        id: 'DEP-10412',
+        type: 'deposit',
+        status: 'confirmed',
+        country: 'Uganda',
+        method: 'MTN',
+        destination: '+256 770 *** 210',
+        coins: 500,
+        grossUsd: 3.55,
+        feeUsd: 0,
+        netUsd: 3.55,
+        note: 'Initial wallet top-up',
+        createdAt: new Date(Date.now() - 3600 * 1000 * 26).toISOString(),
+        updatedAt: new Date(Date.now() - 3600 * 1000 * 26 + 45000).toISOString()
+      }
+    ];
+    let activeHistoryFilter = 'all';
     let selectedDepositProvider = 'MTN';
     let selectedWithdrawProvider = 'MTN';
 
@@ -743,6 +766,21 @@
 
     function formatUsd(usdAmount) {
       return `$${Number(usdAmount || 0).toFixed(2)}`;
+    }
+
+    function maskDestination(kind, rawValue) {
+      const val = String(rawValue || '').trim();
+      if (!val) return 'Not specified';
+      if (kind === 'card') {
+        const digits = val.replace(/\D/g, '');
+        return `•••• ${digits.slice(-4) || 'CARD'}`;
+      }
+      if (val.length <= 6) return val;
+      return `${val.slice(0, 4)} *** ${val.slice(-3)}`;
+    }
+
+    function createTxRef(prefix) {
+      return `${prefix}-${Math.floor(10000 + Math.random() * 90000)}`;
     }
 
     function getWithdrawalCounts() {
@@ -1119,6 +1157,12 @@
       }
       document.getElementById('wallet-momo-badge').textContent = formatSavedPayoutBadge(profileData);
 
+      const pendingDot = document.getElementById('wallet-pending-dot');
+      if (pendingDot) {
+        const hasPending = walletTransactions.some(tx => tx.status === 'pending');
+        pendingDot.classList.toggle('hidden', !hasPending);
+      }
+
       await loadProfileTabGrid(activeProfileTab, profileData.id, postsList);
     }
 
@@ -1452,6 +1496,130 @@
       netEl.textContent = `${formatUsd(netUsd)} USD`;
     }
 
+    function setHistoryFilter(filter) {
+      activeHistoryFilter = filter;
+      renderTransactionHistoryPanel();
+    }
+
+    function getStatusBadgeHtml(status) {
+      if (status === 'confirmed') {
+        return `<span class="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Confirmed</span>`;
+      }
+      if (status === 'failed') {
+        return `<span class="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-red-500/20 text-red-300 border border-red-500/40">Failed</span>`;
+      }
+      return `<span class="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/40">Pending</span>`;
+    }
+
+    async function updateTransactionStatus(txId, nextStatus) {
+      const tx = walletTransactions.find(item => item.id === txId);
+      if (!tx || tx.status !== 'pending') return;
+
+      tx.status = nextStatus;
+      tx.updatedAt = new Date().toISOString();
+
+      if (tx.type === 'deposit' && nextStatus === 'confirmed') {
+        currentProfile = {
+          ...currentProfile,
+          coins: Number(currentProfile.coins || 0) + Number(tx.coins || 0)
+        };
+        tx.note = 'Payment confirmed and coins credited';
+      } else if (tx.type === 'deposit' && nextStatus === 'failed') {
+        tx.note = 'Payment declined or expired';
+      } else if (tx.type === 'withdraw' && nextStatus === 'confirmed') {
+        tx.note = 'Payout settled to destination';
+      } else if (tx.type === 'withdraw' && nextStatus === 'failed') {
+        currentProfile = {
+          ...currentProfile,
+          coins: Number(currentProfile.coins || 0) + Number(tx.coins || 0)
+        };
+        tx.note = 'Payout failed — coins refunded to wallet';
+      }
+
+      viewingProfileData = currentProfile;
+      await renderProfileView(currentProfile);
+      renderTransactionHistoryPanel();
+    }
+
+    function renderTransactionHistoryPanel() {
+      const body = document.getElementById('subpanel-body');
+      if (!body) return;
+
+      const filtered = walletTransactions.filter(tx => {
+        if (activeHistoryFilter === 'deposits') return tx.type === 'deposit';
+        if (activeHistoryFilter === 'withdrawals') return tx.type === 'withdraw';
+        if (activeHistoryFilter === 'pending') return tx.status === 'pending';
+        return true;
+      });
+
+      const pendingCount = walletTransactions.filter(t => t.status === 'pending').length;
+      const tabs = [
+        { id: 'all', label: `All (${walletTransactions.length})` },
+        { id: 'deposits', label: 'Deposits' },
+        { id: 'withdrawals', label: 'Withdrawals' },
+        { id: 'pending', label: `Pending (${pendingCount})` }
+      ];
+
+      body.innerHTML = `
+        <div class="space-y-3">
+          <div class="grid grid-cols-4 gap-1.5 bg-slate-800/80 p-1 rounded-xl border border-slate-700/80">
+            ${tabs.map(t => `
+              <button type="button" onclick="setHistoryFilter('${t.id}')"
+                class="py-1.5 px-2 rounded-lg text-xs font-bold transition ${activeHistoryFilter === t.id ? 'bg-sky-500 text-slate-950' : 'text-slate-300 hover:text-white'}">
+                ${t.label}
+              </button>`).join('')}
+          </div>
+
+          ${!filtered.length
+            ? `<div class="py-10 text-center text-sm text-slate-400">No ${activeHistoryFilter === 'all' ? '' : activeHistoryFilter + ' '}transactions yet.</div>`
+            : `<div class="space-y-2.5">
+                ${filtered.map(tx => {
+                  const isDeposit = tx.type === 'deposit';
+                  const localTime = new Date(tx.createdAt).toLocaleString();
+                  return `
+                    <div class="p-3.5 rounded-2xl bg-slate-800/70 border border-slate-700/80 space-y-2">
+                      <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 min-w-0">
+                          <span class="w-7 h-7 rounded-lg flex items-center justify-center text-xs ${isDeposit ? 'bg-sky-500/20 text-sky-300' : 'bg-orange-500/20 text-orange-400'}">
+                            <i class="fa-solid ${isDeposit ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
+                          </span>
+                          <div class="min-w-0">
+                            <span class="block text-sm font-bold text-white truncate">${isDeposit ? 'Deposit' : 'Withdrawal'} • ${escapeHtml(tx.method)}</span>
+                            <span class="block text-[11px] text-slate-400">${escapeHtml(tx.id)} • ${escapeHtml(tx.country)}</span>
+                          </div>
+                        </div>
+                        ${getStatusBadgeHtml(tx.status)}
+                      </div>
+
+                      <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-700/60">
+                        <span class="text-slate-300 font-semibold">${isDeposit ? '+' : '-'}${Number(tx.coins).toLocaleString()} Coins (${formatUsd(tx.netUsd)} USD)</span>
+                        <span class="text-slate-400">${escapeHtml(tx.destination)}</span>
+                      </div>
+
+                      ${tx.feeUsd > 0 ? `<div class="text-[11px] text-orange-300">Fee charged: ${formatUsd(tx.feeUsd)} USD</div>` : ''}
+
+                      <div class="flex items-center justify-between text-[11px] text-slate-400">
+                        <span>${escapeHtml(tx.note || '')}</span>
+                        <span>${escapeHtml(localTime)}</span>
+                      </div>
+
+                      ${tx.status === 'pending' ? `
+                        <div class="flex gap-2 pt-1.5 border-t border-slate-700/60">
+                          <button type="button" onclick="updateTransactionStatus('${tx.id}', 'confirmed')"
+                            class="flex-1 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition">
+                            Mark Confirmed
+                          </button>
+                          <button type="button" onclick="updateTransactionStatus('${tx.id}', 'failed')"
+                            class="flex-1 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 font-bold text-xs transition">
+                            Mark Failed
+                          </button>
+                        </div>` : ''}
+                    </div>`;
+                }).join('')}
+              </div>`}
+        </div>`;
+    }
+
     function openProfileSubModal(mode) {
       const subpanel = document.getElementById('profile-subpanel');
       const title = document.getElementById('subpanel-title');
@@ -1496,6 +1664,9 @@
             </form>
             <button type="button" onclick="logoutUser()" class="w-full py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 font-bold text-sm">Log Out</button>
           </div>`;
+      } else if (mode === 'history') {
+        title.textContent = 'Deposit & Withdraw History';
+        renderTransactionHistoryPanel();
       } else if (mode === 'buy-coins') {
         const methods = getCountryMethods(selectedCountryCode);
         if (!methods.some(m => m.value === selectedDepositProvider)) {
@@ -1702,17 +1873,35 @@
       if (!accountVal) {
         return alert('Enter your payment details to continue.');
       }
-      const nextCoins = Number(currentProfile.coins || 0) + Number(amount);
-      const built = buildAccountPatch('deposit', selectedDepositProvider, accountVal, { coins: nextCoins });
+      const built = buildAccountPatch('deposit', selectedDepositProvider, accountVal);
       if (!built) return;
 
       const country = getCountryByCode(selectedCountryCode);
-      const totalUsd = formatUsd(Number(amount) * COIN_DEPOSIT_USD);
+      const spec = getMethodSpec(selectedDepositProvider);
+      const totalUsdNum = Number(amount) * COIN_DEPOSIT_USD;
+      const txId = createTxRef('DEP');
+
+      walletTransactions.unshift({
+        id: txId,
+        type: 'deposit',
+        status: 'pending',
+        country: country.name,
+        method: selectedDepositProvider,
+        destination: maskDestination(spec.kind, built.destination),
+        coins: Number(amount),
+        grossUsd: totalUsdNum,
+        feeUsd: 0,
+        netUsd: totalUsdNum,
+        note: 'Awaiting payment confirmation',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+
       currentProfile = { ...currentProfile, ...built.patch };
       viewingProfileData = currentProfile;
-      alert(`${selectedDepositProvider} (${country.name}) deposit of ${Number(amount).toLocaleString()} Coins (${totalUsd} USD) completed.`);
-      closeProfileSubModal();
       await renderProfileView(currentProfile);
+      activeHistoryFilter = 'pending';
+      openProfileSubModal('history');
     }
 
     async function handleWithdrawCoins(e) {
@@ -1732,7 +1921,7 @@
         return alert('Enter a valid coin amount within your balance.');
       }
 
-      const { grossUsd, feePercent, feeUsd, netUsd } = calculateWithdrawalSummary(amount);
+      const { grossUsd, feeUsd, netUsd } = calculateWithdrawalSummary(amount);
       if (grossUsd < MIN_WITHDRAWAL_USD) {
         return alert(`Minimum withdrawal is ${formatUsd(MIN_WITHDRAWAL_USD)} USD.`);
       }
@@ -1741,12 +1930,31 @@
       if (!built) return;
 
       const country = getCountryByCode(selectedCountryCode);
+      const spec = getMethodSpec(selectedWithdrawProvider);
+      const txId = createTxRef('WDR');
+
       withdrawalHistory.push(Date.now());
+      walletTransactions.unshift({
+        id: txId,
+        type: 'withdraw',
+        status: 'pending',
+        country: country.name,
+        method: selectedWithdrawProvider,
+        destination: maskDestination(spec.kind, built.destination),
+        coins: amount,
+        grossUsd,
+        feeUsd,
+        netUsd,
+        note: 'Coins held — payout processing',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+
       currentProfile = { ...currentProfile, ...built.patch };
       viewingProfileData = currentProfile;
-      alert(`${selectedWithdrawProvider} (${country.name}) withdrawal of ${amount} Coins submitted to ${built.destination}.\nWithdrawal Charge (${feePercent}%): ${formatUsd(feeUsd)}\nNet Payout: ${formatUsd(netUsd)} USD`);
-      closeProfileSubModal();
       await renderProfileView(currentProfile);
+      activeHistoryFilter = 'pending';
+      openProfileSubModal('history');
     }
 
     function openSearchModal() {
